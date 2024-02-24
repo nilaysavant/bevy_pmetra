@@ -1,0 +1,55 @@
+[package]
+name = "parametric_cad_modelling"
+version = "0.1.0"
+edition = "2021"
+authors = ["Nilay Savant"]
+description = "Crate for Parametric/CAD Modelling in Bevy."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { version = "0.12", default-features = false, features = [
+    "animation",
+    "bevy_asset",
+    "bevy_gilrs",
+    "bevy_scene",
+    "bevy_winit",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_gltf",
+    "bevy_render",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "multi-threaded",
+    "png",
+    "hdr",
+    "x11",
+    "bevy_gizmos",
+    "tonemapping_luts",
+    "default_font",
+    "webgl2",
+] }
+anyhow = "1.0"
+strum = { version = "0.25", features = ["derive"] }
+lazy_static = "1.4"
+# picking
+bevy_mod_picking = "0.17"
+# 2D stuff like uv processing etc.
+tiny-skia = "0.11"
+# image processing
+image = "0.24"
+# truck stuff
+truck-modeling = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+truck-topology = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+truck-base = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+# truck deps for custom adaptation...
+rustc-hash = "1.1.0"
+
+
+[dev-dependencies]
+smooth-bevy-cameras = "0.10"
+bevy_egui = "0.23"
+bevy-inspector-egui = "0.21"

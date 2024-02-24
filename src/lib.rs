@@ -1,14 +1,8 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+//! # This Crate
+//!
+//! The `bevy_pmetra` crate is just a container crate that makes it easier to consume the sub-crates:
+//!
+//! - `parametric_cad_modelling`
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// Just re-export the main plugin for now...
+pub use parametric_cad_modelling::*;
