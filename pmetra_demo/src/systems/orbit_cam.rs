@@ -97,6 +97,7 @@ pub fn fire_balls_at_look_point(
         },
         RigidBody::Dynamic,
         Collider::ball(BULLET_SPHERE_RADIUS),
+        Ccd::enabled(),
         ext_impulse,
     ));
 }
