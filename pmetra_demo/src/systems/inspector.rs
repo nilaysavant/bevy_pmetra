@@ -7,7 +7,7 @@ use bevy::prelude::*;
 /// - Internally checks if Debug is enabled on the app. Useful for disabling in prod release.
 ///
 /// ### Usage:
-/// ```rust
+/// ```ignore
 /// app // App
 ///     .init_resource::<Configuration>()
 ///     .register_type::<Configuration>()

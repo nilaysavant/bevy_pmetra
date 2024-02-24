@@ -1,35 +1,12 @@
-[package]
-name = "bevy_pmetra"
-description = "Parametric/CAD modelling in Bevy Engine using Truck CAD kernel."
-version = "0.1.0"
-edition = "2021"
-authors = ["Nilay Savant"]
-categories = [
-    "bevy",
-    "parametric",
-    "CAD",
-    "procedural",
-    "mesh",
-    "3D",
-    "graphics",
-]
-exclude = ["assets/", ".github/", "crates/"]
-keywords = [
-    "bevy",
-    "parametric",
-    "CAD",
-    "procedural",
-    "mesh",
-    "3D",
-    "gamedev",
-    "graphics",
-]
-license = "MIT OR Apache-2.0"
-readme = "README.md"
-
-
-[dependencies]
-parametric_cad_modelling = { path = "crates/parametric_cad_modelling" }
-
 [workspace]
+resolver = "2"
+
 members = ["crates/*", "pmetra_demo"]
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1

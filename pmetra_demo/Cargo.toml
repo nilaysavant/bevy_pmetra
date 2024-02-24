@@ -5,6 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+dev = ["bevy/dynamic_linking", "bevy/trace", "bevy/file_watcher"]
+
 [dependencies]
 bevy = { version = "0.12", default-features = false, features = [
     "animation",
@@ -62,5 +66,4 @@ gltf = { version = "1.3", features = [
 image = "0.24"
 base64 = "0.21"
 # workspace crates...
-bevy_pmetra = { path = "../" }
-
+bevy_pmetra = { path = "../crates/bevy_pmetra" }
