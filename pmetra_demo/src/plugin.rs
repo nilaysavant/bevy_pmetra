@@ -33,7 +33,7 @@ impl Plugin for PmetraDemoPlugin {
         // Init my bevy defaults...
         app.add_plugins(
             MyBevyDefaultPluginsConfig {
-                game_title: "Truck Int Test".to_string(),
+                game_title: "Pmetra Demo".to_string(),
                 #[cfg(not(target_arch = "wasm32"))]
                 enable_polygon_line_mode: true,
                 ..default()
