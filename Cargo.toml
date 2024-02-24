@@ -32,4 +32,4 @@ readme = "README.md"
 parametric_cad_modelling = { path = "crates/parametric_cad_modelling" }
 
 [workspace]
-members = ["crates/*"]
+members = ["crates/*", "pmetra_demo"]
