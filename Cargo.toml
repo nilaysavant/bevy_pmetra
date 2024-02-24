@@ -1,6 +1,5 @@
 [workspace]
 resolver = "2"
-
 members = ["crates/*", "pmetra_demo"]
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
