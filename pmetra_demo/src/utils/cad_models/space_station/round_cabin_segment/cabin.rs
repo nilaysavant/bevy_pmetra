@@ -291,106 +291,14 @@ pub fn build_cabin_mesh(
 ) -> Result<CadMesh> {
     let RoundCabinSegment { profile_width, .. } = builder.params;
 
-    let Some(CadElement::Face(extruded_profile_face)) =
-        cad_shell.get_element_by_tag(CadElementTag::new("ExtrudedProfileFace"))
-    else {
-        return Err(anyhow!("Could not find extruded_profile_face!"));
-    };
-    let Some(CadElement::Face(top_face)) =
-        cad_shell.get_element_by_tag(CadElementTag::new("TopFace"))
-    else {
-        return Err(anyhow!("Could not find top_face!"));
-    };
-
-    // Get faces for material application...
-    let base_faces = cad_shell
-        .shell
-        .face_iter()
-        .map(|f| f.id())
-        .collect::<HashSet<_>>();
-    let roof_faces = cad_shell
-        .shell
-        .face_iter()
-        .filter_map(|f| {
-            let normal = f.oriented_surface().normal(0.5, 0.5);
-            if normal.abs_diff_eq(&Vector3::unit_y(), Point3::default_epsilon())
-                || normal.abs_diff_eq(&-Vector3::unit_y(), Point3::default_epsilon())
-            {
-                return Some(f.id());
-            }
-            None
-        })
-        .collect::<HashSet<_>>();
-    let faces_excluding_top_face = cad_shell
-        .shell
-        .face_iter()
-        .flat_map(|f| {
-            if f.id() != top_face.id() {
-                Some(f.id())
-            } else {
-                None
-            }
-        })
-        .collect::<HashSet<_>>();
-
-    let mut face_uv_confs = FaceUvConfs(
-        cad_shell
-            .shell
-            .face_iter()
-            .map(|f| {
-                if f.id() == top_face.id() {
-                    let mut transform = Transform::default();
-                    transform.scale.x =
-                        (profile_width / RoundCabinSegment::default().profile_width) as f32;
-                    return (f.id(), FaceUvConf { transform });
-                }
-                (f.id(), FaceUvConf::default())
-            })
-            .collect(),
-    );
-    let extruded_profile_face_conf = face_uv_confs.get_mut(&extruded_profile_face.id()).unwrap();
-    extruded_profile_face_conf.transform = Transform::uv_face_transform(
-        Vec3::splat(0.),
-        Quat::from_rotation_z(std::f32::consts::FRAC_PI_4),
-        Vec3::splat(0.6),
-    );
-
-    let (material_texture_set, main_polygon) =
-        CadMaterialWithPolygonBuilder::<RoundCabinSegment>::new(
-            builder.params.clone(),
-            cad_shell.clone(),
-            textures.clone(),
-        )?
-        .set_atlas_image_config(CadTextureAtlasImageConfig {
-            tile_margins: UVec2::ZERO,
-            ..Default::default()
-        })?
-        .build_material_textures()?
-        // .apply_material_to_faces(
-        //     CadMaterialIds::Base.to_string().into(),
-        //     &base_faces,
-        //     &face_uv_confs,
-        // )?
-        .apply_material_to_faces(
-            CadMaterialIds::Roof.to_string().into(),
-            &roof_faces,
-            &face_uv_confs,
-        )?
-        // .debug_save_uv_image(
-        //     "exports/temp/cad_uv_debug.png".into(),
-        //     &faces_excluding_top_face,
-        // )?
-        // .build_debug_texture_base_color()?
-        .build()?;
-
-    let main_mesh = main_polygon.build_mesh();
+    let main_mesh = cad_shell.build_polygon()?.build_mesh();
     // spawn entity with generated mesh...
-    let main_mesh_transform = Transform::from_translation(Vec3::ZERO);
+    let main_mesh_transform: Transform = Transform::from_translation(Vec3::ZERO);
     // Init cad mesh from mesh stuff...
     let cad_mesh = CadMeshBuilder::new(builder.params.clone(), cad_shell.clone())? // builder
         .set_bevy_mesh(main_mesh)?
-        // .set_base_material(Color::RED.into())?
-        .set_material_texture_set(material_texture_set)?
+        .set_base_material(Color::RED.into())?
+        // .set_material_texture_set(material_texture_set)?
         .set_outlines(cad_shell.shell.build_outlines())?
         .set_transform(main_mesh_transform)?
         .add_cursor(
