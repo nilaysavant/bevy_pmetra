@@ -33,15 +33,3 @@ parametric_cad_modelling = { path = "crates/parametric_cad_modelling" }
 
 [workspace]
 members = ["crates/*"]
-
-# Enable a small amount of optimization in debug mode
-[profile.dev]
-opt-level = 1
-
-# Enable a small amount of optimization in debug mode for our code:
-[profile.dev.package."parametric_cad_modelling"]
-opt-level = 1
-
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
-[profile.dev.package."*"]
-opt-level = 3
