@@ -14,10 +14,6 @@ pub struct BelongsToCadGeneratedRoot(pub Entity);
 #[derive(Debug, Component, Reflect)]
 pub struct CadGeneratedMesh;
 
-/// Initially set material on this entity.
-#[derive(Debug, Component, Reflect)]
-pub struct InitialMaterial(pub StandardMaterial);
-
 /// Marker indicating which [`CadGeneratedMesh`] [`Entity`] it belongs to.
 #[derive(Debug, Component, Reflect)]
 pub struct BelongsToCadGeneratedMesh(pub Entity);

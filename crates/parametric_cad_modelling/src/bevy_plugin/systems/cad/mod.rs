@@ -10,7 +10,7 @@ use crate::{
                 BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot, CadGeneratedCursor,
                 CadGeneratedCursorConfig, CadGeneratedCursorPreviousTransform,
                 CadGeneratedCursorState, CadGeneratedMesh, CadGeneratedMeshOutlines,
-                CadGeneratedMeshOutlinesState, CadGeneratedRoot, InitialMaterial,
+                CadGeneratedMeshOutlinesState, CadGeneratedRoot,
             },
             wire_frame::WireFrameDisplaySettings,
         },
@@ -103,7 +103,6 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
                     mesh_name.clone(),
                     Name::new(mesh_name.0.clone()),
                     CadGeneratedMesh,
-                    InitialMaterial(material.clone()),
                     BelongsToCadGeneratedRoot(cad_generated_root),
                     CadGeneratedMeshOutlines(outlines.clone()),
                     CadGeneratedMeshOutlinesState::default(),
@@ -213,7 +212,6 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
             &BelongsToCadGeneratedRoot,
             &Handle<Mesh>,
             &Handle<StandardMaterial>,
-            &mut InitialMaterial,
             &mut Transform,
             &mut CadGeneratedMeshOutlines,
         ),
@@ -254,7 +252,6 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
             BelongsToCadGeneratedRoot(cad_root_cur),
             mesh_hdl,
             material_hdl,
-            mut initial_material,
             mut mesh_transform,
             mut mesh_outlines,
         ) in cad_generated_mesh.iter_mut()
@@ -289,7 +286,6 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
                 continue;
             };
             *current_material = material.clone();
-            initial_material.0 = material; // Also update the initial material
 
             // Update transform & outlines...
             *mesh_transform = *transform;

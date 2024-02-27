@@ -10,7 +10,7 @@ use crate::{
                 BelongsToCadGeneratedCursor, BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot,
                 CadGeneratedCursor, CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
                 CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
-                CadGeneratedRoot, InitialMaterial,
+                CadGeneratedRoot,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
