@@ -5,6 +5,10 @@ default: dev-demo
 dev-demo:
   cargo run --package=pmetra_demo --features=dev
 
+# Run dev with tracy (`bevy/trace_tracy`). This is useful for profiling.
+dev-demo-tracy:
+  cargo run --package=pmetra_demo --features=dev,bevy/trace_tracy
+
 # Build all.
 build:
   cargo build
