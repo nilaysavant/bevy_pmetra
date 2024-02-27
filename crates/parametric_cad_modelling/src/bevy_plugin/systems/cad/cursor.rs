@@ -26,14 +26,7 @@ pub fn cursor_drag_start(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     drag_event: Listener<Pointer<DragStart>>,
-    cad_meshes: Query<
-        (
-            Entity,
-            &BelongsToCadGeneratedRoot,
-            &Handle<StandardMaterial>,
-        ),
-        With<CadGeneratedMesh>,
-    >,
+    cad_meshes: Query<(Entity, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
     mut cad_cursors: Query<
         (
             &CadGeneratedCursorConfig,
@@ -105,38 +98,23 @@ pub fn cursor_drag_start(
     // Disable picking on cursor, etc...
     commands.entity(cursor).insert(Pickable::IGNORE);
     // Disable picking on all meshes belonging to current root...
-    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur), material_hdl) in cad_meshes.iter() {
+    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
             continue;
         }
         commands.entity(entity).insert(Pickable::IGNORE);
-        // Make meshes transparent when dragging....
-        let Some(material) = materials.get_mut(material_hdl) else {
-            continue;
-        };
-        material.alpha_mode = AlphaMode::Blend;
-        material.base_color.set_a(0.5);
     }
     commands.entity(*cad_root).insert(Pickable::IGNORE);
 }
 
 pub fn cursor_drag_end(
     mut commands: Commands,
-    mut materials: ResMut<Assets<StandardMaterial>>,
     drag_event: Listener<Pointer<DragEnd>>,
     cad_cursor_drag_planes: Query<
         (Entity, &BelongsToCadGeneratedCursor),
         With<CadGeneratedCursorDragPlane>,
     >,
-    cad_meshes: Query<
-        (
-            Entity,
-            &BelongsToCadGeneratedRoot,
-            &Handle<StandardMaterial>,
-            &InitialMaterial,
-        ),
-        With<CadGeneratedMesh>,
-    >,
+    cad_meshes: Query<(Entity, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
     mut cursors: Query<
         (
             &mut Transform,
@@ -181,18 +159,11 @@ pub fn cursor_drag_end(
     // Make cursor, etc pick-able again...
     commands.entity(cursor).insert(Pickable::default());
     // Enable picking on all meshes belonging to current root...
-    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur), material_hdl, initial_material) in
-        cad_meshes.iter()
-    {
+    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
             continue;
         }
         commands.entity(entity).insert(Pickable::default());
-        // Reset the transparency on meshes when dragging...
-        let Some(material) = materials.get_mut(material_hdl) else {
-            continue;
-        };
-        *material = initial_material.0.clone();
     }
     commands.entity(*cad_root).insert(Pickable::default());
     // Make params ui visible...
