@@ -22,11 +22,12 @@ use super::{
             },
             generate_cad_model_on_event,
             mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
+            outlines::generated_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
                 setup_param_display_ui, show_params_display_ui_on_hover_cursor,
             },
-            truck_show_mesh_outlines, update_cad_model_on_params_change,
+            update_cad_model_on_params_change,
         },
         wire_frame::control_wire_frame_display,
     },
@@ -83,7 +84,7 @@ impl Plugin for ParametricCadModellingBasePlugin {
             .add_systems(
                 Update,
                 (
-                    truck_show_mesh_outlines,
+                    generated_mesh_outlines,
                     handle_mesh_selection,
                     show_mesh_local_debug_axis,
                 ),
