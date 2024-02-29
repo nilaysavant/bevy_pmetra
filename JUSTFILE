@@ -9,6 +9,10 @@ dev-demo:
 dev-demo-tracy:
   cargo run --package=pmetra_demo --features=dev,bevy/trace_tracy
 
+# Build the release version of the pmetra demo.
+build-release-demo:
+  cargo build --package=pmetra_demo --release
+
 # Build all.
 build:
   cargo build
