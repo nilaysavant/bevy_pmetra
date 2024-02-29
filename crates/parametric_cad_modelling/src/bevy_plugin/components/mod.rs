@@ -1,3 +1,5 @@
+/// Components used for async tasks.
+pub mod async_tasks;
 /// Components used in CAD generation.
 pub mod cad;
 /// Components used to mark and config camera used for CAD generation.

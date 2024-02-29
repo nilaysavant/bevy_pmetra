@@ -1,11 +1,21 @@
-use bevy::{pbr::NotShadowCaster, prelude::*};
+use std::time::{Duration, Instant};
+
+use anyhow::Result;
+use bevy::{
+    pbr::NotShadowCaster,
+    prelude::*,
+    tasks::{AsyncComputeTaskPool, ComputeTaskPool, Task},
+    utils::HashMap,
+};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
 };
+use futures_lite::future;
 
 use crate::{
     bevy_plugin::{
         components::{
+            async_tasks::{ComputeCadMeshesResult, ComputeCadMeshesTask},
             cad::{
                 BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot, CadGeneratedCursor,
                 CadGeneratedCursorConfig, CadGeneratedCursorPreviousTransform,
@@ -25,7 +35,8 @@ use crate::{
     },
     cad_core::{
         builders::{
-            CadCursor, CadCursorName, CadMaterialTextures, CadMesh, CadMeshName, ParametricCad,
+            CadCursor, CadCursorName, CadMaterialTextures, CadMesh, CadMeshName, CadMeshes,
+            ParametricCad,
         },
         extensions::standard_material::StandardMaterialExtensions,
     },
@@ -196,11 +207,38 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
     }
 }
 
-pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
+pub fn update_cad_model_on_params_change_spawn_task<Params: ParametricCad + Component + Clone>(
+    mut commands: Commands,
     cad_generated: Query<
         (Entity, &Params, &CadMaterialTextures<Option<Handle<Image>>>),
         (With<CadGeneratedRoot>, Changed<Params>),
     >,
+    images: ResMut<Assets<Image>>,
+) {
+    let thread_pool = AsyncComputeTaskPool::get();
+    for (cad_generated_root, params, textures) in cad_generated.iter() {
+        let params = params.clone();
+        let cad_material_textures = textures.resolve_image_handles(&images);
+        let future = async move {
+            let cad_gen_meshes_result = params.build_cad_meshes(cad_material_textures);
+            ComputeCadMeshesResult::<Params> {
+                cad_generated_root,
+                cad_gen_meshes_result,
+                _phantom_data: std::marker::PhantomData,
+            }
+        };
+        let task = thread_pool.spawn_local(future);
+        commands.spawn(ComputeCadMeshesTask(task));
+    }
+}
+
+pub fn update_cad_model_on_params_change_handle_task<Params: ParametricCad + Component + Clone>(
+    mut commands: Commands,
+    mut compute_cad_meshes_tasks: Query<(Entity, &mut ComputeCadMeshesTask<Params>)>,
+    // cad_generated: Query<
+    //     (Entity, &Params, &CadMaterialTextures<Option<Handle<Image>>>),
+    //     (With<CadGeneratedRoot>, Changed<Params>),
+    // >,
     mut cad_generated_mesh: Query<
         (
             Entity,
@@ -233,9 +271,37 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
 ) {
-    for (cad_generated_root, params, textures) in cad_generated.iter() {
-        let cad_generations = match params.build_cad_meshes(textures.resolve_image_handles(&images))
+    let mut cad_gen_meshes_result_by_root: HashMap<Entity, Vec<Result<CadMeshes>>> =
+        HashMap::default();
+
+    for (task_entity, mut task) in compute_cad_meshes_tasks.iter_mut() {
+        let future = future::poll_once(&mut task.0);
+        if let Some(ComputeCadMeshesResult {
+            cad_generated_root,
+            cad_gen_meshes_result,
+            ..
+        }) = future::block_on(future)
         {
+            if let Some(cad_meshes_result) =
+                cad_gen_meshes_result_by_root.get_mut(&cad_generated_root)
+            {
+                cad_meshes_result.push(cad_gen_meshes_result)
+            } else {
+                cad_gen_meshes_result_by_root
+                    .insert(cad_generated_root, vec![cad_gen_meshes_result]);
+            }
+            // Important! Don't forget to remove task component else it will panic!...
+            commands
+                .entity(task_entity)
+                .remove::<ComputeCadMeshesTask<Params>>();
+        }
+    }
+
+    for (cad_generated_root, cad_gen_meshes_results) in cad_gen_meshes_result_by_root.iter() {
+        let Some(cad_gen_meshes) = cad_gen_meshes_results.iter().last() else {
+            continue;
+        };
+        let cad_generations = match cad_gen_meshes {
             Ok(result) => result,
             Err(e) => {
                 error!("build_cad_meshes failed with error: {:?}", e);
@@ -252,7 +318,7 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
             mut mesh_outlines,
         ) in cad_generated_mesh.iter_mut()
         {
-            if *cad_root_cur != cad_generated_root {
+            if *cad_root_cur != *cad_generated_root {
                 continue;
             }
 
@@ -301,7 +367,7 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
                 if *cgm_entity != cad_generated_mesh_entity {
                     continue;
                 }
-                if *cad_root_cur != cad_generated_root {
+                if *cad_root_cur != *cad_generated_root {
                     continue;
                 }
 
@@ -336,6 +402,52 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
                     }
                 }
             }
+        }
+    }
+}
+
+#[derive(Component)]
+pub struct ComputeTransform(pub Task<Transform>);
+
+/// This system generates tasks simulating computationally intensive
+/// work that potentially spans multiple frames/ticks. A separate
+/// system, [`handle_tasks`], will poll the spawned tasks on subsequent
+/// frames/ticks, and use the results to spawn cubes
+pub fn spawn_tasks(mut commands: Commands) {
+    let thread_pool = AsyncComputeTaskPool::get();
+    for x in 0..10 {
+        // Spawn new task on the AsyncComputeTaskPool; the task will be
+        // executed in the background, and the Task future returned by
+        // spawn() can be used to poll for the result
+        let task = thread_pool.spawn(async move {
+            let start_time = Instant::now();
+            let duration = Duration::from_secs_f32(1.);
+            while start_time.elapsed() < duration {
+                // Spinning for 'duration', simulating doing hard
+                // compute work generating translation coords!
+            }
+
+            // Such hard work, all done!
+            Transform::default()
+        });
+
+        // Spawn new entity and add our new task as a component
+        commands.spawn(ComputeTransform(task));
+    }
+}
+
+/// This system queries for entities that have our Task<Transform> component. It polls the
+/// tasks to see if they're complete. If the task is complete it takes the result, adds a
+/// new [`PbrBundle`] of components to the entity using the result from the task's work, and
+/// removes the task component from the entity.
+pub fn handle_tasks(
+    mut commands: Commands,
+    mut transform_tasks: Query<(Entity, &mut ComputeTransform)>,
+) {
+    for (entity, mut task) in &mut transform_tasks {
+        if let Some(transform) = future::block_on(future::poll_once(&mut task.0)) {
+            // Task is complete, so remove task component from entity
+            commands.entity(entity).remove::<ComputeTransform>();
         }
     }
 }

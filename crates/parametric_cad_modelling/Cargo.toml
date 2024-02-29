@@ -47,6 +47,8 @@ truck-topology = { git = "https://github.com/nilaysavant/truck.git", rev = "fce1
 truck-base = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
+# for async tasks
+futures-lite = "2.2.0"
 
 
 [dev-dependencies]

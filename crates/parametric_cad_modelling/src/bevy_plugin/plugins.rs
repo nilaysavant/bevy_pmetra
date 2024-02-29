@@ -21,7 +21,10 @@ use super::{
                 update_params_from_cursors,
             },
             mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
-            model::{generate_cad_model_on_event, update_cad_model_on_params_change},
+            model::{
+                generate_cad_model_on_event, update_cad_model_on_params_change_handle_task,
+                update_cad_model_on_params_change_spawn_task,
+            },
             outlines::generated_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
@@ -134,7 +137,8 @@ impl<Params: ParametricCad + Component + Clone> Plugin for ParametricCadParamsPl
                 Update,
                 (
                     generate_cad_model_on_event::<Params>,
-                    update_cad_model_on_params_change::<Params>,
+                    update_cad_model_on_params_change_spawn_task::<Params>,
+                    update_cad_model_on_params_change_handle_task::<Params>,
                     update_params_from_cursors::<Params>,
                     show_params_display_ui_on_hover_cursor::<Params>,
                     move_params_display_ui_on_transform_cursor::<Params>,
