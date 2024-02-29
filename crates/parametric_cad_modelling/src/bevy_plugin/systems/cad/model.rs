@@ -272,29 +272,28 @@ pub fn update_cad_model_on_params_change_handle_task<Params: ParametricCad + Com
 
     for (task_entity, mut task) in compute_cad_meshes_tasks.iter_mut() {
         let future = future::poll_once(&mut task.0);
-        if let Some(ComputeCadMeshesResult {
+        let Some(ComputeCadMeshesResult {
             cad_generated_root,
             cad_gen_meshes_result,
             ..
         }) = future::block_on(future)
+        else {
+            continue;
+        };
+        if let Some(cad_meshes_result) = cad_gen_meshes_result_by_root.get_mut(&cad_generated_root)
         {
-            if let Some(cad_meshes_result) =
-                cad_gen_meshes_result_by_root.get_mut(&cad_generated_root)
-            {
-                cad_meshes_result.push(cad_gen_meshes_result)
-            } else {
-                cad_gen_meshes_result_by_root
-                    .insert(cad_generated_root, vec![cad_gen_meshes_result]);
-            }
-            // Important! Don't forget to remove task component else it will panic!...
-            commands
-                .entity(task_entity)
-                .remove::<ComputeCadMeshesTask<Params>>();
+            cad_meshes_result.push(cad_gen_meshes_result)
+        } else {
+            cad_gen_meshes_result_by_root.insert(cad_generated_root, vec![cad_gen_meshes_result]);
         }
+        // Important! Don't forget to remove task component else it will panic!...
+        commands
+            .entity(task_entity)
+            .remove::<ComputeCadMeshesTask<Params>>();
     }
 
     for (cad_generated_root, cad_gen_meshes_results) in cad_gen_meshes_result_by_root.iter() {
-        let Some(cad_gen_meshes) = cad_gen_meshes_results.iter().last() else {
+        let Some(cad_gen_meshes) = cad_gen_meshes_results.last() else {
             continue;
         };
         let cad_generations = match cad_gen_meshes {
