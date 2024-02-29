@@ -45,6 +45,7 @@ impl Plugin for PmetraDemoPlugin {
                 log_filter_debug: vec![
                     (env!("CARGO_PKG_NAME"), "debug"),
                     ("bevy_pmetra", "debug"),
+                    ("parametric_cad_modelling", "debug"),
                 ],
                 log_filter_release: vec![(env!("CARGO_PKG_NAME"), "info")],
             });
