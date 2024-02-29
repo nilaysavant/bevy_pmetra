@@ -324,11 +324,7 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
                             rotation: transform.rotation,
                             scale: cursor_transform.scale,
                         };
-                        *prev_transform = CadGeneratedCursorPreviousTransform(Transform {
-                            translation: transform.translation,
-                            rotation: transform.rotation,
-                            scale: cursor_transform.scale,
-                        });
+                        *prev_transform = CadGeneratedCursorPreviousTransform(*cursor_transform);
                     }
                     CadGeneratedCursorState::Dragging => {
                         // Update prev transform using new translation/rotation but use original scale...
