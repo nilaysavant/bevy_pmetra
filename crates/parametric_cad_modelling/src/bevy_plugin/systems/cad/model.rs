@@ -235,10 +235,6 @@ pub fn update_cad_model_on_params_change_spawn_task<Params: ParametricCad + Comp
 pub fn update_cad_model_on_params_change_handle_task<Params: ParametricCad + Component + Clone>(
     mut commands: Commands,
     mut compute_cad_meshes_tasks: Query<(Entity, &mut ComputeCadMeshesTask<Params>)>,
-    // cad_generated: Query<
-    //     (Entity, &Params, &CadMaterialTextures<Option<Handle<Image>>>),
-    //     (With<CadGeneratedRoot>, Changed<Params>),
-    // >,
     mut cad_generated_mesh: Query<
         (
             Entity,
@@ -305,7 +301,7 @@ pub fn update_cad_model_on_params_change_handle_task<Params: ParametricCad + Com
             Ok(result) => result,
             Err(e) => {
                 error!("build_cad_meshes failed with error: {:?}", e);
-                return;
+                continue;
             }
         };
         for (
