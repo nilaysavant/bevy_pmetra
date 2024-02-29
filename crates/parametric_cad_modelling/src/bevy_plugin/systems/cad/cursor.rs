@@ -236,7 +236,7 @@ pub fn update_params_from_cursors<Params: ParametricCad + Component>(
             &CadGeneratedCursorConfig,
             &CadGeneratedCursorState,
         ),
-        With<CadGeneratedCursor>,
+        (With<CadGeneratedCursor>, Changed<Transform>),
     >,
 ) {
     for (
@@ -249,10 +249,6 @@ pub fn update_params_from_cursors<Params: ParametricCad + Component>(
         state,
     ) in cursors.iter()
     {
-        let Ok((cad_generated_ent, mut params)) = generated_roots.get_mut(*cad_generated_root)
-        else {
-            continue;
-        };
         let Ok(mesh_name) = generated_meshes.get(*cad_mesh) else {
             continue;
         };
@@ -261,6 +257,10 @@ pub fn update_params_from_cursors<Params: ParametricCad + Component>(
             .abs_diff_eq(previous_transform.0.translation, 0.01));
 
         if !is_transforms_equal && matches!(state, CadGeneratedCursorState::Dragging) {
+            let Ok((cad_generated_ent, mut params)) = generated_roots.get_mut(*cad_generated_root)
+            else {
+                continue;
+            };
             // run event handler on params...
             params.on_cursor_transform(
                 mesh_name.clone(),
