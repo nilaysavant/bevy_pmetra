@@ -1,0 +1,110 @@
+# System design for the distributing CAD model generation
+#
+# Optimising for parallism and speed.
+
+# diagram settings...
+direction: right
+
+# heading...
+System Design - Cad Model Generation: {
+  shape: text
+  near: top-center
+  style: {
+    font-size: 55
+  }
+}
+
+# components used in cad generation...
+
+root_components: {
+  Params: {
+    shape: stored_data
+  }
+
+  CadGeneratedRoot: {
+    shape: stored_data
+  }
+
+  BelongsToCadGeneratedRoot: {
+    shape: stored_data
+  }
+}
+
+mesh_components: {
+  CadGeneratedMesh: {
+    shape: stored_data
+  }
+
+  CadGeneratedMeshOutlines: {
+    shape: stored_data
+  }
+
+  CadGeneratedMeshOutlinesState: {
+    shape: stored_data
+  }
+}
+
+cursor_components: {
+  CadGeneratedCursor: {
+    shape: stored_data
+  }
+
+  CadGeneratedCursorConfig: {
+    shape: stored_data
+  }
+
+  CadGeneratedCursorState: {
+    shape: stored_data
+  }
+
+  CadGeneratedCursorPreviousTransform: {
+    shape: stored_data
+  }
+
+  BelongsToCadGeneratedCursor: {
+    shape: stored_data
+  }
+
+  CadGeneratedCursorDragPlane: {
+    shape: stored_data
+  }
+}
+
+# evenst used in cad generation...
+
+GenerateCadModel: {
+  shape: queue
+}
+
+# native components...
+
+native_components: {
+  'Handle<Mesh>': {
+    shape: stored_data
+  }
+
+  'Handle<StandardMaterial>': {
+    shape: stored_data
+  }
+}
+
+# systems used in cad generation...
+
+generate_cad_model_on_event: {
+  shape: parallelogram
+}
+
+update_cad_model_on_params_change: {
+  shape: parallelogram
+}
+
+# connections...
+
+GenerateCadModel -> generate_cad_model_on_event
+root_components.Params -> generate_cad_model_on_event
+root_components.CadGeneratedRoot -> generate_cad_model_on_event
+
+root_components.CadGeneratedRoot -> update_cad_model_on_params_change
+root_components.BelongsToCadGeneratedRoot -> update_cad_model_on_params_change
+mesh_components.CadGeneratedMesh -> update_cad_model_on_params_change
+CadGeneratedCursor -> update_cad_model_on_params_change
