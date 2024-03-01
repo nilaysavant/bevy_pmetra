@@ -35,6 +35,10 @@ mesh_components: {
     shape: stored_data
   }
 
+  BelongsToCadGeneratedMesh: {
+    shape: stored_data
+  }
+
   CadGeneratedMeshOutlines: {
     shape: stored_data
   }
@@ -68,17 +72,13 @@ cursor_components: {
   CadGeneratedCursorDragPlane: {
     shape: stored_data
   }
-}
 
-# evenst used in cad generation...
+  # native...
 
-GenerateCadModel: {
-  shape: queue
-}
+  Transform: {
+    shape: stored_data
+  }
 
-# native components...
-
-native_components: {
   'Handle<Mesh>': {
     shape: stored_data
   }
@@ -86,6 +86,12 @@ native_components: {
   'Handle<StandardMaterial>': {
     shape: stored_data
   }
+}
+
+# evenst used in cad generation...
+
+GenerateCadModel: {
+  shape: queue
 }
 
 # systems used in cad generation...
@@ -100,11 +106,20 @@ update_cad_model_on_params_change: {
 
 # connections...
 
+# event...
 GenerateCadModel -> generate_cad_model_on_event
+# root...
 root_components.Params -> generate_cad_model_on_event
 root_components.CadGeneratedRoot -> generate_cad_model_on_event
 
+# root..
 root_components.CadGeneratedRoot -> update_cad_model_on_params_change
 root_components.BelongsToCadGeneratedRoot -> update_cad_model_on_params_change
+# mesh...
 mesh_components.CadGeneratedMesh -> update_cad_model_on_params_change
-CadGeneratedCursor -> update_cad_model_on_params_change
+mesh_components.BelongsToCadGeneratedMesh -> update_cad_model_on_params_change
+# cursor
+cursor_components.CadGeneratedCursor -> update_cad_model_on_params_change
+cursor_components.Transform -> update_cad_model_on_params_change
+cursor_components.CadGeneratedCursorPreviousTransform -> update_cad_model_on_params_change
+cursor_components.CadGeneratedCursorState -> update_cad_model_on_params_change
