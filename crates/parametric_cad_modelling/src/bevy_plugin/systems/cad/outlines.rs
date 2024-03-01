@@ -4,7 +4,7 @@ use crate::bevy_plugin::components::cad::{
     CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
 };
 
-pub fn generated_mesh_outlines(
+pub fn generate_mesh_outlines(
     cad_meshes: Query<
         (
             Entity,

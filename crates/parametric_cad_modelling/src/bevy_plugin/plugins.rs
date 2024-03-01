@@ -22,7 +22,7 @@ use super::{
             },
             mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
             model::{generate_cad_model_on_event, update_cad_model_on_params_change},
-            outlines::generated_mesh_outlines,
+            outlines::generate_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
                 setup_param_display_ui, show_params_display_ui_on_hover_cursor,
@@ -83,7 +83,7 @@ impl Plugin for ParametricCadModellingBasePlugin {
             .add_systems(
                 Update,
                 (
-                    generated_mesh_outlines,
+                    generate_mesh_outlines,
                     handle_mesh_selection,
                     show_mesh_local_debug_axis,
                 ),
