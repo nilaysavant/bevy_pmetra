@@ -154,9 +154,18 @@ CadMeshBuilder: {
   # connections...
   new -> set_bevy_mesh -> set_base_material -> set_outlines -> set_transform -> add_cursor -> build
 }
+CadCursor: |rust
+  struct CadCursor {
+    pub normal: Vec3,
+    pub transform: Transform,
+    pub cursor_radius: f32,
+    pub cursor_type: CadCursorType,
+  }
+|
 # connections...
 ParametricCad.build_cad_meshes -> ParametricModelling.build_shells
 ParametricModelling.build_shells -> CadShellsBuilder.new
 CadShellsBuilder.add_shell -> CadTaggedElements
 ParametricCad.build_cad_meshes_from_shells -> CadMeshesBuilder.new
 CadMeshesBuilder.add_mesh -> CadMeshBuilder.new
+CadMeshBuilder.add_cursor -> CadCursor
