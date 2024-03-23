@@ -3,3 +3,4 @@
 pub mod cad;
 /// Events dispatched by a cursor..
 pub mod cursor;
+pub mod lazy_cad;
