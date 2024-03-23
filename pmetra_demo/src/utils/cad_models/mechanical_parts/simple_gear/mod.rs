@@ -58,9 +58,8 @@ impl ParametricCad for SimpleGear {
     fn build_cad_meshes_from_shells(
         &self,
         solids: CadShells,
-        textures: CadMaterialTextures<Option<Image>>,
     ) -> Result<CadMeshes> {
-        CadMeshesBuilder::new(self.clone(), solids, textures)? // builder
+        CadMeshesBuilder::new(self.clone(), solids)? // builder
             .add_mesh(
                 CadSolidIds::MainGear.to_string(),
                 CadMeshIds::MainGear.to_string(),

@@ -12,7 +12,6 @@ use super::{CadCursor, CadMaterialTextureSet, CadMaterialTextures, CadShell, Cad
 pub struct CadMeshesBuilder<P: Default + Clone> {
     pub params: P,
     pub shells: CadShells,
-    pub textures: CadMaterialTextures<Option<Image>>,
     pub meshes: CadMeshes,
 }
 
@@ -20,12 +19,10 @@ impl<P: Default + Clone> CadMeshesBuilder<P> {
     pub fn new(
         params: P,
         shells: CadShells,
-        textures: CadMaterialTextures<Option<Image>>,
     ) -> Result<Self> {
         let builder = Self {
             params,
             shells,
-            textures,
             ..default()
         };
         Ok(builder)
@@ -38,14 +35,14 @@ impl<P: Default + Clone> CadMeshesBuilder<P> {
         &mut self,
         shell_name: String,
         mesh_name: String,
-        build_fn: fn(&Self, &CadShell, &CadMaterialTextures<Option<Image>>) -> Result<CadMesh>,
+        build_fn: fn(&Self, &CadShell) -> Result<CadMesh>,
     ) -> Result<Self> {
         let shell = self
             .shells
             .get(&shell_name)
             .ok_or_else(|| anyhow!("Could not find solid!"))?;
         let mesh =
-            build_fn(self, shell, &self.textures).with_context(|| "Failed to build mesh!")?;
+            build_fn(self, shell).with_context(|| "Failed to build mesh!")?;
         self.meshes.insert(mesh_name.into(), mesh);
         Ok(self.clone())
     }

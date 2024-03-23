@@ -47,7 +47,6 @@ pub fn build_cylinder_shell(builder: &CadShellsBuilder<SimpleCubeAtCylinder>) ->
 pub fn build_cylinder_mesh(
     builder: &CadMeshesBuilder<SimpleCubeAtCylinder>,
     cad_shell: &CadShell,
-    textures: &CadMaterialTextures<Option<Image>>,
 ) -> Result<CadMesh> {
     let SimpleCubeAtCylinder {
         cylinder_radius,

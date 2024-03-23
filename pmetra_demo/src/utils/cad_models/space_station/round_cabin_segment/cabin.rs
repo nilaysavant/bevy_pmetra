@@ -287,7 +287,6 @@ fn get_shell_face_mut_from_normal_dir(
 pub fn build_cabin_mesh(
     builder: &CadMeshesBuilder<RoundCabinSegment>,
     cad_shell: &CadShell,
-    textures: &CadMaterialTextures<Option<Image>>,
 ) -> Result<CadMesh> {
     let RoundCabinSegment { profile_width, .. } = builder.params;
 

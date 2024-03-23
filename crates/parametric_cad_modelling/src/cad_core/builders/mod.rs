@@ -23,17 +23,13 @@ pub trait ParametricModelling {
 
 /// Trait to generate CAD like interface (with [`FaceCursor`]s) for [`ParametricSolid`].
 pub trait ParametricCad: ParametricModelling {
-    fn build_cad_meshes_from_shells(
-        &self,
-        shells: CadShells,
-        textures: CadMaterialTextures<Option<Image>>,
-    ) -> Result<CadMeshes>;
-    fn build_cad_meshes(&self, textures: CadMaterialTextures<Option<Image>>) -> Result<CadMeshes> {
+    fn build_cad_meshes_from_shells(&self, shells: CadShells) -> Result<CadMeshes>;
+    fn build_cad_meshes(&self) -> Result<CadMeshes> {
         let cad_shells = self
             .build_shells()
             .with_context(|| "Could not build CadShells for parametric struct!")?;
 
-        self.build_cad_meshes_from_shells(cad_shells, textures)
+        self.build_cad_meshes_from_shells(cad_shells)
     }
     /// Handler called whenever a cursor is Transformed.
     fn on_cursor_transform(

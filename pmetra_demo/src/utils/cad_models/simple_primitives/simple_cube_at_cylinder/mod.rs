@@ -67,9 +67,8 @@ impl ParametricCad for SimpleCubeAtCylinder {
     fn build_cad_meshes_from_shells(
         &self,
         solids: CadShells,
-        textures: CadMaterialTextures<Option<Image>>,
     ) -> Result<CadMeshes> {
-        CadMeshesBuilder::new(self.clone(), solids, textures)? // builder
+        CadMeshesBuilder::new(self.clone(), solids)? // builder
             .add_mesh(
                 CadSolidIds::Cylinder.to_string(),
                 CadMeshIds::Cylinder.to_string(),

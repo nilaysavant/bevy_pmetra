@@ -70,7 +70,6 @@ pub fn build_end_wall_shell(builder: &CadShellsBuilder<RoundCabinSegment>) -> Re
 pub fn build_end_wall_mesh(
     builder: &CadMeshesBuilder<RoundCabinSegment>,
     cad_shell: &CadShell,
-    textures: &CadMaterialTextures<Option<Image>>,
 ) -> Result<CadMesh> {
     let RoundCabinSegment {
         profile_width,

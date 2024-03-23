@@ -264,7 +264,6 @@ fn get_point_with_max_x_from_2_tuple(points_tuple: (DVec3, DVec3)) -> DVec3 {
 pub fn build_main_gear_mesh(
     builder: &CadMeshesBuilder<SimpleGear>,
     cad_shell: &CadShell,
-    textures: &CadMaterialTextures<Option<Image>>,
 ) -> Result<CadMesh> {
     // convert result into mesh...
     let poly_mesh = cad_shell.build_polygon_with_tol(FAST_TRIANGULATION_TOL_1 * 1.5)?;

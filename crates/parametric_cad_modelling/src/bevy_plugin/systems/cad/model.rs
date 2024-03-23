@@ -54,7 +54,7 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
             }
         }
 
-        let cad_generations = match params.build_cad_meshes(textures.resolve_image_handles(&images))
+        let cad_generations = match params.build_cad_meshes()
         {
             Ok(result) => result,
             Err(e) => {
@@ -234,7 +234,7 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
     mut images: ResMut<Assets<Image>>,
 ) {
     for (cad_generated_root, params, textures) in cad_generated.iter() {
-        let cad_generations = match params.build_cad_meshes(textures.resolve_image_handles(&images))
+        let cad_generations = match params.build_cad_meshes()
         {
             Ok(result) => result,
             Err(e) => {
