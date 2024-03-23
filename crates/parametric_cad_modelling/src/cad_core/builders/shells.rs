@@ -53,7 +53,7 @@ pub struct CadShells(pub HashMap<String, CadShell>);
 /// CAD generated [`Shell`].
 ///
 /// Holds [`Shell`] with [`CadTaggedElements`].
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Component)]
 pub struct CadShell {
     pub shell: Shell,
     pub tagged_elements: CadTaggedElements,

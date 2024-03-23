@@ -5,7 +5,10 @@ use bevy_mod_picking::{
 
 use crate::{
     bevy_plugin::{components::cad::CadGeneratedRoot, events::lazy_cad::GenerateLazyCadModel},
-    cad_core::lazy_builders::ParametricLazyCad,
+    cad_core::{
+        builders::CadShell,
+        lazy_builders::{CadShellLazyBuilder, CadShellName, ParametricLazyCad},
+    },
 };
 
 pub fn spawn_shells_lazy_builders_on_generate<Params: ParametricLazyCad + Component + Clone>(
@@ -44,4 +47,46 @@ pub fn spawn_shells_lazy_builders_on_generate<Params: ParametricLazyCad + Compon
             commands.spawn((shell_name.clone(), shell_builder.clone()));
         }
     }
+}
+
+pub fn build_shells_from_builders<Params: ParametricLazyCad + Component + Clone>(
+    mut commands: Commands,
+    shell_builders: Query<
+        (Entity, &CadShellName, &CadShellLazyBuilder<Params>),
+        (Without<CadShell>, Changed<CadShellLazyBuilder<Params>>),
+    >,
+) {
+    for (entity, name, builder) in shell_builders.iter() {
+        let CadShellLazyBuilder {
+            params,
+            build_cad_shell,
+        } = builder;
+        let shell = match build_cad_shell(params) {
+            Ok(shell) => shell,
+            Err(e) => {
+                error!(
+                    "build_cad_shell for shell_name: {:?} failed, error: {:?}",
+                    name, e
+                );
+                continue;
+            }
+        };
+
+        commands.entity(entity).insert(shell);
+    }
+}
+
+pub fn shells_to_mesh_builder<Params: ParametricLazyCad + Component + Clone>(
+    mut commands: Commands,
+    shell_builders: Query<
+        (
+            Entity,
+            &CadShellName,
+            &CadShellLazyBuilder<Params>,
+            &CadShell,
+        ),
+        Changed<CadShellLazyBuilder<Params>>,
+    >,
+) {
+    // TODO
 }
