@@ -23,12 +23,7 @@ use crate::{
             mesh::{mesh_pointer_move, mesh_pointer_out},
         },
     },
-    cad_core::{
-        builders::{
-            CadCursor, CadCursorName, CadMaterialTextures, CadMesh, CadMeshName, ParametricCad,
-        },
-        extensions::standard_material::StandardMaterialExtensions,
-    },
+    cad_core::builders::{CadCursor, CadCursorName, CadMesh, CadMeshName, ParametricCad},
 };
 
 pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
@@ -41,7 +36,6 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
 ) {
     for GenerateCadModel {
         params,
-        textures,
         remove_existing_models,
     } in events.read()
     {
@@ -54,8 +48,7 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
             }
         }
 
-        let cad_generations = match params.build_cad_meshes()
-        {
+        let cad_generations = match params.build_cad_meshes() {
             Ok(result) => result,
             Err(e) => {
                 error!("build_cad_meshes failed with error: {:?}", e);
@@ -64,27 +57,19 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
         };
         // Spawn root...
         let cad_generated_root = commands
-            .spawn((
-                SpatialBundle::default(),
-                CadGeneratedRoot,
-                params.clone(),
-                textures.clone(),
-            ))
+            .spawn((SpatialBundle::default(), CadGeneratedRoot, params.clone()))
             .id();
 
         for (mesh_name, cad_mesh) in cad_generations.iter() {
             let CadMesh {
                 mesh,
                 base_material,
-                material_texture_set,
                 outlines,
                 transform,
                 cursors,
             } = cad_mesh;
 
             let mut material = base_material.clone();
-            material
-                .update_textures_from_set(&material_texture_set.create_image_handles(&mut images));
             let material_hdl = materials.add(material.clone());
 
             // Spawn generated mesh...
@@ -197,10 +182,7 @@ pub fn generate_cad_model_on_event<Params: ParametricCad + Component + Clone>(
 }
 
 pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
-    cad_generated: Query<
-        (Entity, &Params, &CadMaterialTextures<Option<Handle<Image>>>),
-        (With<CadGeneratedRoot>, Changed<Params>),
-    >,
+    cad_generated: Query<(Entity, &Params), (With<CadGeneratedRoot>, Changed<Params>)>,
     mut cad_generated_mesh: Query<
         (
             Entity,
@@ -233,9 +215,8 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
 ) {
-    for (cad_generated_root, params, textures) in cad_generated.iter() {
-        let cad_generations = match params.build_cad_meshes()
-        {
+    for (cad_generated_root, params) in cad_generated.iter() {
+        let cad_generations = match params.build_cad_meshes() {
             Ok(result) => result,
             Err(e) => {
                 error!("build_cad_meshes failed with error: {:?}", e);
@@ -259,7 +240,6 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
             let Some(CadMesh {
                 mesh,
                 base_material,
-                material_texture_set,
                 outlines,
                 transform,
                 cursors,
@@ -276,8 +256,6 @@ pub fn update_cad_model_on_params_change<Params: ParametricCad + Component>(
 
             // Update material...
             let mut material = base_material.clone();
-            material
-                .update_textures_from_set(&material_texture_set.create_image_handles(&mut images));
             let Some(current_material) = materials.get_mut(material_hdl) else {
                 continue;
             };

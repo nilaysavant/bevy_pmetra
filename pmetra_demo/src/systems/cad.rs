@@ -1,11 +1,12 @@
 use bevy::{prelude::*, utils::hashbrown::HashMap};
-use bevy_rapier3d::prelude::*;
 use bevy_pmetra::prelude::*;
+use bevy_rapier3d::prelude::*;
 
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
-        mechanical_parts::simple_gear::SimpleGear, simple_primitives::SimpleCubeAtCylinder,
+        mechanical_parts::simple_gear::SimpleGear,
+        simple_primitives::SimpleCubeAtCylinder,
         space_station::{round_cabin_segment::CadMaterialIds, RoundCabinSegment},
     },
 };
@@ -35,35 +36,7 @@ pub fn spawn_cad_model(
             spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::RoundCabinSegment => {
-            let mut cad_material_textures = CadMaterialTextures::default();
-            // cad_material_textures.insert(
-            //     CadMaterialIds::Base.to_string().into(),
-            //     CadMaterialTextureSet {
-            //         base_color_texture: Some(
-            //             asset_server.load("textures/Prototype_Grid_Teal_10-512x512.png"),
-            //         ),
-            //         ..Default::default()
-            //     },
-            // );
-            cad_material_textures.insert(
-                CadMaterialIds::Roof.to_string().into(),
-                CadMaterialTextureSet {
-                    base_color_texture: Some(
-                        asset_server.load("textures/terrazzo_11_basecolor-1K.png"),
-                    ),
-                    normal_map_texture: Some(
-                        asset_server.load("textures/terrazzo_11_normal-1K.png"),
-                    ),
-                    metallic_roughness_texture: Some(
-                        asset_server.load("textures/terrazzo_11_roughness-1K.png"),
-                    ),
-                    ..Default::default()
-                },
-            );
-            spawn_round_cabin_segment.send(GenerateCadModel {
-                textures: cad_material_textures,
-                ..Default::default()
-            });
+            spawn_round_cabin_segment.send(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::SimpleGear => {
             spawn_simple_gear.send(GenerateCadModel::default());

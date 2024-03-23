@@ -6,14 +6,15 @@ pub mod cursors;
 #[deprecated]
 mod faces;
 /// Materials Builders.
-pub mod materials;
+#[deprecated]
+mod materials;
 /// Meshes Builders.
 pub mod meshes;
 /// Shells builders.
 pub mod shells;
 pub mod tags;
 
-pub use {cursors::*, materials::*, meshes::*, shells::*, tags::*};
+pub use {cursors::*, meshes::*, shells::*, tags::*};
 
 /// Trait for parametrically generating models from struct.
 pub trait ParametricModelling {

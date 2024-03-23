@@ -5,7 +5,7 @@ use truck_modeling::{builder, Shell, Solid};
 
 use crate::{cad_core::dimensions::AsBevyVec3, constants::CUSTOM_TRUCK_TOLERANCE_1};
 
-use super::{CadCursor, CadMaterialTextureSet, CadMaterialTextures, CadShell, CadShells};
+use super::{CadCursor, CadShell, CadShells};
 
 /// Builder for building [`CadSolid`]s.
 #[derive(Debug, Clone, Default)]
@@ -16,10 +16,7 @@ pub struct CadMeshesBuilder<P: Default + Clone> {
 }
 
 impl<P: Default + Clone> CadMeshesBuilder<P> {
-    pub fn new(
-        params: P,
-        shells: CadShells,
-    ) -> Result<Self> {
+    pub fn new(params: P, shells: CadShells) -> Result<Self> {
         let builder = Self {
             params,
             shells,
@@ -41,8 +38,7 @@ impl<P: Default + Clone> CadMeshesBuilder<P> {
             .shells
             .get(&shell_name)
             .ok_or_else(|| anyhow!("Could not find solid!"))?;
-        let mesh =
-            build_fn(self, shell).with_context(|| "Failed to build mesh!")?;
+        let mesh = build_fn(self, shell).with_context(|| "Failed to build mesh!")?;
         self.meshes.insert(mesh_name.into(), mesh);
         Ok(self.clone())
     }
@@ -86,7 +82,6 @@ impl<P: Default + Clone> CadMeshBuilder<P> {
         self.cad_mesh = Some(CadMesh {
             mesh,
             base_material: Default::default(),
-            material_texture_set: Default::default(),
             outlines: Default::default(),
             transform: Default::default(),
             cursors: Default::default(),
@@ -100,18 +95,6 @@ impl<P: Default + Clone> CadMeshBuilder<P> {
             .as_mut()
             .ok_or_else(|| anyhow!("CadMesh is None!"))?;
         cad_mesh.base_material = material;
-        Ok(self.clone())
-    }
-
-    pub fn set_material_texture_set(
-        &mut self,
-        material_texture_set: CadMaterialTextureSet<Option<Image>>,
-    ) -> Result<Self> {
-        let cad_mesh = self
-            .cad_mesh
-            .as_mut()
-            .ok_or_else(|| anyhow!("CadMesh is None!"))?;
-        cad_mesh.material_texture_set = material_texture_set;
         Ok(self.clone())
     }
 
@@ -159,7 +142,6 @@ impl<P: Default + Clone> CadMeshBuilder<P> {
 pub struct CadMesh {
     pub mesh: Mesh,
     pub base_material: StandardMaterial,
-    pub material_texture_set: CadMaterialTextureSet<Option<Image>>,
     pub transform: Transform,
     pub outlines: CadMeshOutlines,
     pub cursors: HashMap<CadCursorName, CadCursor>,
