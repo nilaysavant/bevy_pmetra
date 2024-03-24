@@ -6,18 +6,26 @@ use bevy_mod_picking::{
 use crate::{
     bevy_plugin::{
         components::cad::CadGeneratedRoot,
-        events::lazy_cad::GenerateLazyCadModel,
-        systems::cad::mesh::{mesh_pointer_move, mesh_pointer_out},
+        events::{
+            cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
+            lazy_cad::GenerateLazyCadModel,
+        },
+        systems::cad::{
+            cursor::{cursor_drag_end, cursor_drag_start},
+            mesh::{mesh_pointer_move, mesh_pointer_out},
+        },
     },
     cad_core::{
-        builders::{CadMeshName, CadShell},
+        builders::{CadCursor, CadMeshName, CadShell},
         lazy_builders::{
             CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, ParametricLazyCad,
         },
     },
     prelude::{
-        BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedMeshOutlines,
-        CadGeneratedMeshOutlinesState, WireFrameDisplaySettings,
+        BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot, CadGeneratedCursor,
+        CadGeneratedCursorConfig, CadGeneratedCursorPreviousTransform, CadGeneratedCursorState,
+        CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
+        WireFrameDisplaySettings,
     },
 };
 
@@ -216,5 +224,95 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
             continue;
         };
         root_ent_commands.push_children(&[mesh_entity]);
+    }
+}
+
+pub fn mesh_builder_to_cursors<Params: ParametricLazyCad + Component + Clone>(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mesh_builders: Query<
+        (
+            Entity,
+            &CadMeshName,
+            &CadMeshLazyBuilder<Params>,
+            &BelongsToCadGeneratedRoot,
+        ),
+        Changed<CadMeshLazyBuilder<Params>>,
+    >,
+) {
+    for (entity, mesh_name, mesh_builder, belongs_to_root) in mesh_builders.iter() {
+        let cursors = &mesh_builder.cursors;
+
+        // Spawn cursors...
+        for (
+            cursor_name,
+            CadCursor {
+                normal,
+                transform,
+                cursor_radius,
+                cursor_type,
+            },
+        ) in cursors.iter()
+        {
+            let cursor = commands
+                .spawn((
+                    PbrBundle {
+                        material: materials.add(StandardMaterial {
+                            base_color: Color::WHITE.with_a(0.4),
+                            alpha_mode: AlphaMode::Blend,
+                            unlit: true,
+                            double_sided: true,
+                            cull_mode: None,
+                            ..default()
+                        }),
+                        mesh: meshes.add(shape::Circle::new(*cursor_radius).into()),
+                        transform: *transform,
+                        // visibility: Visibility::Hidden,
+                        ..default()
+                    },
+                    cursor_name.clone(),
+                    CadGeneratedCursor,
+                    CadGeneratedCursorConfig {
+                        cursor_radius: *cursor_radius,
+                        drag_plane_normal: *normal,
+                        cursor_type: cursor_type.clone(),
+                    },
+                    CadGeneratedCursorState::default(),
+                    CadGeneratedCursorPreviousTransform(*transform),
+                    BelongsToCadGeneratedMesh(entity),
+                    belongs_to_root.clone(),
+                    NotShadowCaster,
+                    // picking...
+                    PickableBundle::default(), // <- Makes the mesh pickable.
+                    NoBackfaceCulling,
+                    // Disable highlight cursor...
+                    Highlight::<StandardMaterial> {
+                        hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                            base_color: mat.base_color.with_a(0.6),
+                            ..mat.to_owned()
+                        })),
+                        pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                            base_color: mat.base_color.with_a(0.8),
+                            ..mat.to_owned()
+                        })),
+                        selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                            ..mat.to_owned()
+                        })),
+                    },
+                ))
+                .insert((
+                    // events...
+                    On::<Pointer<Move>>::send_event::<CursorPointerMoveEvent>(),
+                    On::<Pointer<Out>>::send_event::<CursorPointerOutEvent>(),
+                    // Add drag plane on drag start...
+                    On::<Pointer<DragStart>>::run(cursor_drag_start),
+                    On::<Pointer<DragEnd>>::run(cursor_drag_end),
+                ))
+                .insert(NoDeselect) // Prevent de-select other ent when cursor is interacted with.
+                .id();
+            // Add cursor to root
+            commands.entity(belongs_to_root.0).add_child(cursor);
+        }
     }
 }
