@@ -64,4 +64,8 @@ impl<P: Default + Clone> CadShellLazyBuilder<P> {
             build_cad_shell: build_fn,
         }
     }
+
+    pub fn build_cad_shell(&self) -> Result<CadShell> {
+        (self.build_cad_shell)(&self.params)
+    }
 }

@@ -57,11 +57,7 @@ pub fn build_shells_from_builders<Params: ParametricLazyCad + Component + Clone>
     >,
 ) {
     for (entity, name, builder) in shell_builders.iter() {
-        let CadShellLazyBuilder {
-            params,
-            build_cad_shell,
-        } = builder;
-        let shell = match build_cad_shell(params) {
+        let shell = match builder.build_cad_shell() {
             Ok(shell) => shell,
             Err(e) => {
                 error!(
