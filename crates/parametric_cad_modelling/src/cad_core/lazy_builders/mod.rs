@@ -1,10 +1,12 @@
 use anyhow::Result;
 use bevy::prelude::*;
 
+/// Meshes builders.
+pub mod meshes;
 /// Shells builders.
 pub mod shells;
 
-pub use shells::*;
+pub use {meshes::*, shells::*};
 
 /// Trait for parametrically generating [`CadShell`]s from struct.
 pub trait ParametricLazyModelling: Clone + Default {

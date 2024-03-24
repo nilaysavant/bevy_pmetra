@@ -157,7 +157,7 @@ impl From<String> for CadCursorName {
 }
 
 /// Outlines for [`InteractiveCadMesh`]
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
+#[derive(Debug, Clone, Default, Deref, DerefMut, Reflect)]
 pub struct CadMeshOutlines(pub Vec<Vec<Vec3>>);
 
 /// Trait which allows building [`CadMeshOutlines`] for given truck primitive elem.
