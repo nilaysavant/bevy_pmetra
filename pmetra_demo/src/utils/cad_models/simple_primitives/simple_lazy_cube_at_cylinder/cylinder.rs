@@ -51,30 +51,30 @@ pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShel
     })
 }
 
-pub fn cylinder_mesh_builder(
-    params: &SimpleLazyCubeAtCylinder,
-    cad_shell: &CadShell,
-) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
-    let SimpleLazyCubeAtCylinder {
-        cylinder_radius,
-        cylinder_height,
-        cube_attach_angle,
-        cube_side_length,
-    } = &params;
-    // spawn entity with generated mesh...
-    let transform = Transform::default();
+// pub fn cylinder_mesh_builder(
+//     params: &SimpleLazyCubeAtCylinder,
+//     cad_shell: &CadShell,
+// ) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
+//     let SimpleLazyCubeAtCylinder {
+//         cylinder_radius,
+//         cylinder_height,
+//         cube_attach_angle,
+//         cube_side_length,
+//     } = &params;
+//     // spawn entity with generated mesh...
+//     let transform = Transform::default();
 
-    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), cad_shell.clone())? // builder
-        .set_transform(transform)?
-        .set_base_material(Color::RED.into())?
-        .set_outlines(cad_shell.shell.build_outlines())?
-        .add_cursor(
-            CylinderCursorIds::RadiusCursor.to_string(),
-            build_radius_cursor,
-        )?;
+//     let mesh_builder = CadMeshLazyBuilder::new(params.clone(), cad_shell.clone())? // builder
+//         .set_transform(transform)?
+//         .set_base_material(Color::RED.into())?
+//         .set_outlines(cad_shell.shell.build_outlines())?
+//         .add_cursor(
+//             CylinderCursorIds::RadiusCursor.to_string(),
+//             build_radius_cursor,
+//         )?;
 
-    Ok(mesh_builder)
-}
+//     Ok(mesh_builder)
+// }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CylinderCursorIds {

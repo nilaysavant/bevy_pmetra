@@ -25,8 +25,8 @@ use super::{
             params_ui::{hide_params_display_ui_on_out_cursor, setup_param_display_ui},
         },
         lazy_cad::model::{
-            build_shells_from_builders, mesh_builder_to_bundle, mesh_builder_to_cursors,
-            shells_to_mesh_builder, spawn_shells_lazy_builders_on_generate,
+            mesh_builder_to_bundle, mesh_builder_to_cursors, shells_to_mesh_builder,
+            spawn_shells_lazy_builders_on_generate,
         },
         wire_frame::control_wire_frame_display,
     },
@@ -136,7 +136,6 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
                 Update,
                 (
                     spawn_shells_lazy_builders_on_generate::<Params>,
-                    build_shells_from_builders::<Params>,
                     shells_to_mesh_builder::<Params>,
                     mesh_builder_to_bundle::<Params>,
                     mesh_builder_to_cursors::<Params>,

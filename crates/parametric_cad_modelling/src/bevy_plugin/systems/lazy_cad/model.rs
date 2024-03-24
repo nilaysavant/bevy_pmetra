@@ -18,7 +18,8 @@ use crate::{
     cad_core::{
         builders::{CadCursor, CadMeshName, CadShell},
         lazy_builders::{
-            CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, ParametricLazyCad,
+            CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, CadShellsByName,
+            ParametricLazyCad,
         },
     },
     prelude::{
@@ -62,91 +63,79 @@ pub fn spawn_shells_lazy_builders_on_generate<Params: ParametricLazyCad + Compon
             }
         };
 
-        // Spawn shell builder entities for parallel shell building in later systems...
+        let mut shells_by_name = CadShellsByName::default();
+        // Build Shells from Builders and add to common resource for later use.
         for (shell_name, shell_builder) in shells_lazy_builders.builders.iter() {
-            commands.spawn((
-                shell_name.clone(),
-                shell_builder.clone(),
-                BelongsToCadGeneratedRoot(root),
-            ));
+            let cad_shell = match shell_builder.build_cad_shell() {
+                Ok(shell) => shell,
+                Err(e) => {
+                    error!(
+                        "build_cad_shell for shell_name: {:?} failed, error: {:?}",
+                        shell_name, e
+                    );
+                    continue;
+                }
+            };
+            shells_by_name.insert(shell_name.clone(), cad_shell);
         }
-    }
-}
-
-pub fn build_shells_from_builders<Params: ParametricLazyCad + Component + Clone>(
-    mut commands: Commands,
-    shell_builders: Query<
-        (Entity, &CadShellName, &CadShellLazyBuilder<Params>),
-        (Without<CadShell>, Changed<CadShellLazyBuilder<Params>>),
-    >,
-) {
-    for (entity, name, builder) in shell_builders.iter() {
-        let shell = match builder.build_cad_shell() {
-            Ok(shell) => shell,
-            Err(e) => {
-                error!(
-                    "build_cad_shell for shell_name: {:?} failed, error: {:?}",
-                    name, e
-                );
-                continue;
-            }
-        };
-
-        commands.entity(entity).insert(shell);
+        commands.spawn((
+            params.clone(),
+            shells_by_name,
+            BelongsToCadGeneratedRoot(root),
+        ));
     }
 }
 
 pub fn shells_to_mesh_builder<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    shell_builders: Query<
+    shells: Query<
         (
             Entity,
-            &CadShellName,
-            &CadShellLazyBuilder<Params>,
-            &CadShell,
+            &Params,
+            &CadShellsByName,
             &BelongsToCadGeneratedRoot,
         ),
         Changed<CadShellLazyBuilder<Params>>,
     >,
 ) {
-    for (entity, shell_name, shell_builder, shell, belongs_to_root) in shell_builders.iter() {
-        let meshes_builder = match shell_builder
-            .params
-            .meshes_builders_by_shell(shell_name.clone(), shell.clone())
-        {
-            Ok(meshes_builder) => meshes_builder,
-            Err(e) => {
-                error!(
-                    "meshes_builders_by_shell for shell_name: {:?} failed, error: {:?}",
-                    shell_name, e
-                );
-                continue;
-            }
-        };
-        let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
-            continue;
-        };
-        let mesh_hdl = meshes.add(bevy_mesh);
+    // for (entity, params, shells_by_name, belongs_to_root) in shells.iter() {
+    //     let meshes_builder = match shell_builder
+    //         .params
+    //         .meshes_builders_by_shell(shell_name.clone(), shell.clone())
+    //     {
+    //         Ok(meshes_builder) => meshes_builder,
+    //         Err(e) => {
+    //             error!(
+    //                 "meshes_builders_by_shell for shell_name: {:?} failed, error: {:?}",
+    //                 shell_name, e
+    //             );
+    //             continue;
+    //         }
+    //     };
+    //     let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
+    //         continue;
+    //     };
+    //     let mesh_hdl = meshes.add(bevy_mesh);
 
-        for (mesh_name, mut mesh_builder) in meshes_builder.mesh_builders {
-            let Ok(mesh_builder) = mesh_builder.set_mesh_hdl(mesh_hdl.clone()) else {
-                continue;
-            };
-            commands.spawn((
-                shell.clone(),
-                mesh_name,
-                mesh_builder,
-                belongs_to_root.clone(),
-            ));
-        }
+    //     for (mesh_name, mut mesh_builder) in meshes_builder.mesh_builders {
+    //         let Ok(mesh_builder) = mesh_builder.set_mesh_hdl(mesh_hdl.clone()) else {
+    //             continue;
+    //         };
+    //         commands.spawn((
+    //             shell.clone(),
+    //             mesh_name,
+    //             mesh_builder,
+    //             belongs_to_root.clone(),
+    //         ));
+    //     }
 
-        // De-spawn shell builder...
-        let Some(ent_commands) = commands.get_entity(entity) else {
-            continue;
-        };
-        ent_commands.despawn_recursive();
-    }
+    //     // De-spawn shell builder...
+    //     let Some(ent_commands) = commands.get_entity(entity) else {
+    //         continue;
+    //     };
+    //     ent_commands.despawn_recursive();
+    // }
 }
 
 pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
@@ -183,7 +172,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
             base_material,
             transform,
             outlines,
-            cursors,
+            // cursors,
         } = cad_mesh;
 
         let material_hdl = materials.add(base_material);
@@ -241,78 +230,78 @@ pub fn mesh_builder_to_cursors<Params: ParametricLazyCad + Component + Clone>(
         Changed<CadMeshLazyBuilder<Params>>,
     >,
 ) {
-    for (entity, mesh_name, mesh_builder, belongs_to_root) in mesh_builders.iter() {
-        let cursors = &mesh_builder.cursors;
+    // for (entity, mesh_name, mesh_builder, belongs_to_root) in mesh_builders.iter() {
+    //     let cursors = &mesh_builder.cursors;
 
-        // Spawn cursors...
-        for (
-            cursor_name,
-            CadCursor {
-                normal,
-                transform,
-                cursor_radius,
-                cursor_type,
-            },
-        ) in cursors.iter()
-        {
-            let cursor = commands
-                .spawn((
-                    PbrBundle {
-                        material: materials.add(StandardMaterial {
-                            base_color: Color::WHITE.with_a(0.4),
-                            alpha_mode: AlphaMode::Blend,
-                            unlit: true,
-                            double_sided: true,
-                            cull_mode: None,
-                            ..default()
-                        }),
-                        mesh: meshes.add(shape::Circle::new(*cursor_radius).into()),
-                        transform: *transform,
-                        // visibility: Visibility::Hidden,
-                        ..default()
-                    },
-                    cursor_name.clone(),
-                    CadGeneratedCursor,
-                    CadGeneratedCursorConfig {
-                        cursor_radius: *cursor_radius,
-                        drag_plane_normal: *normal,
-                        cursor_type: cursor_type.clone(),
-                    },
-                    CadGeneratedCursorState::default(),
-                    CadGeneratedCursorPreviousTransform(*transform),
-                    BelongsToCadGeneratedMesh(entity),
-                    belongs_to_root.clone(),
-                    NotShadowCaster,
-                    // picking...
-                    PickableBundle::default(), // <- Makes the mesh pickable.
-                    NoBackfaceCulling,
-                    // Disable highlight cursor...
-                    Highlight::<StandardMaterial> {
-                        hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                            base_color: mat.base_color.with_a(0.6),
-                            ..mat.to_owned()
-                        })),
-                        pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                            base_color: mat.base_color.with_a(0.8),
-                            ..mat.to_owned()
-                        })),
-                        selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                            ..mat.to_owned()
-                        })),
-                    },
-                ))
-                .insert((
-                    // events...
-                    On::<Pointer<Move>>::send_event::<CursorPointerMoveEvent>(),
-                    On::<Pointer<Out>>::send_event::<CursorPointerOutEvent>(),
-                    // Add drag plane on drag start...
-                    On::<Pointer<DragStart>>::run(cursor_drag_start),
-                    On::<Pointer<DragEnd>>::run(cursor_drag_end),
-                ))
-                .insert(NoDeselect) // Prevent de-select other ent when cursor is interacted with.
-                .id();
-            // Add cursor to root
-            commands.entity(belongs_to_root.0).add_child(cursor);
-        }
-    }
+    //     // Spawn cursors...
+    //     for (
+    //         cursor_name,
+    //         CadCursor {
+    //             normal,
+    //             transform,
+    //             cursor_radius,
+    //             cursor_type,
+    //         },
+    //     ) in cursors.iter()
+    //     {
+    //         let cursor = commands
+    //             .spawn((
+    //                 PbrBundle {
+    //                     material: materials.add(StandardMaterial {
+    //                         base_color: Color::WHITE.with_a(0.4),
+    //                         alpha_mode: AlphaMode::Blend,
+    //                         unlit: true,
+    //                         double_sided: true,
+    //                         cull_mode: None,
+    //                         ..default()
+    //                     }),
+    //                     mesh: meshes.add(shape::Circle::new(*cursor_radius).into()),
+    //                     transform: *transform,
+    //                     // visibility: Visibility::Hidden,
+    //                     ..default()
+    //                 },
+    //                 cursor_name.clone(),
+    //                 CadGeneratedCursor,
+    //                 CadGeneratedCursorConfig {
+    //                     cursor_radius: *cursor_radius,
+    //                     drag_plane_normal: *normal,
+    //                     cursor_type: cursor_type.clone(),
+    //                 },
+    //                 CadGeneratedCursorState::default(),
+    //                 CadGeneratedCursorPreviousTransform(*transform),
+    //                 BelongsToCadGeneratedMesh(entity),
+    //                 belongs_to_root.clone(),
+    //                 NotShadowCaster,
+    //                 // picking...
+    //                 PickableBundle::default(), // <- Makes the mesh pickable.
+    //                 NoBackfaceCulling,
+    //                 // Disable highlight cursor...
+    //                 Highlight::<StandardMaterial> {
+    //                     hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+    //                         base_color: mat.base_color.with_a(0.6),
+    //                         ..mat.to_owned()
+    //                     })),
+    //                     pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+    //                         base_color: mat.base_color.with_a(0.8),
+    //                         ..mat.to_owned()
+    //                     })),
+    //                     selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+    //                         ..mat.to_owned()
+    //                     })),
+    //                 },
+    //             ))
+    //             .insert((
+    //                 // events...
+    //                 On::<Pointer<Move>>::send_event::<CursorPointerMoveEvent>(),
+    //                 On::<Pointer<Out>>::send_event::<CursorPointerOutEvent>(),
+    //                 // Add drag plane on drag start...
+    //                 On::<Pointer<DragStart>>::run(cursor_drag_start),
+    //                 On::<Pointer<DragEnd>>::run(cursor_drag_end),
+    //             ))
+    //             .insert(NoDeselect) // Prevent de-select other ent when cursor is interacted with.
+    //             .id();
+    //         // Add cursor to root
+    //         commands.entity(belongs_to_root.0).add_child(cursor);
+    //     }
+    // }
 }

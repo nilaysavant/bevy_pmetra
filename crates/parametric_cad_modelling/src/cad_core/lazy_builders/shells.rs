@@ -69,3 +69,7 @@ impl<P: Default + Clone> CadShellLazyBuilder<P> {
         (self.build_cad_shell)(&self.params)
     }
 }
+
+/// Component to store all generated [`CadShell`]s by [`CadShellName`].
+#[derive(Debug, Clone, Component, Deref, DerefMut, Default)]
+pub struct CadShellsByName(pub HashMap<CadShellName, CadShell>);

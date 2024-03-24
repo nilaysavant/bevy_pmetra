@@ -20,9 +20,8 @@ pub trait ParametricLazyModelling: Clone + Default {
 pub trait ParametricLazyCad: ParametricLazyModelling {
     fn meshes_builders_by_shell(
         &self,
-        shell_name: CadShellName,
-        shell: CadShell,
-    ) -> Result<CadMeshesLazyBuilder<Self>>;
+        shells_by_name: CadShellsByName,
+    ) -> Result<CadMeshesLazyBuildersByCadShell<Self>>;
 
     /// Handler called whenever a cursor is Transformed.
     fn on_cursor_transform(
@@ -66,27 +65,18 @@ mod test {
         impl ParametricLazyCad for Cube {
             fn meshes_builders_by_shell(
                 &self,
-                shell_name: CadShellName,
-                cad_shell: CadShell,
-            ) -> Result<CadMeshesLazyBuilder<Self>> {
-                match shell_name.0.as_str() {
-                    "s1" => {
-                        let meshes_builder =
-                            CadMeshesLazyBuilder::new(self.clone(), cad_shell.clone())?
-                                .add_mesh_builder(
-                                    "m1".into(),
-                                    CadMeshLazyBuilder::new(self.clone(), cad_shell.clone())?
-                                        .set_transform(Transform::default())?
-                                        .set_base_material(StandardMaterial::default())?
-                                        .set_outlines(cad_shell.shell.build_outlines())?
-                                        .add_cursor("c1".into(), build_cursor_c1)?,
-                                )?;
-                        Ok(meshes_builder)
-                    }
-                    _ => Err(anyhow!("Could not find shell with name: {:?}", shell_name)),
-                }
+                shells_by_name: CadShellsByName,
+            ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
+                CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name)?
+                    .add_mesh_builder(
+                        CadShellName("s1".into()),
+                        "m1".into(),
+                        CadMeshLazyBuilder::new(self.clone(), CadShellName("s1".into()))?
+                            .set_transform(Transform::default())?
+                            .set_base_material(StandardMaterial::default())?,
+                    )
             }
-            
+
             fn on_cursor_transform(
                 &mut self,
                 mesh_name: CadMeshName,
@@ -96,7 +86,7 @@ mod test {
             ) {
                 // TODO
             }
-            
+
             fn on_cursor_tooltip(
                 &self,
                 mesh_name: CadMeshName,
@@ -105,8 +95,6 @@ mod test {
                 // TODO
                 Ok("Test".into())
             }
-
-            
         }
 
         pub fn build_cursor_c1(
