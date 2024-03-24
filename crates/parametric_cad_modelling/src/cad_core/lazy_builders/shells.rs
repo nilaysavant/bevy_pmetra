@@ -6,10 +6,7 @@ use crate::cad_core::builders::CadShell;
 
 /// Holds multiple [`CadShellLazyBuilder`]s.
 #[derive(Clone, Default)]
-pub struct CadShellsLazyBuilders<P>
-where
-    P: Default + Clone,
-{
+pub struct CadShellsLazyBuilders<P: Default + Clone> {
     pub params: P,
     pub builders: HashMap<CadShellName, CadShellLazyBuilder<P>>,
 }
@@ -55,10 +52,16 @@ pub struct CadShellName(pub String);
 
 /// Builder for building [`CadShell`]s.
 #[derive(Clone, Component)]
-pub struct CadShellLazyBuilder<P>
-where
-    P: Default + Clone,
-{
+pub struct CadShellLazyBuilder<P: Default + Clone> {
     pub params: P,
     pub build_cad_shell: fn(&P) -> Result<CadShell>,
+}
+
+impl<P: Default + Clone> CadShellLazyBuilder<P> {
+    pub fn new(params: P, build_fn: fn(&P) -> Result<CadShell>) -> Self {
+        Self {
+            params,
+            build_cad_shell: build_fn,
+        }
+    }
 }

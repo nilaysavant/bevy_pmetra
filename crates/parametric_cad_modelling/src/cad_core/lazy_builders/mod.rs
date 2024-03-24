@@ -31,16 +31,8 @@ mod test {
 
         impl ParametricLazyModelling for Cube {
             fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
-                let mut builders = CadShellsLazyBuilders::default();
-                let b = CadShellLazyBuilder {
-                    params: self.clone(),
-                    build_cad_shell: |p: &Self| -> Result<CadShell> {
-                        println!("{:?}", p);
-                        Ok(CadShell::default())
-                    },
-                };
-                builders.builders.insert(CadShellName("a".into()), b);
-                Ok(builders)
+                CadShellsLazyBuilders::default()
+                    .add_shell_builder(CadShellName("a".into()), |p: &Self| Ok(CadShell::default()))
             }
         }
 
