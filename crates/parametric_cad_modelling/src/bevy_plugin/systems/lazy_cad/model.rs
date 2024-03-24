@@ -74,6 +74,7 @@ pub fn build_shells_from_builders<Params: ParametricLazyCad + Component + Clone>
 
 pub fn shells_to_mesh_builder<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
     shell_builders: Query<
         (
             Entity,
@@ -84,5 +85,36 @@ pub fn shells_to_mesh_builder<Params: ParametricLazyCad + Component + Clone>(
         Changed<CadShellLazyBuilder<Params>>,
     >,
 ) {
-    // TODO
+    for (entity, shell_name, shell_builder, shell) in shell_builders.iter() {
+        let meshes_builder = match shell_builder
+            .params
+            .meshes_builders_by_shell(shell_name.clone(), shell.clone())
+        {
+            Ok(meshes_builder) => meshes_builder,
+            Err(e) => {
+                error!(
+                    "meshes_builders_by_shell for shell_name: {:?} failed, error: {:?}",
+                    shell_name, e
+                );
+                continue;
+            }
+        };
+        let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
+            continue;
+        };
+        let mesh_hdl = meshes.add(bevy_mesh);
+
+        for (mesh_name, mut mesh_builder) in meshes_builder.mesh_builders {
+            let Ok(mesh_builder) = mesh_builder.set_mesh_hdl(mesh_hdl.clone()) else {
+                continue;
+            };
+            commands.spawn((shell.clone(), mesh_name, mesh_builder));
+        }
+
+        // De-spawn shell builders...
+        let Some(ent_commands) = commands.get_entity(entity) else {
+            continue;
+        };
+        ent_commands.despawn_recursive();
+    }
 }
