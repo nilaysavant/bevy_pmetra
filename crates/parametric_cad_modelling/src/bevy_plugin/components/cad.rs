@@ -7,7 +7,7 @@ use crate::cad_core::builders::{CadCursorType, CadMeshOutlines};
 pub struct CadGeneratedRoot;
 
 /// Marker indicating which [`CadGenerated`] [`Entity`] it belongs to.
-#[derive(Debug, Component, Reflect)]
+#[derive(Debug, Component, Clone, Reflect)]
 pub struct BelongsToCadGeneratedRoot(pub Entity);
 
 /// Marker for CAD generated mesh root.
