@@ -108,7 +108,7 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
                 control_wire_frame_display.run_if(move || allow_wire_frames),
             )
             .add_systems(Startup, || {
-                info!("ParametricCadModellingBasePlugin started!")
+                info!("ParametricLazyCadModellingBasePlugin started!")
             });
     }
 }
