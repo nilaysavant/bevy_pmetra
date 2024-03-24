@@ -1,12 +1,12 @@
 use anyhow::Result;
 use bevy::prelude::*;
 
+use super::builders::{CadCursorName, CadMeshName, CadShell};
+
 /// Meshes builders.
 pub mod meshes;
 /// Shells builders.
 pub mod shells;
-
-use super::builders::CadShell;
 
 pub use {meshes::*, shells::*};
 
@@ -23,6 +23,21 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
         shell_name: CadShellName,
         shell: CadShell,
     ) -> Result<CadMeshesLazyBuilder<Self>>;
+
+    /// Handler called whenever a cursor is Transformed.
+    fn on_cursor_transform(
+        &mut self,
+        mesh_name: CadMeshName,
+        cursor_name: CadCursorName,
+        prev_transform: Transform,
+        new_transform: Transform,
+    );
+    /// Handler called to get [`CadCursor`] tooltip UI text.
+    fn on_cursor_tooltip(
+        &self,
+        mesh_name: CadMeshName,
+        cursor_name: CadCursorName,
+    ) -> Result<String>;
 }
 
 mod test {
@@ -68,11 +83,30 @@ mod test {
                                 )?;
                         Ok(meshes_builder)
                     }
-                    _ => {
-                        Err(anyhow!("Could not find shell with name: {:?}", shell_name))
-                    }
+                    _ => Err(anyhow!("Could not find shell with name: {:?}", shell_name)),
                 }
             }
+            
+            fn on_cursor_transform(
+                &mut self,
+                mesh_name: CadMeshName,
+                cursor_name: CadCursorName,
+                prev_transform: Transform,
+                new_transform: Transform,
+            ) {
+                // TODO
+            }
+            
+            fn on_cursor_tooltip(
+                &self,
+                mesh_name: CadMeshName,
+                cursor_name: CadCursorName,
+            ) -> Result<String> {
+                // TODO
+                Ok("Test".into())
+            }
+
+            
         }
 
         pub fn build_cursor_c1(
