@@ -16,9 +16,6 @@ use crate::{
 
 use super::CadShellName;
 
-// CadMeshesLazyBuildersByCadShell
-// - HashMap<ShellId, CadMeshesLazyBuilder>
-
 /// Builder for building [`CadSolid`]s.
 #[derive(Debug, Clone, Default)]
 pub struct CadMeshesLazyBuildersByCadShell<P: Default + Clone>(
