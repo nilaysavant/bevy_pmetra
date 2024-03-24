@@ -18,31 +18,6 @@ use super::CadShellName;
 
 /// Builder for building [`CadSolid`]s.
 #[derive(Debug, Clone, Default)]
-pub struct CadMeshesLazyBuildersByCadShell<P: Default + Clone>(
-    pub HashMap<CadShellName, CadMeshesLazyBuilder<P>>,
-);
-
-impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
-    pub fn new() -> Self {
-        Self(HashMap::new())
-    }
-
-    pub fn add_meshes_builder(
-        &mut self,
-        shell_name: CadShellName,
-        mesh_builder: CadMeshesLazyBuilder<P>,
-    ) -> Result<Self> {
-        self.0.insert(shell_name, mesh_builder);
-        Ok(self.clone())
-    }
-
-    pub fn build(&self) -> Result<HashMap<CadShellName, CadMeshesLazyBuilder<P>>> {
-        Ok(self.0.clone())
-    }
-}
-
-/// Builder for building [`CadSolid`]s.
-#[derive(Debug, Clone, Default)]
 pub struct CadMeshesLazyBuilder<P: Default + Clone> {
     pub params: P,
     pub shell: CadShell,
