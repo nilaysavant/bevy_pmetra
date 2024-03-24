@@ -8,11 +8,29 @@ use bevy::{
 use bevy_mod_picking::{debug::DebugPickingMode, DefaultPickingPlugins};
 
 use crate::{
-    cad_core::builders::ParametricCad,
-    prelude::{GenerateCadModel, WireFrameDisplaySettings},
+    bevy_plugin::components::wire_frame::WireFrameDisplaySettings,
+    cad_core::lazy_builders::ParametricLazyCad,
 };
 
-use super::systems::wire_frame::control_wire_frame_display;
+use super::{
+    events::{
+        cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
+        lazy_cad::GenerateLazyCadModel,
+    },
+    systems::{
+        cad::{
+            cursor::{draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor},
+            mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
+            outlines::generate_mesh_outlines,
+            params_ui::{hide_params_display_ui_on_out_cursor, setup_param_display_ui},
+        },
+        lazy_cad::model::{
+            build_shells_from_builders, mesh_builder_to_bundle, mesh_builder_to_cursors,
+            shells_to_mesh_builder, spawn_shells_lazy_builders_on_generate,
+        },
+        wire_frame::control_wire_frame_display,
+    },
+};
 
 /// Base [`bevy`] [`Plugin`] for Parametric CAD Modelling.
 #[derive(Default)]
@@ -52,37 +70,37 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
             // picking
             .add_plugins(DefaultPickingPlugins.build())
             .insert_resource(State::new(DebugPickingMode::Disabled)) // to disable debug overlay
-            // // picking events...
-            // .add_event::<TransformCursorEvent>()
-            // .add_event::<CursorPointerMoveEvent>()
-            // .add_event::<CursorPointerOutEvent>()
-            // // UI for params and dimensions...
-            // .add_systems(
-            //     Update,
-            //     (setup_param_display_ui, hide_params_display_ui_on_out_cursor),
-            // )
-            // // mesh systems...
-            // .add_systems(
-            //     Update,
-            //     (
-            //         generate_mesh_outlines,
-            //         handle_mesh_selection,
-            //         show_mesh_local_debug_axis,
-            //     ),
-            // )
-            // // cursor systems...
-            // .add_systems(
-            //     Update,
-            //     (
-            //         (
-            //             //
-            //             transform_cursor,
-            //             scale_cursors_based_on_zoom_level,
-            //         )
-            //             .chain(),
-            //         draw_cursor_gizmo,
-            //     ),
-            // )
+            // picking events...
+            .add_event::<TransformCursorEvent>()
+            .add_event::<CursorPointerMoveEvent>()
+            .add_event::<CursorPointerOutEvent>()
+            // UI for params and dimensions...
+            .add_systems(
+                Update,
+                (setup_param_display_ui, hide_params_display_ui_on_out_cursor),
+            )
+            // mesh systems...
+            .add_systems(
+                Update,
+                (
+                    generate_mesh_outlines,
+                    handle_mesh_selection,
+                    show_mesh_local_debug_axis,
+                ),
+            )
+            // cursor systems...
+            .add_systems(
+                Update,
+                (
+                    (
+                        //
+                        transform_cursor,
+                        scale_cursors_based_on_zoom_level,
+                    )
+                        .chain(),
+                    draw_cursor_gizmo,
+                ),
+            )
             // wire frame...
             .register_type::<WireFrameDisplaySettings>()
             .add_systems(
@@ -101,27 +119,29 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
 ///
 /// The [`Plugin`] then allows generating CAD models using the passed [`Params`].
 #[derive(Default)]
-pub struct ParametricLazyCadParamsPlugin<Params: ParametricCad + Component> {
+pub struct ParametricLazyCadParamsPlugin<Params: ParametricLazyCad + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: ParametricCad + Component + Clone> Plugin for ParametricLazyCadParamsPlugin<Params> {
+impl<Params: ParametricLazyCad + Component + Clone> Plugin
+    for ParametricLazyCadParamsPlugin<Params>
+{
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App
             // truck...
-            .add_event::<GenerateCadModel<Params>>()
-            // .add_systems(
-            //     Update,
-            //     (
-            //         generate_cad_model_on_event::<Params>,
-            //         update_cad_model_on_params_change::<Params>,
-            //         update_params_from_cursors::<Params>,
-            //         show_params_display_ui_on_hover_cursor::<Params>,
-            //         move_params_display_ui_on_transform_cursor::<Params>,
-            //     ),
-            // )
+            .add_event::<GenerateLazyCadModel<Params>>()
+            .add_systems(
+                Update,
+                (
+                    spawn_shells_lazy_builders_on_generate::<Params>,
+                    build_shells_from_builders::<Params>,
+                    shells_to_mesh_builder::<Params>,
+                    mesh_builder_to_bundle::<Params>,
+                    mesh_builder_to_cursors::<Params>,
+                ),
+            )
             // rest...
             .add_systems(Startup, || info!("ParametricLazyCadParamsPlugin started!"));
     }
