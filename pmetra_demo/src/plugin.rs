@@ -128,6 +128,7 @@ impl Plugin for PmetraDemoPlugin {
             // inspectors...
             .register_type::<RoundCabinSegment>()
             .register_type::<SimpleCubeAtCylinder>()
+            .register_type::<SimpleLazyCubeAtCylinder>()
             .register_type::<SimpleGear>()
             .register_type::<RoundRectCuboid>()
             .add_plugins(
