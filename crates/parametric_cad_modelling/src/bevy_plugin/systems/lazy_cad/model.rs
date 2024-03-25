@@ -10,10 +10,7 @@ use crate::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
-        systems::cad::{
-            cursor::{cursor_drag_end, cursor_drag_start},
-            mesh::{mesh_pointer_move, mesh_pointer_out},
-        },
+        systems::cad::mesh::{mesh_pointer_move, mesh_pointer_out},
     },
     cad_core::{
         builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
@@ -29,6 +26,8 @@ use crate::{
         WireFrameDisplaySettings,
     },
 };
+
+use super::cursor::{cursor_drag_end, cursor_drag_start};
 
 pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
@@ -166,9 +165,10 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
                 cursor_type,
             } = cursor;
 
-            if let Some((_, _, _, mut cursor_transform, mut prev_transform, cursor_state)) = cad_cursors
-                .iter_mut()
-                .find(|(_, name, bel_root, _, _, _)| *name == cursor_name && bel_root.0 == root_ent)
+            if let Some((_, _, _, mut cursor_transform, mut prev_transform, cursor_state)) =
+                cad_cursors.iter_mut().find(|(_, name, bel_root, _, _, _)| {
+                    *name == cursor_name && bel_root.0 == root_ent
+                })
             {
                 // If cursor already exists, update it...
                 // Update transform only in normal state...

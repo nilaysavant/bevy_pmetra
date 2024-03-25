@@ -19,11 +19,11 @@ use super::{
     },
     systems::{
         cad::{
-            cursor::{draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor},
             mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
             outlines::generate_mesh_outlines,
         },
         lazy_cad::{
+            cursor::{draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor},
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
                 mesh_builder_to_cursors, shells_to_cursors, shells_to_mesh_builder_events,
