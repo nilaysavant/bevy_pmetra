@@ -140,8 +140,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
     for (entity, params, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
     {
-        let Ok(meshes_builders_by_shell) = params.meshes_builders_by_shell(shells_by_name.clone())
-        else {
+        let Ok(meshes_builders_by_shell) = params.meshes_builders_by_shell(shells_by_name) else {
             warn!("Could not get meshes_builders_by_shell!");
             continue;
         };

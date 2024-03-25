@@ -5,7 +5,7 @@ use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
         extensions::shell::ShellCadExtension,
-        lazy_builders::{CadMeshLazyBuilder, CadMeshesLazyBuilder, CadShellName},
+        lazy_builders::{CadMeshLazyBuilder, CadMeshesLazyBuilder, CadShellName, CadShellsByName},
     },
     math::get_rotation_from_normals,
     prelude::*,
@@ -16,7 +16,7 @@ use bevy_pmetra::{
 };
 use strum::{Display, EnumString};
 
-use super::SimpleLazyCubeAtCylinder;
+use super::{CadShellIds, SimpleLazyCubeAtCylinder};
 
 pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShell> {
     let SimpleLazyCubeAtCylinder {
@@ -72,15 +72,19 @@ pub fn cylinder_mesh_builder(
 }
 
 pub fn build_radius_cursor(
-    builder: &CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>,
-    cad_shell: &CadShell,
+    params: &SimpleLazyCubeAtCylinder,
+    cad_shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
     let SimpleLazyCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
         cube_attach_angle,
         cube_side_length,
-    } = &builder.params;
+    } = params;
+
+    let cad_shell = cad_shells_by_name
+        .get(&CadShellName(CadShellIds::Cylinder.to_string()))
+        .ok_or_else(|| anyhow!("Could not get cylinder shell!"))?;
 
     let Some(CadElement::Vertex(vertex_v0)) =
         cad_shell.get_element_by_tag(CadElementTag::new("VertexV0"))

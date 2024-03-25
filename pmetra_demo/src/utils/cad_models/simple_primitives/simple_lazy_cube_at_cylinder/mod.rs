@@ -46,7 +46,7 @@ impl Default for SimpleLazyCubeAtCylinder {
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CadSolidIds {
+pub enum CadShellIds {
     Cylinder,
     Cube,
 }
@@ -69,11 +69,11 @@ impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
     ) -> Result<bevy_pmetra::cad_core::lazy_builders::CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
             .add_shell_builder(
-                CadShellName(CadSolidIds::Cylinder.to_string()),
+                CadShellName(CadShellIds::Cylinder.to_string()),
                 build_cylinder_shell,
             )?
             .add_shell_builder(
-                CadShellName(CadSolidIds::Cube.to_string()),
+                CadShellName(CadShellIds::Cube.to_string()),
                 build_cube_shell,
             )?;
         Ok(builders)
@@ -83,22 +83,32 @@ impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
 impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
     fn meshes_builders_by_shell(
         &self,
-        shells_by_name: CadShellsByName,
+        shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
         let cad_meshes_lazy_builders_by_cad_shell =
-            CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name)?
+            CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
-                    CadShellName(CadSolidIds::Cylinder.to_string()),
+                    CadShellName(CadShellIds::Cylinder.to_string()),
                     CadMeshIds::Cylinder.to_string(),
-                    cylinder_mesh_builder(self, CadShellName(CadSolidIds::Cylinder.to_string()))?,
+                    cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
                 )?
                 .add_mesh_builder(
-                    CadShellName(CadSolidIds::Cylinder.to_string()),
+                    CadShellName(CadShellIds::Cylinder.to_string()),
                     CadMeshIds::Cylinder.to_string(),
-                    cylinder_mesh_builder(self, CadShellName(CadSolidIds::Cylinder.to_string()))?,
+                    cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
                 )?;
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
+    }
+
+    fn cursors(&self, shells_by_name: CadShellsByName) -> Result<CadCursors> {
+        let mut cursors = CadCursors::default();
+        cursors.insert(
+            CadCursorName(CadCursorIds::CylinderRadius.to_string()),
+            build_radius_cursor(self, &shells_by_name)?,
+        );
+
+        Ok(cursors)
     }
 
     fn on_cursor_transform(

@@ -13,7 +13,7 @@ use bevy_pmetra::{
 };
 use strum::{Display, EnumString};
 
-use super::{CadSolidIds, SimpleLazyCubeAtCylinder};
+use super::{CadShellIds, SimpleLazyCubeAtCylinder};
 
 pub fn build_cube_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShell> {
     let SimpleLazyCubeAtCylinder {

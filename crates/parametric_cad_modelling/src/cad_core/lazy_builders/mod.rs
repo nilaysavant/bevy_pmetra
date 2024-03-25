@@ -20,7 +20,7 @@ pub trait ParametricLazyModelling: Clone + Default {
 pub trait ParametricLazyCad: ParametricLazyModelling {
     fn meshes_builders_by_shell(
         &self,
-        shells_by_name: CadShellsByName,
+        shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>>;
 
     /// Configure Cursors.
@@ -63,9 +63,9 @@ mod test {
         impl ParametricLazyCad for Cube {
             fn meshes_builders_by_shell(
                 &self,
-                shells_by_name: CadShellsByName,
+                shells_by_name: &CadShellsByName,
             ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
-                CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name)?
+                CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                     .add_mesh_builder(
                         CadShellName("s1".into()),
                         "m1".into(),
