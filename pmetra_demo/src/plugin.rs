@@ -5,7 +5,12 @@ use bevy_inspector_egui::quick::{
 };
 use bevy_rapier3d::prelude::*;
 
-use bevy_pmetra::prelude::*;
+use bevy_pmetra::{
+    bevy_plugin::lazy_plugins::{
+        ParametricLazyCadModellingBasePlugin, ParametricLazyCadParamsPlugin,
+    },
+    prelude::*,
+};
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
 use crate::{
@@ -17,11 +22,18 @@ use crate::{
     },
     resources::CadGeneratedModelSpawner,
     systems::{
-        cad::{add_collider_to_generated_cad_model, spawn_cad_model}, inspector::toggle_inspector_is_active, orbit_cam::{fire_balls_at_look_point, orbit_cam_custom_input_map_controller}, rapier::{control_debug_render, setup_debug_render}, scene::{scene_setup, test_manual_mesh_gen}
+        cad::{add_collider_to_generated_cad_model, spawn_cad_model},
+        inspector::toggle_inspector_is_active,
+        orbit_cam::{fire_balls_at_look_point, orbit_cam_custom_input_map_controller},
+        rapier::{control_debug_render, setup_debug_render},
+        scene::{scene_setup, test_manual_mesh_gen},
     },
     utils::cad_models::{
         mechanical_parts::simple_gear::SimpleGear,
-        simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
+        simple_primitives::{
+            simple_cube_at_cylinder::SimpleCubeAtCylinder,
+            simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
+        },
         space_station::{RoundCabinSegment, RoundRectCuboid},
     },
 };
@@ -87,6 +99,12 @@ impl Plugin for PmetraDemoPlugin {
                 ParametricCadParamsPlugin::<SimpleCubeAtCylinder>::default(),
                 ParametricCadParamsPlugin::<RoundCabinSegment>::default(),
                 ParametricCadParamsPlugin::<SimpleGear>::default(),
+            ))
+            .add_plugins((
+                ParametricLazyCadModellingBasePlugin {
+                    allow_wire_frames: true,
+                },
+                ParametricLazyCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()

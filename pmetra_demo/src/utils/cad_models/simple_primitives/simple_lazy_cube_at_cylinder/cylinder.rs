@@ -5,7 +5,7 @@ use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
         extensions::shell::ShellCadExtension,
-        lazy_builders::{CadMeshLazyBuilder, CadMeshesLazyBuilder},
+        lazy_builders::{CadMeshLazyBuilder, CadMeshesLazyBuilder, CadShellName},
     },
     math::get_rotation_from_normals,
     prelude::*,
@@ -51,30 +51,25 @@ pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShel
     })
 }
 
-// pub fn cylinder_mesh_builder(
-//     params: &SimpleLazyCubeAtCylinder,
-//     cad_shell: &CadShell,
-// ) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
-//     let SimpleLazyCubeAtCylinder {
-//         cylinder_radius,
-//         cylinder_height,
-//         cube_attach_angle,
-//         cube_side_length,
-//     } = &params;
-//     // spawn entity with generated mesh...
-//     let transform = Transform::default();
+pub fn cylinder_mesh_builder(
+    params: &SimpleLazyCubeAtCylinder,
+    shell_name: CadShellName,
+) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
+    let SimpleLazyCubeAtCylinder {
+        cylinder_radius,
+        cylinder_height,
+        cube_attach_angle,
+        cube_side_length,
+    } = &params;
+    // spawn entity with generated mesh...
+    let transform = Transform::default();
 
-//     let mesh_builder = CadMeshLazyBuilder::new(params.clone(), cad_shell.clone())? // builder
-//         .set_transform(transform)?
-//         .set_base_material(Color::RED.into())?
-//         .set_outlines(cad_shell.shell.build_outlines())?
-//         .add_cursor(
-//             CylinderCursorIds::RadiusCursor.to_string(),
-//             build_radius_cursor,
-//         )?;
+    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+        .set_transform(transform)?
+        .set_base_material(Color::RED.into())?;
 
-//     Ok(mesh_builder)
-// }
+    Ok(mesh_builder)
+}
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CylinderCursorIds {

@@ -1,12 +1,12 @@
 use std::{f64::consts::PI, str::FromStr};
 
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{anyhow, Context, Error, Ok, Result};
 use bevy::{math::DVec3, prelude::*, utils::HashMap};
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{
     cad_core::lazy_builders::{
-        CadMeshLazyBuilder, CadMeshesLazyBuilder, CadShellName, CadShellsLazyBuilders,
-        ParametricLazyCad, ParametricLazyModelling,
+        CadMeshLazyBuilder, CadMeshesLazyBuilder, CadMeshesLazyBuildersByCadShell, CadShellName,
+        CadShellsByName, CadShellsLazyBuilders, ParametricLazyCad, ParametricLazyModelling,
     },
     prelude::*,
 };
@@ -15,7 +15,7 @@ use strum::{Display, EnumString};
 use self::{
     cube::{build_cube_shell, CubeCursorIds},
     cylinder::{
-        build_cylinder_shell, build_radius_cursor, CylinderCursorIds,
+        build_cylinder_shell, build_radius_cursor, cylinder_mesh_builder, CylinderCursorIds,
     },
 };
 
@@ -76,74 +76,75 @@ impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
     }
 }
 
-// impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
-//     fn meshes_builders_by_shell(
-//         &self,
-//         shell_name: CadShellName,
-//         shell: CadShell,
-//     ) -> Result<CadMeshesLazyBuilder<Self>> {
-//         match CadSolidIds::from_str(&shell_name.0)? {
-//             CadSolidIds::Cylinder => {
-//                 CadMeshesLazyBuilder::new(self.clone(), shell.clone())? // builder
-//                     .add_mesh_builder(
-//                         CadMeshIds::Cylinder.to_string(),
-//                         cylinder_mesh_builder(self, &shell)?,
-//                     )
-//             }
-//             CadSolidIds::Cube => {
-//                 todo!()
-//             }
-//         }
-//     }
+impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
+    fn meshes_builders_by_shell(
+        &self,
+        shells_by_name: CadShellsByName,
+    ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
+        let cad_meshes_lazy_builders_by_cad_shell =
+            CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name)?
+                .add_mesh_builder(
+                    CadShellName(CadSolidIds::Cylinder.to_string()),
+                    CadMeshIds::Cylinder.to_string(),
+                    cylinder_mesh_builder(self, CadShellName(CadSolidIds::Cylinder.to_string()))?,
+                )?
+                .add_mesh_builder(
+                    CadShellName(CadSolidIds::Cylinder.to_string()),
+                    CadMeshIds::Cylinder.to_string(),
+                    cylinder_mesh_builder(self, CadShellName(CadSolidIds::Cylinder.to_string()))?,
+                )?;
 
-//     fn on_cursor_transform(
-//         &mut self,
-//         mesh_name: CadMeshName,
-//         cursor_name: CadCursorName,
-//         prev_transform: Transform,
-//         new_transform: Transform,
-//     ) {
-//         match CadMeshIds::from_str(&mesh_name).unwrap() {
-//             CadMeshIds::Cylinder => match CylinderCursorIds::from_str(&cursor_name).unwrap() {
-//                 CylinderCursorIds::RadiusCursor => {
-//                     let delta = new_transform.translation - prev_transform.translation;
-//                     if delta.length() > 0. {
-//                         let sensitivity = 1.;
-//                         let new_value = self.cylinder_radius + delta.x as f64 * sensitivity;
-//                         self.cylinder_radius = new_value.clamp(0.01, std::f64::MAX);
-//                     }
-//                 }
-//             },
-//             CadMeshIds::Cube => match CubeCursorIds::from_str(&cursor_name).unwrap() {
-//                 CubeCursorIds::SideLength => {
-//                     let delta = new_transform.translation - prev_transform.translation;
-//                     if delta.length() > 0. {
-//                         let sensitivity = 1.;
-//                         let new_value = self.cube_side_length + delta.z as f64 * sensitivity;
-//                         self.cube_side_length = new_value.clamp(0.01, std::f64::MAX);
-//                     }
-//                 }
-//             },
-//         }
-//     }
+        Ok(cad_meshes_lazy_builders_by_cad_shell)
+    }
 
-//     fn on_cursor_tooltip(
-//         &self,
-//         mesh_name: CadMeshName,
-//         cursor_name: CadCursorName,
-//     ) -> Result<String> {
-//         let tooltip = match CadMeshIds::from_str(&mesh_name).unwrap() {
-//             CadMeshIds::Cylinder => match CylinderCursorIds::from_str(&cursor_name).unwrap() {
-//                 CylinderCursorIds::RadiusCursor => {
-//                     format!("cylinder_radius : {:.3}", self.cylinder_radius)
-//                 }
-//             },
-//             CadMeshIds::Cube => match CubeCursorIds::from_str(&cursor_name).unwrap() {
-//                 CubeCursorIds::SideLength => {
-//                     format!("cube_side_length : {:.3}", self.cube_side_length)
-//                 }
-//             },
-//         };
-//         Ok(tooltip)
-//     }
-// }
+    fn on_cursor_transform(
+        &mut self,
+        mesh_name: CadMeshName,
+        cursor_name: CadCursorName,
+        prev_transform: Transform,
+        new_transform: Transform,
+    ) {
+        match CadMeshIds::from_str(&mesh_name).unwrap() {
+            CadMeshIds::Cylinder => match CylinderCursorIds::from_str(&cursor_name).unwrap() {
+                CylinderCursorIds::RadiusCursor => {
+                    let delta = new_transform.translation - prev_transform.translation;
+                    if delta.length() > 0. {
+                        let sensitivity = 1.;
+                        let new_value = self.cylinder_radius + delta.x as f64 * sensitivity;
+                        self.cylinder_radius = new_value.clamp(0.01, std::f64::MAX);
+                    }
+                }
+            },
+            CadMeshIds::Cube => match CubeCursorIds::from_str(&cursor_name).unwrap() {
+                CubeCursorIds::SideLength => {
+                    let delta = new_transform.translation - prev_transform.translation;
+                    if delta.length() > 0. {
+                        let sensitivity = 1.;
+                        let new_value = self.cube_side_length + delta.z as f64 * sensitivity;
+                        self.cube_side_length = new_value.clamp(0.01, std::f64::MAX);
+                    }
+                }
+            },
+        }
+    }
+
+    fn on_cursor_tooltip(
+        &self,
+        mesh_name: CadMeshName,
+        cursor_name: CadCursorName,
+    ) -> Result<String> {
+        let tooltip = match CadMeshIds::from_str(&mesh_name).unwrap() {
+            CadMeshIds::Cylinder => match CylinderCursorIds::from_str(&cursor_name).unwrap() {
+                CylinderCursorIds::RadiusCursor => {
+                    format!("cylinder_radius : {:.3}", self.cylinder_radius)
+                }
+            },
+            CadMeshIds::Cube => match CubeCursorIds::from_str(&cursor_name).unwrap() {
+                CubeCursorIds::SideLength => {
+                    format!("cube_side_length : {:.3}", self.cube_side_length)
+                }
+            },
+        };
+        Ok(tooltip)
+    }
+}

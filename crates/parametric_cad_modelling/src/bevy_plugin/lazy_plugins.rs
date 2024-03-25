@@ -5,7 +5,7 @@ use bevy::{
     prelude::*,
 };
 
-use bevy_mod_picking::{debug::DebugPickingMode, DefaultPickingPlugins};
+use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlugins};
 
 use crate::{
     bevy_plugin::components::wire_frame::WireFrameDisplaySettings,
@@ -25,7 +25,8 @@ use super::{
             params_ui::{hide_params_display_ui_on_out_cursor, setup_param_display_ui},
         },
         lazy_cad::model::{
-            handle_spawn_meshes_builder_events, mesh_builder_to_bundle, mesh_builder_to_cursors, shells_to_mesh_builder_events, spawn_shells_lazy_builders_on_generate
+            handle_spawn_meshes_builder_events, mesh_builder_to_bundle, mesh_builder_to_cursors,
+            shells_to_mesh_builder_events, spawn_shells_lazy_builders_on_generate,
         },
         wire_frame::control_wire_frame_display,
     },
@@ -49,26 +50,32 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
         if allow_wire_frames {
             // Add wire frame setup only in native environment...
             #[cfg(not(target_arch = "wasm32"))]
-            app.add_plugins(
-                // You need to add this plugin to enable wireframe rendering
-                WireframePlugin,
-            )
-            // Wireframes can be configured with this resource. This can be changed at runtime.
-            .insert_resource(WireframeConfig {
-                // The global wireframe config enables drawing of wireframes on every mesh,
-                // except those with `NoWireframe`. Meshes with `Wireframe` will always have a wireframe,
-                // regardless of the global configuration.
-                global: false,
-                // Controls the default color of all wireframes. Used as the default color for global wireframes.
-                // Can be changed per mesh using the `WireframeColor` component.
-                default_color: Color::YELLOW,
-            });
+            if !app.is_plugin_added::<WireframePlugin>() {
+                app.add_plugins(
+                    // You need to add this plugin to enable wireframe rendering
+                    WireframePlugin,
+                )
+                // Wireframes can be configured with this resource. This can be changed at runtime.
+                .insert_resource(WireframeConfig {
+                    // The global wireframe config enables drawing of wireframes on every mesh,
+                    // except those with `NoWireframe`. Meshes with `Wireframe` will always have a wireframe,
+                    // regardless of the global configuration.
+                    global: false,
+                    // Controls the default color of all wireframes. Used as the default color for global wireframes.
+                    // Can be changed per mesh using the `WireframeColor` component.
+                    default_color: Color::YELLOW,
+                });
+            }
         }
+
+        if !app.is_plugin_added::<picking_core::CorePlugin>() {
+            app // picking
+                .add_plugins(DefaultPickingPlugins.build())
+                .insert_resource(State::new(DebugPickingMode::Disabled)); // to disable debug overlay
+        }
+
         // Add all the plugins/systems/resources/events that are not specific to params...
         app // app
-            // picking
-            .add_plugins(DefaultPickingPlugins.build())
-            .insert_resource(State::new(DebugPickingMode::Disabled)) // to disable debug overlay
             // picking events...
             .add_event::<TransformCursorEvent>()
             .add_event::<CursorPointerMoveEvent>()

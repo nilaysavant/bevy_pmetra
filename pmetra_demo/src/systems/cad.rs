@@ -1,12 +1,14 @@
 use bevy::{prelude::*, utils::hashbrown::HashMap};
-use bevy_pmetra::prelude::*;
+use bevy_pmetra::{bevy_plugin::events::lazy_cad::GenerateLazyCadModel, prelude::*};
 use bevy_rapier3d::prelude::*;
 
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
         mechanical_parts::simple_gear::SimpleGear,
-        simple_primitives::SimpleCubeAtCylinder,
+        simple_primitives::{
+            simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder, SimpleCubeAtCylinder,
+        },
         space_station::{round_cabin_segment::CadMaterialIds, RoundCabinSegment},
     },
 };
@@ -16,6 +18,9 @@ pub fn spawn_cad_model(
     cad_model_spawner: Res<CadGeneratedModelSpawner>,
     cad_models: Query<Entity, With<CadGeneratedRoot>>,
     mut spawn_simple_cube_at_cylinder: EventWriter<GenerateCadModel<SimpleCubeAtCylinder>>,
+    mut spawn_lazy_simple_cube_at_cylinder: EventWriter<
+        GenerateLazyCadModel<SimpleLazyCubeAtCylinder>,
+    >,
     mut spawn_round_cabin_segment: EventWriter<GenerateCadModel<RoundCabinSegment>>,
     mut spawn_simple_gear: EventWriter<GenerateCadModel<SimpleGear>>,
     mut asset_server: ResMut<AssetServer>,
@@ -40,6 +45,9 @@ pub fn spawn_cad_model(
         }
         CadGeneratedModelParamsId::SimpleGear => {
             spawn_simple_gear.send(GenerateCadModel::default());
+        }
+        CadGeneratedModelParamsId::SimplLazyCubeAtCylinder => {
+            spawn_lazy_simple_cube_at_cylinder.send(GenerateLazyCadModel::default())
         }
     }
 }
