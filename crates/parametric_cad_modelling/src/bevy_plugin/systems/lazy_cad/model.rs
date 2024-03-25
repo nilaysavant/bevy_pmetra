@@ -8,7 +8,7 @@ use crate::{
         components::cad::CadGeneratedRoot,
         events::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
-            lazy_cad::GenerateLazyCadModel,
+            lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
         systems::cad::{
             cursor::{cursor_drag_end, cursor_drag_start},
@@ -86,56 +86,67 @@ pub fn spawn_shells_lazy_builders_on_generate<Params: ParametricLazyCad + Compon
     }
 }
 
-pub fn shells_to_mesh_builder<Params: ParametricLazyCad + Component + Clone>(
+pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    shells: Query<
+    shells_by_name_entities: Query<
         (
             Entity,
             &Params,
             &CadShellsByName,
             &BelongsToCadGeneratedRoot,
         ),
-        Changed<CadShellLazyBuilder<Params>>,
+        Changed<CadShellsByName>,
     >,
+    mut spawn_meshes_builder_evt: EventWriter<SpawnMeshesBuilder<Params>>,
 ) {
-    // for (entity, params, shells_by_name, belongs_to_root) in shells.iter() {
-    //     let meshes_builder = match shell_builder
-    //         .params
-    //         .meshes_builders_by_shell(shell_name.clone(), shell.clone())
-    //     {
-    //         Ok(meshes_builder) => meshes_builder,
-    //         Err(e) => {
-    //             error!(
-    //                 "meshes_builders_by_shell for shell_name: {:?} failed, error: {:?}",
-    //                 shell_name, e
-    //             );
-    //             continue;
-    //         }
-    //     };
-    //     let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
-    //         continue;
-    //     };
-    //     let mesh_hdl = meshes.add(bevy_mesh);
+    for (entity, params, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+        shells_by_name_entities.iter()
+    {
+        let Ok(meshes_builders_by_shell) = params.meshes_builders_by_shell(shells_by_name.clone())
+        else {
+            warn!("Could not get meshes_builders_by_shell!");
+            continue;
+        };
+        for (shell_name, meshes_builder) in meshes_builders_by_shell.meshes_builders.iter() {
+            spawn_meshes_builder_evt.send(SpawnMeshesBuilder {
+                shell_name: shell_name.clone(),
+                meshes_builder: meshes_builder.clone(),
+                belongs_to_root: root_ent,
+            });
+        }
+    }
+}
 
-    //     for (mesh_name, mut mesh_builder) in meshes_builder.mesh_builders {
-    //         let Ok(mesh_builder) = mesh_builder.set_mesh_hdl(mesh_hdl.clone()) else {
-    //             continue;
-    //         };
-    //         commands.spawn((
-    //             shell.clone(),
-    //             mesh_name,
-    //             mesh_builder,
-    //             belongs_to_root.clone(),
-    //         ));
-    //     }
+pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut events: EventReader<SpawnMeshesBuilder<Params>>,
+) {
+    for SpawnMeshesBuilder {
+        shell_name,
+        meshes_builder,
+        belongs_to_root,
+    } in events.read()
+    {
+        let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
+            warn!("Could not build bevy_mesh for shell_name: {:?}", shell_name);
+            continue;
+        };
+        let mesh_hdl = meshes.add(bevy_mesh);
 
-    //     // De-spawn shell builder...
-    //     let Some(ent_commands) = commands.get_entity(entity) else {
-    //         continue;
-    //     };
-    //     ent_commands.despawn_recursive();
-    // }
+        for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
+            let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
+                continue;
+            };
+            commands.spawn((
+                shell_name.clone(),
+                mesh_name.clone(),
+                mesh_builder,
+                BelongsToCadGeneratedRoot(*belongs_to_root),
+            ));
+        }
+    }
 }
 
 pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
@@ -145,7 +156,6 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
         (
             Entity,
             &CadShellName,
-            &CadShell,
             &CadMeshName,
             &CadMeshLazyBuilder<Params>,
             &BelongsToCadGeneratedRoot,
@@ -153,9 +163,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
         Changed<CadMeshLazyBuilder<Params>>,
     >,
 ) {
-    for (entity, shell_name, shell, mesh_name, mesh_builder, belongs_to_root) in
-        mesh_builders.iter()
-    {
+    for (entity, shell_name, mesh_name, mesh_builder, belongs_to_root) in mesh_builders.iter() {
         let cad_mesh = match mesh_builder.build() {
             Ok(cad_mesh) => cad_mesh,
             Err(e) => {

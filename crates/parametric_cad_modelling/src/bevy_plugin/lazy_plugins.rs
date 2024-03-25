@@ -15,7 +15,7 @@ use crate::{
 use super::{
     events::{
         cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
-        lazy_cad::GenerateLazyCadModel,
+        lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
     },
     systems::{
         cad::{
@@ -25,8 +25,7 @@ use super::{
             params_ui::{hide_params_display_ui_on_out_cursor, setup_param_display_ui},
         },
         lazy_cad::model::{
-            mesh_builder_to_bundle, mesh_builder_to_cursors, shells_to_mesh_builder,
-            spawn_shells_lazy_builders_on_generate,
+            handle_spawn_meshes_builder_events, mesh_builder_to_bundle, mesh_builder_to_cursors, shells_to_mesh_builder_events, spawn_shells_lazy_builders_on_generate
         },
         wire_frame::control_wire_frame_display,
     },
@@ -132,11 +131,13 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
         app // App
             // truck...
             .add_event::<GenerateLazyCadModel<Params>>()
+            .add_event::<SpawnMeshesBuilder<Params>>()
             .add_systems(
                 Update,
                 (
                     spawn_shells_lazy_builders_on_generate::<Params>,
-                    shells_to_mesh_builder::<Params>,
+                    shells_to_mesh_builder_events::<Params>,
+                    handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
                     mesh_builder_to_cursors::<Params>,
                 ),
