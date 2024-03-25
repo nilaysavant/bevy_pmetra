@@ -223,7 +223,6 @@ pub fn transform_cursor(
 
 pub fn update_params_from_cursors<Params: ParametricLazyCad + Component>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
-    generated_meshes: Query<&CadMeshName, With<CadGeneratedMesh>>,
     cursors: Query<
         (
             &CadCursorName,
