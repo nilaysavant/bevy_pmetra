@@ -59,7 +59,6 @@ pub fn show_params_display_ui_on_hover_cursor<Params: ParametricLazyCad + Compon
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
-    generated_meshes: Query<&CadMeshName, With<CadGeneratedMesh>>,
     cursors: Query<(&CadCursorName, &BelongsToCadGeneratedRoot), With<CadGeneratedCursor>>,
 ) {
     if events.is_empty() {
@@ -120,7 +119,6 @@ pub fn move_params_display_ui_on_transform_cursor<Params: ParametricLazyCad + Co
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
-    generated_meshes: Query<&CadMeshName, With<CadGeneratedMesh>>,
     cursors: Query<(&CadCursorName, &BelongsToCadGeneratedRoot), With<CadGeneratedCursor>>,
 ) {
     if events.is_empty() {
