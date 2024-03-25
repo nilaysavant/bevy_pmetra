@@ -68,6 +68,7 @@ pub fn show_params_display_ui_on_hover_cursor<Params: ParametricLazyCad + Compon
         return;
     };
     let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.get_single_mut() else {
+        warn!("NO UI!");
         return;
     };
     for CursorPointerMoveEvent { target, hit } in events.read() {
@@ -78,6 +79,7 @@ pub fn show_params_display_ui_on_hover_cursor<Params: ParametricLazyCad + Compon
         let Ok(params) = generated_roots.get(*cad_root_ent) else {
             continue;
         };
+
         // Update UI text...
         let Ok(tooltip) = params.on_cursor_tooltip(cursor_name.clone()) else {
             continue;
