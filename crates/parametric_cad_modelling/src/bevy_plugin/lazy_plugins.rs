@@ -22,12 +22,17 @@ use super::{
             cursor::{draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor},
             mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
             outlines::generate_mesh_outlines,
-            params_ui::{hide_params_display_ui_on_out_cursor, setup_param_display_ui},
         },
-        lazy_cad::model::{
-            handle_spawn_meshes_builder_events, mesh_builder_to_bundle, mesh_builder_to_cursors,
-            shells_to_cursors, shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
-            update_shells_by_name_on_params_change,
+        lazy_cad::{
+            model::{
+                handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
+                mesh_builder_to_cursors, shells_to_cursors, shells_to_mesh_builder_events,
+                spawn_shells_by_name_on_generate, update_shells_by_name_on_params_change,
+            },
+            params_ui::{
+                hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
+                setup_param_display_ui, show_params_display_ui_on_hover_cursor,
+            },
         },
         wire_frame::control_wire_frame_display,
     },
@@ -151,6 +156,8 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
                     mesh_builder_to_cursors::<Params>,
+                    show_params_display_ui_on_hover_cursor::<Params>,
+                    move_params_display_ui_on_transform_cursor::<Params>,
                 ),
             )
             // rest...
