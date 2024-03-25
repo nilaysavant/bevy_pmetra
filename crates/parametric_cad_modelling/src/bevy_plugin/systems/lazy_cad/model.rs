@@ -77,11 +77,7 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
             };
             shells_by_name.insert(shell_name.clone(), cad_shell);
         }
-        commands.spawn((
-            params.clone(),
-            shells_by_name,
-            BelongsToCadGeneratedRoot(root),
-        ));
+        commands.spawn((shells_by_name, BelongsToCadGeneratedRoot(root)));
     }
 }
 
@@ -126,13 +122,9 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Compon
 
 pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
+    cad_generated: Query<&Params, With<CadGeneratedRoot>>,
     shells_by_name_entities: Query<
-        (
-            Entity,
-            &Params,
-            &CadShellsByName,
-            &BelongsToCadGeneratedRoot,
-        ),
+        (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
     >,
     mut cad_cursors: Query<
@@ -149,9 +141,14 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    for (entity, params, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+    for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
     {
+        // Get params from root...
+        let Ok(params) = cad_generated.get(root_ent) else {
+            warn!("Could not get `CadGeneratedRoot` with associated params!");
+            continue;
+        };
         // Cursors...
         let Ok(cursors) = params.cursors(shells_by_name) else {
             warn!("Could not get cursors!");
@@ -258,20 +255,21 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
 }
 
 pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clone>(
+    cad_generated: Query<&Params, With<CadGeneratedRoot>>,
     shells_by_name_entities: Query<
-        (
-            Entity,
-            &Params,
-            &CadShellsByName,
-            &BelongsToCadGeneratedRoot,
-        ),
+        (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
     >,
     mut spawn_meshes_builder_evt: EventWriter<SpawnMeshesBuilder<Params>>,
 ) {
-    for (entity, params, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+    for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
     {
+        // Get params from root...
+        let Ok(params) = cad_generated.get(root_ent) else {
+            warn!("Could not get `CadGeneratedRoot` with associated params!");
+            continue;
+        };
         let Ok(meshes_builders_by_shell) = params.meshes_builders_by_shell(shells_by_name) else {
             warn!("Could not get meshes_builders_by_shell!");
             continue;
