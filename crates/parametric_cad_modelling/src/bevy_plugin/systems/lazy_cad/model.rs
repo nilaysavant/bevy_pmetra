@@ -157,16 +157,13 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
 
 pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
-    mut mesh_builders: Query<
-        (
-            Entity,
-            &CadShellName,
-            &CadMeshName,
-            &mut CadMeshLazyBuilder<Params>,
-            &BelongsToCadGeneratedRoot,
-        ),
-        Changed<CadMeshLazyBuilder<Params>>,
-    >,
+    mut mesh_builders: Query<(
+        Entity,
+        &CadShellName,
+        &CadMeshName,
+        &mut CadMeshLazyBuilder<Params>,
+        &BelongsToCadGeneratedRoot,
+    )>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
 ) {
@@ -186,7 +183,6 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
             let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
                 continue;
             };
-
             if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
                 |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
                     *cur_shell_name == shell_name
