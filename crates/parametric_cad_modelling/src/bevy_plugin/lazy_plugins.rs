@@ -26,7 +26,7 @@ use super::{
         },
         lazy_cad::model::{
             handle_spawn_meshes_builder_events, mesh_builder_to_bundle, mesh_builder_to_cursors,
-            shells_to_mesh_builder_events, spawn_shells_lazy_builders_on_generate,
+            shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
         },
         wire_frame::control_wire_frame_display,
     },
@@ -142,7 +142,7 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
             .add_systems(
                 Update,
                 (
-                    spawn_shells_lazy_builders_on_generate::<Params>,
+                    spawn_shells_by_name_on_generate::<Params>,
                     shells_to_mesh_builder_events::<Params>,
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,

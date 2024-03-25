@@ -30,7 +30,7 @@ use crate::{
     },
 };
 
-pub fn spawn_shells_lazy_builders_on_generate<Params: ParametricLazyCad + Component + Clone>(
+pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut events: EventReader<GenerateLazyCadModel<Params>>,
     cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>)>,
