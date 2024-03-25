@@ -23,7 +23,10 @@ use super::{
             outlines::generate_mesh_outlines,
         },
         lazy_cad::{
-            cursor::{draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor},
+            cursor::{
+                draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
+                update_params_from_cursors,
+            },
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
                 mesh_builder_to_cursors, shells_to_cursors, shells_to_mesh_builder_events,
@@ -149,6 +152,7 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
             .add_systems(
                 Update,
                 (
+                    // Model...
                     spawn_shells_by_name_on_generate::<Params>,
                     update_shells_by_name_on_params_change::<Params>,
                     shells_to_cursors::<Params>,
@@ -156,6 +160,9 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
                     mesh_builder_to_cursors::<Params>,
+                    // Cursors...
+                    update_params_from_cursors::<Params>,
+                    // Params UI...
                     show_params_display_ui_on_hover_cursor::<Params>,
                     move_params_display_ui_on_transform_cursor::<Params>,
                 ),

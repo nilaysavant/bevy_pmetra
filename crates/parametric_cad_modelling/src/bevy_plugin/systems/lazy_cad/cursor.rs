@@ -251,7 +251,6 @@ pub fn update_params_from_cursors<Params: ParametricLazyCad + Component>(
         let is_transforms_equal = (transform
             .translation
             .abs_diff_eq(previous_transform.0.translation, 0.01));
-
         if !is_transforms_equal && matches!(state, CadGeneratedCursorState::Dragging) {
             // run event handler on params...
             params.on_cursor_transform(cursor_name.clone(), previous_transform.0, *transform);
