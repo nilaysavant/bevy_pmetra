@@ -24,7 +24,7 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>>;
 
     /// Configure Cursors.
-    fn cursors(&self, shells_by_name: CadShellsByName) -> Result<CadCursors>;
+    fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors>;
 
     /// Handler called whenever a cursor is Transformed.
     fn on_cursor_transform(
@@ -75,7 +75,7 @@ mod test {
                     )
             }
 
-            fn cursors(&self, shells_by_name: CadShellsByName) -> Result<CadCursors> {
+            fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
                 let mut cursors = CadCursors::default();
                 cursors.insert(CadCursorName("c1".into()), CadCursor::default());
 

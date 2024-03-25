@@ -16,7 +16,7 @@ use crate::{
         },
     },
     cad_core::{
-        builders::{CadCursor, CadMeshName, CadShell},
+        builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
         lazy_builders::{
             CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, CadShellsByName,
             ParametricLazyCad,
@@ -120,6 +120,138 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Compon
                     }
                 };
                 shells_by_name.insert(shell_name.clone(), cad_shell);
+            }
+        }
+    }
+}
+
+pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
+    mut commands: Commands,
+    shells_by_name_entities: Query<
+        (
+            Entity,
+            &Params,
+            &CadShellsByName,
+            &BelongsToCadGeneratedRoot,
+        ),
+        Changed<CadShellsByName>,
+    >,
+    mut cad_cursors: Query<
+        (
+            Entity,
+            &CadCursorName,
+            &BelongsToCadGeneratedRoot,
+            &mut Transform,
+            &mut CadGeneratedCursorPreviousTransform,
+            &CadGeneratedCursorState,
+        ),
+        (With<CadGeneratedCursor>, Without<CadGeneratedRoot>),
+    >,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+) {
+    for (entity, params, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+        shells_by_name_entities.iter()
+    {
+        // Cursors...
+        let Ok(cursors) = params.cursors(shells_by_name) else {
+            warn!("Could not get cursors!");
+            continue;
+        };
+        for (cursor_name, cursor) in cursors.iter() {
+            let CadCursor {
+                normal,
+                transform,
+                cursor_radius,
+                cursor_type,
+            } = cursor;
+
+            if let Some((_, _, _, mut cursor_transform, mut prev_transform, cursor_state)) = cad_cursors
+                .iter_mut()
+                .find(|(_, name, bel_root, _, _, _)| *name == cursor_name && bel_root.0 == root_ent)
+            {
+                // If cursor already exists, update it...
+                // Update transform only in normal state...
+                match cursor_state {
+                    CadGeneratedCursorState::Normal => {
+                        // Update transform using new translation/rotation but use original scale...
+                        // Since we're setting scale for adaptive cursors, changing it causes flickering.
+                        *cursor_transform = Transform {
+                            translation: transform.translation,
+                            rotation: transform.rotation,
+                            scale: cursor_transform.scale,
+                        };
+                        *prev_transform = CadGeneratedCursorPreviousTransform(*cursor_transform);
+                    }
+                    CadGeneratedCursorState::Dragging => {
+                        // Update prev transform using new translation/rotation but use original scale...
+                        // Since we're setting scale for adaptive cursors, changing it causes flickering.
+                        *prev_transform = CadGeneratedCursorPreviousTransform(Transform {
+                            translation: transform.translation,
+                            rotation: transform.rotation,
+                            scale: cursor_transform.scale,
+                        });
+                    }
+                }
+            } else {
+                // Spawn new cursor...
+                let cursor = commands
+                    .spawn((
+                        PbrBundle {
+                            material: materials.add(StandardMaterial {
+                                base_color: Color::WHITE.with_a(0.4),
+                                alpha_mode: AlphaMode::Blend,
+                                unlit: true,
+                                double_sided: true,
+                                cull_mode: None,
+                                ..default()
+                            }),
+                            mesh: meshes.add(shape::Circle::new(*cursor_radius).into()),
+                            transform: *transform,
+                            // visibility: Visibility::Hidden,
+                            ..default()
+                        },
+                        cursor_name.clone(),
+                        CadGeneratedCursor,
+                        CadGeneratedCursorConfig {
+                            cursor_radius: *cursor_radius,
+                            drag_plane_normal: *normal,
+                            cursor_type: cursor_type.clone(),
+                        },
+                        CadGeneratedCursorState::default(),
+                        CadGeneratedCursorPreviousTransform(*transform),
+                        BelongsToCadGeneratedRoot(root_ent),
+                        NotShadowCaster,
+                        // picking...
+                        PickableBundle::default(), // <- Makes the mesh pickable.
+                        NoBackfaceCulling,
+                        // Disable highlight cursor...
+                        Highlight::<StandardMaterial> {
+                            hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                                base_color: mat.base_color.with_a(0.6),
+                                ..mat.to_owned()
+                            })),
+                            pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                                base_color: mat.base_color.with_a(0.8),
+                                ..mat.to_owned()
+                            })),
+                            selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                                ..mat.to_owned()
+                            })),
+                        },
+                    ))
+                    .insert((
+                        // events...
+                        On::<Pointer<Move>>::send_event::<CursorPointerMoveEvent>(),
+                        On::<Pointer<Out>>::send_event::<CursorPointerOutEvent>(),
+                        // Add drag plane on drag start...
+                        On::<Pointer<DragStart>>::run(cursor_drag_start),
+                        On::<Pointer<DragEnd>>::run(cursor_drag_end),
+                    ))
+                    .insert(NoDeselect) // Prevent de-select other ent when cursor is interacted with.
+                    .id();
+                // Add cursor to root
+                commands.entity(root_ent).add_child(cursor);
             }
         }
     }
