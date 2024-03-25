@@ -50,7 +50,7 @@ impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
             .get(&shell_name)
             .ok_or_else(|| anyhow!("Could not find shell with name: {:?}", shell_name))?;
         let mut mesh_builder = mesh_builder;
-        mesh_builder.set_outlines(shell.shell.build_outlines());
+        mesh_builder.set_outlines(shell.shell.build_outlines())?;
         if let Some(meshes_builder) = self.meshes_builders.get_mut(&shell_name) {
             // Add the mesh builder to the existing meshes builder...
             meshes_builder.add_mesh_builder(mesh_name, mesh_builder)?;
