@@ -86,9 +86,46 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
     }
 }
 
+pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Component + Clone>(
+    cad_generated: Query<(Entity, &Params), (Changed<Params>, With<CadGeneratedRoot>)>,
+    mut shells_by_name_entities: Query<(Entity, &BelongsToCadGeneratedRoot, &mut CadShellsByName)>,
+) {
+    for (root_ent, params) in cad_generated.iter() {
+        for (entity, &BelongsToCadGeneratedRoot(cur_root), mut shells_by_name) in
+            shells_by_name_entities.iter_mut()
+        {
+            if cur_root != root_ent {
+                continue;
+            }
+            // Get the shell builders from params...
+            let shells_lazy_builders = match params.shells_builders() {
+                Ok(result) => result,
+                Err(e) => {
+                    error!("shells_builders failed with error: {:?}", e);
+                    return;
+                }
+            };
+            // Clear existing shells...
+            shells_by_name.clear();
+            // Build Shells from Builders and add to shells_by_name...
+            for (shell_name, shell_builder) in shells_lazy_builders.builders.iter() {
+                let cad_shell = match shell_builder.build_cad_shell() {
+                    Ok(shell) => shell,
+                    Err(e) => {
+                        error!(
+                            "build_cad_shell for shell_name: {:?} failed, error: {:?}",
+                            shell_name, e
+                        );
+                        continue;
+                    }
+                };
+                shells_by_name.insert(shell_name.clone(), cad_shell);
+            }
+        }
+    }
+}
+
 pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clone>(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
     shells_by_name_entities: Query<
         (
             Entity,
@@ -120,6 +157,16 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
 
 pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
+    mut mesh_builders: Query<
+        (
+            Entity,
+            &CadShellName,
+            &CadMeshName,
+            &mut CadMeshLazyBuilder<Params>,
+            &BelongsToCadGeneratedRoot,
+        ),
+        Changed<CadMeshLazyBuilder<Params>>,
+    >,
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
 ) {
@@ -139,12 +186,25 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
             let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
                 continue;
             };
-            commands.spawn((
-                shell_name.clone(),
-                mesh_name.clone(),
-                mesh_builder,
-                BelongsToCadGeneratedRoot(*belongs_to_root),
-            ));
+
+            if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
+                |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
+                    *cur_shell_name == shell_name
+                        && *cur_mesh_name == mesh_name
+                        && cur_bel_root.0 == *belongs_to_root
+                },
+            ) {
+                // if mesh_builder already exists, update it...
+                *cur_mesh_builder = mesh_builder;
+            } else {
+                // Spawn new mesh_builder...
+                commands.spawn((
+                    shell_name.clone(),
+                    mesh_name.clone(),
+                    mesh_builder,
+                    BelongsToCadGeneratedRoot(*belongs_to_root),
+                ));
+            };
         }
     }
 }
