@@ -278,7 +278,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
             spawn_meshes_builder_evt.send(SpawnMeshesBuilder {
                 shell_name: shell_name.clone(),
                 meshes_builder: meshes_builder.clone(),
-                belongs_to_root: root_ent,
+                belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
             });
         }
     }
@@ -299,7 +299,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     for SpawnMeshesBuilder {
         shell_name,
         meshes_builder,
-        belongs_to_root,
+        belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
     } in events.read()
     {
         let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
@@ -316,7 +316,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
                 |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
                     *cur_shell_name == shell_name
                         && *cur_mesh_name == mesh_name
-                        && cur_bel_root.0 == *belongs_to_root
+                        && cur_bel_root.0 == *root_ent
                 },
             ) {
                 // if mesh_builder already exists, update it...
@@ -327,7 +327,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
                     shell_name.clone(),
                     mesh_name.clone(),
                     mesh_builder,
-                    BelongsToCadGeneratedRoot(*belongs_to_root),
+                    BelongsToCadGeneratedRoot(*root_ent),
                 ));
             };
         }
@@ -400,7 +400,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
                 On::<Pointer<Out>>::run(mesh_pointer_out),
             ))
             .id();
-
+        // Add the spawned mesh as child of the root...
         let Some(mut root_ent_commands) = commands.get_entity(belongs_to_root.0) else {
             warn!("Could not get commands for entity: {:?}", belongs_to_root.0);
             continue;

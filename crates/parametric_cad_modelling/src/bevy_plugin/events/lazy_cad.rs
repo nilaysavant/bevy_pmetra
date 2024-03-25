@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::cad_core::lazy_builders::{CadMeshesLazyBuilder, CadShellName, ParametricLazyCad};
+use crate::{cad_core::lazy_builders::{CadMeshesLazyBuilder, CadShellName, ParametricLazyCad}, prelude::BelongsToCadGeneratedRoot};
 
 /// Event when fired, **generates CAD Model** for the passed [`Params`].
 ///
@@ -26,7 +26,7 @@ impl<Params: ParametricLazyCad + Component + Default> Default for GenerateLazyCa
 /// Event used to spawn individual mesh builders for parallel meshing.
 #[derive(Debug, Event, Reflect)]
 pub struct SpawnMeshesBuilder<Params: ParametricLazyCad + Component> {
-    pub belongs_to_root: Entity,
+    pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,
     pub meshes_builder: CadMeshesLazyBuilder<Params>,
 }
