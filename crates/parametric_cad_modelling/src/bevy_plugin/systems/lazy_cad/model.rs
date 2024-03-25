@@ -2,10 +2,11 @@ use bevy::{pbr::NotShadowCaster, prelude::*};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
 };
+use truck_base::id;
 
 use crate::{
     bevy_plugin::{
-        components::cad::CadGeneratedRoot,
+        components::cad::{self, CadGeneratedRoot},
         events::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
@@ -337,9 +338,10 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
 pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mesh_builders: Query<
+    mut mesh_builders: Query<
         (
             Entity,
+            Option<&CadGeneratedMesh>,
             &CadShellName,
             &CadMeshName,
             &CadMeshLazyBuilder<Params>,
@@ -348,7 +350,15 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
         Changed<CadMeshLazyBuilder<Params>>,
     >,
 ) {
-    for (entity, shell_name, mesh_name, mesh_builder, belongs_to_root) in mesh_builders.iter() {
+    for (
+        entity,
+        cad_generated_mesh,
+        shell_name,
+        mesh_name,
+        mesh_builder,
+        BelongsToCadGeneratedRoot(root_ent),
+    ) in mesh_builders.iter_mut()
+    {
         let cad_mesh = match mesh_builder.build() {
             Ok(cad_mesh) => cad_mesh,
             Err(e) => {
@@ -359,7 +369,6 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
                 continue;
             }
         };
-
         let CadLazyMesh {
             mesh_hdl,
             base_material,
@@ -367,44 +376,59 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
             outlines,
             // cursors,
         } = cad_mesh;
-
         let material_hdl = materials.add(base_material);
 
-        let mesh_entity = commands
-            .entity(entity)
-            .insert(PickableBundle::default())
-            .insert(MaterialMeshBundle {
-                material: material_hdl.clone(),
-                mesh: mesh_hdl,
-                transform,
-                ..Default::default()
-            })
-            .insert((
-                Name::new(mesh_name.0.clone()),
-                CadGeneratedMesh,
-                belongs_to_root.clone(),
-                CadGeneratedMeshOutlines(outlines.clone()),
-                CadGeneratedMeshOutlinesState::default(),
-                WireFrameDisplaySettings::default(),
-                // picking...
-                PickableBundle::default(), // <- Makes the mesh pickable.
-                // Pickable::IGNORE,
-                // Disable highlight...
-                Highlight::<StandardMaterial> {
-                    hovered: Some(HighlightKind::Fixed(material_hdl.clone())),
-                    pressed: Some(HighlightKind::Fixed(material_hdl.clone())),
-                    selected: Some(HighlightKind::Fixed(material_hdl.clone())),
+        if cad_generated_mesh.is_some() {
+            // If mesh already exists, update it...
+            commands.entity(entity).insert((
+                MaterialMeshBundle {
+                    material: material_hdl.clone(),
+                    mesh: mesh_hdl,
+                    transform,
+                    ..Default::default()
                 },
-                // Add drag plane on drag start...
-                On::<Pointer<Move>>::run(mesh_pointer_move),
-                On::<Pointer<Out>>::run(mesh_pointer_out),
-            ))
-            .id();
-        // Add the spawned mesh as child of the root...
-        let Some(mut root_ent_commands) = commands.get_entity(belongs_to_root.0) else {
-            warn!("Could not get commands for entity: {:?}", belongs_to_root.0);
-            continue;
-        };
-        root_ent_commands.push_children(&[mesh_entity]);
+                CadGeneratedMeshOutlines(outlines.clone()),
+            ));
+        } else {
+            // Spawn a new mesh...
+            let mesh_entity = commands
+                .entity(entity)
+                .insert((
+                    MaterialMeshBundle {
+                        material: material_hdl.clone(),
+                        mesh: mesh_hdl,
+                        transform,
+                        ..Default::default()
+                    },
+                    CadGeneratedMeshOutlines(outlines.clone()),
+                ))
+                .insert(PickableBundle::default())
+                .insert((
+                    Name::new(mesh_name.0.clone()),
+                    CadGeneratedMesh,
+                    BelongsToCadGeneratedRoot(*root_ent),
+                    CadGeneratedMeshOutlinesState::default(),
+                    WireFrameDisplaySettings::default(),
+                    // picking...
+                    PickableBundle::default(), // <- Makes the mesh pickable.
+                    // Pickable::IGNORE,
+                    // Disable highlight...
+                    Highlight::<StandardMaterial> {
+                        hovered: Some(HighlightKind::Fixed(material_hdl.clone())),
+                        pressed: Some(HighlightKind::Fixed(material_hdl.clone())),
+                        selected: Some(HighlightKind::Fixed(material_hdl.clone())),
+                    },
+                    // Add drag plane on drag start...
+                    On::<Pointer<Move>>::run(mesh_pointer_move),
+                    On::<Pointer<Out>>::run(mesh_pointer_out),
+                ))
+                .id();
+            // Add the spawned mesh as child of the root...
+            let Some(mut root_ent_commands) = commands.get_entity(*root_ent) else {
+                warn!("Could not get commands for entity: {:?}", *root_ent);
+                continue;
+            };
+            root_ent_commands.push_children(&[mesh_entity]);
+        }
     }
 }
