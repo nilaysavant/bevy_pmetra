@@ -104,11 +104,6 @@ pub fn build_cube_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShell> {
 //     Ok(cad_mesh)
 // }
 
-#[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CubeCursorIds {
-    SideLength,
-}
-
 // pub fn build_side_length_cursor(
 //     builder: &CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>,
 //     cad_shell: &CadShell,

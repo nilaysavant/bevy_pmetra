@@ -26,17 +26,12 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
     /// Handler called whenever a cursor is Transformed.
     fn on_cursor_transform(
         &mut self,
-        mesh_name: CadMeshName,
         cursor_name: CadCursorName,
         prev_transform: Transform,
         new_transform: Transform,
     );
     /// Handler called to get [`CadCursor`] tooltip UI text.
-    fn on_cursor_tooltip(
-        &self,
-        mesh_name: CadMeshName,
-        cursor_name: CadCursorName,
-    ) -> Result<String>;
+    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String>;
 }
 
 mod test {
@@ -79,7 +74,6 @@ mod test {
 
             fn on_cursor_transform(
                 &mut self,
-                mesh_name: CadMeshName,
                 cursor_name: CadCursorName,
                 prev_transform: Transform,
                 new_transform: Transform,
@@ -87,11 +81,7 @@ mod test {
                 // TODO
             }
 
-            fn on_cursor_tooltip(
-                &self,
-                mesh_name: CadMeshName,
-                cursor_name: CadCursorName,
-            ) -> Result<String> {
+            fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String> {
                 // TODO
                 Ok("Test".into())
             }

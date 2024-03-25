@@ -71,11 +71,6 @@ pub fn cylinder_mesh_builder(
     Ok(mesh_builder)
 }
 
-#[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CylinderCursorIds {
-    RadiusCursor,
-}
-
 pub fn build_radius_cursor(
     builder: &CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>,
     cad_shell: &CadShell,
