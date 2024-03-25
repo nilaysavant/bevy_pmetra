@@ -1,4 +1,9 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashMap};
+
+use super::CadCursorName;
+
+#[derive(Debug, Clone, Deref, DerefMut, Default)]
+pub struct CadCursors(pub HashMap<CadCursorName, CadCursor>);
 
 #[derive(Debug, Clone)]
 pub struct CadCursor {

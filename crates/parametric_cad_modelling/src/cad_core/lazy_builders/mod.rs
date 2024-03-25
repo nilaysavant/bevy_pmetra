@@ -1,7 +1,7 @@
 use anyhow::Result;
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashMap};
 
-use super::builders::{CadCursorName, CadMeshName, CadShell};
+use super::builders::{CadCursor, CadCursorName, CadCursors, CadMeshName, CadShell};
 
 /// Meshes builders.
 pub mod meshes;
@@ -22,6 +22,9 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
         &self,
         shells_by_name: CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>>;
+
+    /// Configure Cursors.
+    fn cursors(&self, shells_by_name: CadShellsByName) -> Result<CadCursors>;
 
     /// Handler called whenever a cursor is Transformed.
     fn on_cursor_transform(
@@ -70,6 +73,13 @@ mod test {
                             .set_transform(Transform::default())?
                             .set_base_material(StandardMaterial::default())?,
                     )
+            }
+
+            fn cursors(&self, shells_by_name: CadShellsByName) -> Result<CadCursors> {
+                let mut cursors = CadCursors::default();
+                cursors.insert(CadCursorName("c1".into()), CadCursor::default());
+
+                Ok(cursors)
             }
 
             fn on_cursor_transform(
