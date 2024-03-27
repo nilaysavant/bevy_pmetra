@@ -13,7 +13,7 @@ use bevy_pmetra::{
 use strum::{Display, EnumString};
 
 use self::{
-    cube::{build_cube_shell, cube_mesh_builder},
+    cube::{build_cube_shell, build_side_length_cursor, cube_mesh_builder},
     cylinder::{build_cylinder_shell, build_radius_cursor, cylinder_mesh_builder},
 };
 
@@ -104,10 +104,15 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
     }
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let cursors = CadCursors::default().add_cursor(
-            CadCursorIds::CylinderRadius.to_string().into(),
-            build_radius_cursor(self, shells_by_name)?,
-        )?;
+        let cursors = CadCursors::default()
+            .add_cursor(
+                CadCursorIds::CylinderRadius.to_string().into(),
+                build_radius_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::CubeSideLength.to_string().into(),
+                build_side_length_cursor(self, shells_by_name)?,
+            )?;
 
         Ok(cursors)
     }

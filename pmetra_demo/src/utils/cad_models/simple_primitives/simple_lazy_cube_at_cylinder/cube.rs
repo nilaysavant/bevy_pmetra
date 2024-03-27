@@ -104,60 +104,65 @@ pub fn cube_mesh_builder(
     Ok(mesh_builder)
 }
 
-// pub fn build_side_length_cursor(
-//     builder: &CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>,
-//     cad_shell: &CadShell,
-// ) -> Result<CadCursor> {
-//     let SimpleLazyCubeAtCylinder {
-//         cylinder_radius,
-//         cylinder_height,
-//         cube_attach_angle,
-//         cube_side_length,
-//     } = &builder.params;
+pub fn build_side_length_cursor(
+    params: &SimpleLazyCubeAtCylinder,
+    shells_by_name: &CadShellsByName,
+) -> Result<CadCursor> {
+    let SimpleLazyCubeAtCylinder {
+        cylinder_radius,
+        cylinder_height,
+        cube_attach_angle,
+        cube_side_length,
+    } = &params;
 
-//     let Some(CadElement::Vertex(vertex_v0)) =
-//         cad_shell.get_element_by_tag(CadElementTag::new("VertexV0"))
-//     else {
-//         return Err(anyhow!("Could not find vertex!"));
-//     };
-//     let Some(CadElement::Vertex(vertex_v1)) =
-//         cad_shell.get_element_by_tag(CadElementTag::new("VertexV1"))
-//     else {
-//         return Err(anyhow!("Could not find vertex!"));
-//     };
-//     let Some(CadElement::Face(face)) =
-//         cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
-//     else {
-//         return Err(anyhow!("Could not find face!"));
-//     };
-//     let face_normal = face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
-//     let face_boundaries = face.boundaries();
-//     let face_wire = face_boundaries.last().expect("No wire found!");
-//     let face_centroid = face_wire.get_centroid();
-//     let local_right_direction =
-//         (vertex_v1.point().as_bevy_vec3() - vertex_v0.point().as_bevy_vec3()).normalize();
-//     let Some(CadMesh {
-//         transform: mesh_transform,
-//         ..
-//     }) = builder.cad_mesh
-//     else {
-//         return Err(anyhow!("could not get CadMesh!"));
-//     };
-//     let local_cursor_pos =
-//         face_centroid.as_vec3() + Vec3::Z * (*cube_side_length as f32 / 2. + 0.1);
-//     let cursor_pos = mesh_transform.transform_point(local_cursor_pos);
-//     let mut cursor_transform =
-//         Transform::from_translation(cursor_pos).with_rotation(mesh_transform.rotation);
-//     cursor_transform.rotate_y(std::f32::consts::FRAC_PI_2);
+    let cad_shell = shells_by_name
+        .get(&CadShellName(CadShellIds::Cube.to_string()))
+        .ok_or_else(|| anyhow!("Could not get cube shell!"))?;
 
-//     Ok(CadCursor {
-//         normal: mesh_transform.up(),
-//         transform: cursor_transform,
-//         cursor_type: CadCursorType::Linear {
-//             direction: mesh_transform.local_z(),
-//             limit_min: None,
-//             limit_max: None,
-//         },
-//         ..default()
-//     })
-// }
+    let Some(CadElement::Vertex(vertex_v0)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("VertexV0"))
+    else {
+        return Err(anyhow!("Could not find vertex!"));
+    };
+    let Some(CadElement::Vertex(vertex_v1)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("VertexV1"))
+    else {
+        return Err(anyhow!("Could not find vertex!"));
+    };
+    let Some(CadElement::Face(face)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
+    else {
+        return Err(anyhow!("Could not find face!"));
+    };
+    let face_normal = face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
+    let face_boundaries = face.boundaries();
+    let face_wire = face_boundaries.last().expect("No wire found!");
+    let face_centroid = face_wire.get_centroid();
+    let local_right_direction =
+        (vertex_v1.point().as_bevy_vec3() - vertex_v0.point().as_bevy_vec3()).normalize();
+
+    let cube_builder = cube_mesh_builder(
+        params,
+        CadShellName(CadShellIds::Cube.to_string()),
+        shells_by_name,
+    )?;
+    let mesh_transform = cube_builder.transform;
+
+    let local_cursor_pos =
+        face_centroid.as_vec3() + Vec3::Z * (*cube_side_length as f32 / 2. + 0.1);
+    let cursor_pos = mesh_transform.transform_point(local_cursor_pos);
+    let mut cursor_transform =
+        Transform::from_translation(cursor_pos).with_rotation(mesh_transform.rotation);
+    cursor_transform.rotate_y(std::f32::consts::FRAC_PI_2);
+
+    Ok(CadCursor {
+        normal: mesh_transform.up(),
+        transform: cursor_transform,
+        cursor_type: CadCursorType::Linear {
+            direction: mesh_transform.local_z(),
+            limit_min: None,
+            limit_max: None,
+        },
+        ..default()
+    })
+}
