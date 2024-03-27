@@ -1,5 +1,8 @@
 use bevy::{prelude::*, utils::hashbrown::HashMap};
-use bevy_pmetra::{bevy_plugin::events::lazy_cad::GenerateLazyCadModel, prelude::*};
+use bevy_pmetra::{
+    bevy_plugin::events::lazy_cad::GenerateLazyCadModel,
+    cad_core::lazy_builders::ParametricLazyCad, prelude::*,
+};
 use bevy_rapier3d::prelude::*;
 
 use crate::{
@@ -52,10 +55,9 @@ pub fn spawn_cad_model(
     }
 }
 
-pub fn add_collider_to_generated_cad_model<Params: ParametricCad + Component>(
+pub fn add_collider_to_generated_cad_model<Params: ParametricLazyCad + Component>(
     mut commands: Commands,
     meshes: Res<Assets<Mesh>>,
-    cad_roots: Query<Entity, (With<CadGeneratedRoot>, Changed<Params>)>,
     cad_meshes: Query<
         (
             Entity,
@@ -63,27 +65,21 @@ pub fn add_collider_to_generated_cad_model<Params: ParametricCad + Component>(
             &CadMeshName,
             &Handle<Mesh>,
         ),
-        With<CadGeneratedMesh>,
+        (With<CadGeneratedMesh>, Changed<Handle<Mesh>>),
     >,
 ) {
-    for cad_root_ent in cad_roots.iter() {
-        for (cad_mesh_ent, BelongsToCadGeneratedRoot(cad_root_ent_cur), cad_mesh_name, mesh_hdl) in
-            cad_meshes.iter()
-        {
-            if *cad_root_ent_cur != cad_root_ent {
-                continue;
-            }
-            let Some(mesh) = meshes.get(mesh_hdl) else {
-                continue;
-            };
-            let Some(collider) = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh)
-            else {
-                error!("Could not generated collider for {}!", **cad_mesh_name);
-                continue;
-            };
-            commands
-                .entity(cad_mesh_ent)
-                .insert((RigidBody::Fixed, collider));
-        }
+    for (cad_mesh_ent, BelongsToCadGeneratedRoot(cad_root_ent_cur), cad_mesh_name, mesh_hdl) in
+        cad_meshes.iter()
+    {
+        let Some(mesh) = meshes.get(mesh_hdl) else {
+            continue;
+        };
+        let Some(collider) = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh) else {
+            error!("Could not generated collider for {}!", **cad_mesh_name);
+            continue;
+        };
+        commands
+            .entity(cad_mesh_ent)
+            .insert((RigidBody::Fixed, collider));
     }
 }

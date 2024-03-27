@@ -112,7 +112,7 @@ impl Plugin for PmetraDemoPlugin {
             .add_systems(Update, (spawn_cad_model, fire_balls_at_look_point))
             .add_systems(
                 PostUpdate,
-                add_collider_to_generated_cad_model::<RoundCabinSegment>,
+                add_collider_to_generated_cad_model::<SimpleLazyCubeAtCylinder>,
             )
             // scene...
             .add_systems(
