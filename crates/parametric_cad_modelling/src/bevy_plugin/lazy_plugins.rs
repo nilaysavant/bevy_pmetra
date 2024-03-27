@@ -18,12 +18,12 @@ use super::{
         lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
     },
     systems::{
-        cad::mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
         lazy_cad::{
             cursor::{
                 draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
                 update_params_from_cursors,
             },
+            mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle, shells_to_cursors,
                 shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,

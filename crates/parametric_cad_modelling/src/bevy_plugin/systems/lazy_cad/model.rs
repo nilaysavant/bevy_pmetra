@@ -11,7 +11,6 @@ use crate::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
-        systems::cad::mesh::{mesh_pointer_move, mesh_pointer_out},
     },
     cad_core::{
         builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
@@ -28,7 +27,10 @@ use crate::{
     },
 };
 
-use super::cursor::{cursor_drag_end, cursor_drag_start};
+use super::{
+    cursor::{cursor_drag_end, cursor_drag_start},
+    mesh::{mesh_pointer_move, mesh_pointer_out},
+};
 
 pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
