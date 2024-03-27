@@ -1,8 +1,12 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
-use crate::bevy_plugin::components::cad::{
-    BelongsToCadGeneratedMesh, CadGeneratedCursor, CadGeneratedMesh, CadGeneratedMeshOutlinesState,
+use crate::{
+    bevy_plugin::components::cad::{
+        BelongsToCadGeneratedMesh, CadGeneratedCursor, CadGeneratedMesh,
+        CadGeneratedMeshOutlinesState,
+    },
+    prelude::BelongsToCadGeneratedRoot,
 };
 
 pub fn mesh_pointer_move(
@@ -43,24 +47,33 @@ pub fn mesh_pointer_out(
 
 pub fn handle_mesh_selection(
     mut cad_meshes: Query<
-        (Entity, &PickSelection, &mut CadGeneratedMeshOutlinesState),
+        (
+            Entity,
+            &PickSelection,
+            &mut CadGeneratedMeshOutlinesState,
+            &BelongsToCadGeneratedRoot,
+        ),
         (With<CadGeneratedMesh>, Changed<PickSelection>),
     >,
-    mut cad_cursors: Query<(&BelongsToCadGeneratedMesh, &mut Visibility), With<CadGeneratedCursor>>,
+    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
 ) {
-    for (cad_mesh_ent, selection, mut outlines_state) in cad_meshes.iter_mut() {
-        for (BelongsToCadGeneratedMesh(cad_mesh_ent_cur), mut visibility) in cad_cursors.iter_mut()
-        {
-            if *cad_mesh_ent_cur != cad_mesh_ent {
+    for (cad_mesh_ent, selection, mut outlines_state, &BelongsToCadGeneratedRoot(root_ent)) in
+        cad_meshes.iter_mut()
+    {
+        if selection.is_selected {
+            *outlines_state = CadGeneratedMeshOutlinesState::Visible;
+        } else {
+            *outlines_state = CadGeneratedMeshOutlinesState::default();
+        }
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_cursors.iter_mut() {
+            if cur_root_ent != root_ent {
                 continue;
             }
-            // if belongs to selected mesh set to visible else hide cursors...
+            // if belongs to same root as mesh set to visible else hide cursors...
             if selection.is_selected {
                 *visibility = Visibility::Visible;
-                *outlines_state = CadGeneratedMeshOutlinesState::Visible;
             } else {
                 *visibility = Visibility::Hidden;
-                *outlines_state = CadGeneratedMeshOutlinesState::default();
             }
         }
     }
