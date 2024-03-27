@@ -3,7 +3,10 @@ use std::f64::consts::{FRAC_PI_2, PI, TAU};
 use anyhow::{anyhow, Context, Error, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
-    cad_core::{extensions::shell::ShellCadExtension, lazy_builders::CadMeshLazyBuilder},
+    cad_core::{
+        extensions::shell::ShellCadExtension,
+        lazy_builders::{CadMeshLazyBuilder, CadShellName, CadShellsByName},
+    },
     math::get_rotation_from_normals,
     prelude::*,
     re_exports::truck_modeling::{
@@ -60,49 +63,46 @@ pub fn build_cube_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShell> {
     })
 }
 
-// pub fn build_cube_mesh(params: &SimpleLazyCubeAtCylinder, cad_shell: &CadShell) -> Result<CadMesh> {
-//     let SimpleLazyCubeAtCylinder {
-//         cylinder_radius,
-//         cylinder_height,
-//         cube_attach_angle,
-//         cube_side_length,
-//     } = &params;
-//     // convert result into mesh...
-//     let mesh = cad_shell.build_polygon()?.build_mesh();
-//     // spawn entity with generated mesh...
+pub fn cube_mesh_builder(
+    params: &SimpleLazyCubeAtCylinder,
+    shell_name: CadShellName,
+    shells_by_name: &CadShellsByName,
+) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
+    let SimpleLazyCubeAtCylinder {
+        cylinder_radius,
+        cylinder_height,
+        cube_attach_angle,
+        cube_side_length,
+    } = &params;
+    // spawn entity with generated mesh...
+    let transform = Transform::default();
 
-//     let Some(cylinder_solid) = builder.shells.get(&CadSolidIds::Cylinder.to_string()) else {
-//         return Err(anyhow!("Could not get cylinder_solid!"));
-//     };
-//     let Some(CadElement::Vertex(cylinder_v0)) = cylinder_solid
-//         .tagged_elements
-//         .get(&CadElementTag("VertexV0".into()))
-//     else {
-//         return Err(anyhow!("Could not get cylinder VertexV0!"));
-//     };
+    let Some(cylinder_solid) = shells_by_name.get(&CadShellName(CadShellIds::Cylinder.to_string()))
+    else {
+        return Err(anyhow!("Could not get cylinder_solid!"));
+    };
+    let Some(CadElement::Vertex(cylinder_v0)) = cylinder_solid
+        .tagged_elements
+        .get(&CadElementTag("VertexV0".into()))
+    else {
+        return Err(anyhow!("Could not get cylinder VertexV0!"));
+    };
 
-//     let rotation = get_rotation_from_normals(Vec3::Y, Vec3::X);
-//     let mut transform = Transform::from_rotation(rotation).with_translation(
-//         cylinder_v0.point().as_bevy_vec3() + Vec3::Y * (*cylinder_height as f32 / 2.),
-//     );
-//     transform.rotate_around(
-//         Vec3::ZERO,
-//         Quat::from_rotation_y(-std::f32::consts::FRAC_PI_4),
-//     );
+    let rotation = get_rotation_from_normals(Vec3::Y, Vec3::X);
+    let mut transform = Transform::from_rotation(rotation).with_translation(
+        cylinder_v0.point().as_bevy_vec3() + Vec3::Y * (*cylinder_height as f32 / 2.),
+    );
+    transform.rotate_around(
+        Vec3::ZERO,
+        Quat::from_rotation_y(-std::f32::consts::FRAC_PI_4),
+    );
 
-//     let cad_mesh = CadMeshBuilder::new(builder.params.clone(), cad_shell.clone())? // builder
-//         .set_bevy_mesh(mesh)?
-//         .set_base_material(Color::BLUE.into())?
-//         .set_outlines(cad_shell.shell.build_outlines())?
-//         .set_transform(transform)?
-//         .add_cursor(
-//             CubeCursorIds::SideLength.to_string(),
-//             build_side_length_cursor,
-//         )?
-//         .build()?;
+    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+        .set_transform(transform)?
+        .set_base_material(Color::BLUE.into())?;
 
-//     Ok(cad_mesh)
-// }
+    Ok(mesh_builder)
+}
 
 // pub fn build_side_length_cursor(
 //     builder: &CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>,

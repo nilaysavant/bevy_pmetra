@@ -13,7 +13,7 @@ use bevy_pmetra::{
 use strum::{Display, EnumString};
 
 use self::{
-    cube::build_cube_shell,
+    cube::{build_cube_shell, cube_mesh_builder},
     cylinder::{build_cylinder_shell, build_radius_cursor, cylinder_mesh_builder},
 };
 
@@ -64,9 +64,7 @@ pub enum CadCursorIds {
 }
 
 impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
-    fn shells_builders(
-        &self,
-    ) -> Result<bevy_pmetra::cad_core::lazy_builders::CadShellsLazyBuilders<Self>> {
+    fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
             .add_shell_builder(
                 CadShellName(CadShellIds::Cylinder.to_string()),
@@ -93,9 +91,13 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
                     cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
                 )?
                 .add_mesh_builder(
-                    CadShellName(CadShellIds::Cylinder.to_string()),
-                    CadMeshIds::Cylinder.to_string(),
-                    cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
+                    CadShellName(CadShellIds::Cube.to_string()),
+                    CadMeshIds::Cube.to_string(),
+                    cube_mesh_builder(
+                        self,
+                        CadShellName(CadShellIds::Cube.to_string()),
+                        shells_by_name,
+                    )?,
                 )?;
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
