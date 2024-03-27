@@ -34,7 +34,7 @@ pub fn scene_setup(mut commands: Commands) {
 
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
-            illuminance: 15000.,
+            illuminance: 4000.,
             shadows_enabled: true,
             ..default()
         },

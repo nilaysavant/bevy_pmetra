@@ -74,7 +74,7 @@ impl Plugin for PmetraDemoPlugin {
             .insert_resource(DirectionalLightShadowMap { size: 4096 })
             .insert_resource(AmbientLight {
                 color: Color::WHITE,
-                brightness: 0.25,
+                brightness: 400.,
             })
             // physics
             .insert_resource(RapierConfiguration::default())
