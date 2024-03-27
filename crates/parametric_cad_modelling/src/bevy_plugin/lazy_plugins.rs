@@ -18,10 +18,7 @@ use super::{
         lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
     },
     systems::{
-        cad::{
-            mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
-            outlines::generate_mesh_outlines,
-        },
+        cad::mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
         lazy_cad::{
             cursor::{
                 draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
@@ -32,6 +29,7 @@ use super::{
                 shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
                 update_shells_by_name_on_params_change,
             },
+            outlines::generate_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
                 setup_param_display_ui, show_params_display_ui_on_hover_cursor,
