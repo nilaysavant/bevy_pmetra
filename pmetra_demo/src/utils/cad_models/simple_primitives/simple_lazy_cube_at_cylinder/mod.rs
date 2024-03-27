@@ -104,11 +104,10 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
     }
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let mut cursors = CadCursors::default();
-        cursors.insert(
+        let cursors = CadCursors::default().add_cursor(
             CadCursorName(CadCursorIds::CylinderRadius.to_string()),
             build_radius_cursor(self, shells_by_name)?,
-        );
+        )?;
 
         Ok(cursors)
     }
