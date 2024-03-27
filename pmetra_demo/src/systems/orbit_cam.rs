@@ -12,8 +12,8 @@ pub fn orbit_cam_custom_input_map_controller(
     mut events: EventWriter<ControlEvent>,
     mut mouse_wheel_reader: EventReader<MouseWheel>,
     mut mouse_motion_events: EventReader<MouseMotion>,
-    mouse_buttons: Res<Input<MouseButton>>,
-    keyboard: Res<Input<KeyCode>>,
+    mouse_buttons: Res<ButtonInput<MouseButton>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
     controllers: Query<&OrbitCameraController>,
 ) {
     // Can only control one camera at a time.
@@ -64,7 +64,7 @@ pub fn fire_balls_at_look_point(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mouse_input: Res<Input<MouseButton>>,
+    mouse_input: Res<ButtonInput<MouseButton>>,
     query_orbit_cam: Query<&LookTransform, With<OrbitCameraController>>,
 ) {
     if !mouse_input.just_pressed(MouseButton::Right) {
@@ -84,14 +84,11 @@ pub fn fire_balls_at_look_point(
     // Spawn bullet ball...
     commands.spawn((
         PbrBundle {
-            mesh: meshes.add(
-                shape::UVSphere {
-                    radius: BULLET_SPHERE_RADIUS,
-                    ..default()
-                }
-                .into(),
-            ),
-            material: materials.add(Color::WHITE.into()),
+            mesh: meshes.add(shape::UVSphere {
+                radius: BULLET_SPHERE_RADIUS,
+                ..default()
+            }),
+            material: materials.add(Color::WHITE),
             transform: Transform::from_translation(*eye),
             ..default()
         },

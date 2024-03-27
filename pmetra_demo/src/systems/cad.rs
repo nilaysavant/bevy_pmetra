@@ -47,7 +47,7 @@ pub fn spawn_cad_model(
             // spawn_simple_gear.send(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::SimplLazyCubeAtCylinder => {
-            spawn_lazy_simple_cube_at_cylinder.send(GenerateLazyCadModel::default())
+            spawn_lazy_simple_cube_at_cylinder.send(GenerateLazyCadModel::default());
         }
     }
 }

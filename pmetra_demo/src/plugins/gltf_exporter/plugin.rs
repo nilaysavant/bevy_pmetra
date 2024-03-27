@@ -22,7 +22,7 @@ impl Plugin for GltfExporterPlugin {
 }
 
 pub fn save_mesh(
-    key_input: Res<Input<KeyCode>>,
+    key_input: Res<ButtonInput<KeyCode>>,
     selected_meshes: Query<
         (&CadMeshName, &Handle<Mesh>, &Handle<StandardMaterial>),
         With<CadGeneratedMesh>,
@@ -31,7 +31,7 @@ pub fn save_mesh(
     materials: Res<Assets<StandardMaterial>>,
     images: Res<Assets<Image>>,
 ) {
-    if !(key_input.pressed(KeyCode::ControlLeft) && key_input.just_pressed(KeyCode::S)) {
+    if !(key_input.pressed(KeyCode::ControlLeft) && key_input.just_pressed(KeyCode::KeyS)) {
         return;
     }
 

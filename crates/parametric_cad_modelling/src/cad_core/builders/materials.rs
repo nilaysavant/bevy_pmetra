@@ -1,7 +1,10 @@
 use anyhow::{anyhow, Result};
 use bevy::{
     prelude::*,
-    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
+    render::{
+        render_asset::RenderAssetUsages,
+        render_resource::{Extent3d, TextureDimension, TextureFormat},
+    },
     utils::{HashMap, HashSet},
 };
 use image::imageops::FilterType;
@@ -265,6 +268,7 @@ impl<P: Default + Clone> CadMaterialWithPolygonBuilder<P> {
             TextureDimension::D2,
             texture_pixmap.data().to_vec(),
             TextureFormat::Rgba8Unorm,
+            RenderAssetUsages::default(),
         );
         Ok(base_color_texture)
     }
@@ -592,6 +596,7 @@ impl<P: Default + Clone> CadMaterialWithPolygonBuilder<P> {
             TextureDimension::D2,
             pixmap.data().to_vec(),
             TextureFormat::Rgba8Unorm,
+            RenderAssetUsages::default(),
         );
         // set diffuse texture in builder...
         self.material_texture_set.base_color_texture = Some(base_color_texture);

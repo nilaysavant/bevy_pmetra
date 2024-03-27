@@ -34,7 +34,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
                 },
             )
             // Set the alignment of the Text
-            .with_alignment(TextAlignment::Center)
+            .with_justify(JustifyText::Center)
             .with_no_wrap(),
             // Set the style of the TextBundle itself.
             style: Style {

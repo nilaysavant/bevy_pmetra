@@ -63,7 +63,7 @@ pub fn cursor_drag_start(
         .with_rotation(rotation);
     commands.spawn((
         PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(100.).into()),
+            mesh: meshes.add(shape::Plane::from_size(100.)),
             material: materials.add(StandardMaterial {
                 base_color: Color::WHITE.with_a(0.0),
                 alpha_mode: AlphaMode::Blend,

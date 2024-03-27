@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
 };
 use truck_meshalgo::rexport_polymesh::PolygonMesh;
 
@@ -34,8 +34,11 @@ impl BevyMeshBuilder {
 impl From<BevyMeshBuilder> for Mesh {
     /// Builds a Bevy [`Mesh`] from [`BevyMeshBuilder`].
     fn from(value: BevyMeshBuilder) -> Self {
-        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        mesh.set_indices(Some(Indices::U32(value.indices)));
+        let mut mesh = Mesh::new(
+            PrimitiveTopology::TriangleList,
+            RenderAssetUsages::default(),
+        );
+        mesh.insert_indices(Indices::U32(value.indices));
         mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, value.vertices);
         mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, value.normals);
         mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, value.uvs);

@@ -159,10 +159,10 @@ pub fn build_side_length_cursor(
     cursor_transform.rotate_y(std::f32::consts::FRAC_PI_2);
 
     Ok(CadCursor {
-        normal: mesh_transform.up(),
+        normal: *mesh_transform.up(),
         transform: cursor_transform,
         cursor_type: CadCursorType::Linear {
-            direction: mesh_transform.local_z(),
+            direction: *mesh_transform.local_z(),
             limit_min: None,
             limit_max: None,
         },

@@ -69,7 +69,7 @@ pub fn test_manual_mesh_gen(
     commands.spawn((
         PbrBundle {
             mesh: meshes.add(mesh),
-            material: materials.add(Color::GREEN.into()),
+            material: materials.add(Color::GREEN),
             transform: Transform::from_translation(Vec3::X * 3.),
             ..default()
         },

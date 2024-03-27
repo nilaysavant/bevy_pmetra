@@ -17,7 +17,10 @@ use bevy::prelude::*;
 ///     );
 /// ```
 ///
-pub fn toggle_inspector_is_active(input: Res<Input<KeyCode>>, mut is_active: Local<bool>) -> bool {
+pub fn toggle_inspector_is_active(
+    input: Res<ButtonInput<KeyCode>>,
+    mut is_active: Local<bool>,
+) -> bool {
     // toggle `is_active` if debug tools is enabled.
     if input.just_pressed(KeyCode::F2) {
         *is_active = !*is_active;

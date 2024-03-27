@@ -45,7 +45,6 @@ impl MyBevyDefaultPluginsConfig {
                 primary_window: Some(Window {
                     title: self.game_title.clone(),
                     canvas: self.wasm_canvas_selector.clone(),
-                    fit_canvas_to_parent: true,
                     present_mode: self.present_mode,
                     ..default()
                 }),
@@ -103,6 +102,7 @@ impl Plugin for MyBevyCustomLogPlugin {
                 .map(|(k, v)| format!("{}={}", k, v))
                 .collect::<Vec<_>>()
                 .join(","),
+            ..Default::default()
         });
 
         // this code is compiled only if debug assertions are disabled (release mode)

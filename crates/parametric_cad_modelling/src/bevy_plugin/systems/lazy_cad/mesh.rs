@@ -90,19 +90,19 @@ pub fn show_mesh_local_debug_axis(
         // x
         gizmos.line(
             transform.translation,
-            transform.translation + transform.local_x(),
+            transform.translation + *transform.local_x(),
             Color::RED,
         );
         // y
         gizmos.line(
             transform.translation,
-            transform.translation + transform.local_y(),
+            transform.translation + *transform.local_y(),
             Color::GREEN,
         );
         // z
         gizmos.line(
             transform.translation,
-            transform.translation + transform.local_z(),
+            transform.translation + *transform.local_z(),
             Color::BLUE,
         );
     }

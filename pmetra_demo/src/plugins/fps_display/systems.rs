@@ -17,7 +17,7 @@ pub fn fps_text_update_system(
     if !settings.show_fps {
         return;
     }
-    if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+    if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         let Some(avg_fps) = fps.average() else {
             return;
         };

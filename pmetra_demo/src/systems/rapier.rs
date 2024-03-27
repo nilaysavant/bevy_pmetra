@@ -9,7 +9,7 @@ pub fn setup_debug_render(mut debug_render: ResMut<DebugRenderContext>) {
 /// Controls debug render via keybind.
 pub fn control_debug_render(
     mut debug_render: ResMut<DebugRenderContext>,
-    key_input: Res<Input<KeyCode>>,
+    key_input: Res<ButtonInput<KeyCode>>,
 ) {
     if key_input.just_pressed(KeyCode::F2) {
         debug_render.enabled = !debug_render.enabled

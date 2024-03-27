@@ -78,7 +78,7 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
         if !app.is_plugin_added::<picking_core::CorePlugin>() {
             app // picking
                 .add_plugins(DefaultPickingPlugins.build())
-                .insert_resource(State::new(DebugPickingMode::Disabled)); // to disable debug overlay
+                .insert_resource(DebugPickingMode::Disabled); // to disable debug overlay
         }
 
         // Add all the plugins/systems/resources/events that are not specific to params...

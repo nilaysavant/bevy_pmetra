@@ -206,7 +206,7 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
                                 cull_mode: None,
                                 ..default()
                             }),
-                            mesh: meshes.add(shape::Circle::new(*cursor_radius).into()),
+                            mesh: meshes.add(shape::Circle::new(*cursor_radius)),
                             transform: *transform,
                             // visibility: Visibility::Hidden,
                             ..default()

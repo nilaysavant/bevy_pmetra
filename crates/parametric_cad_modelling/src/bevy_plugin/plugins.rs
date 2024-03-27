@@ -69,7 +69,7 @@ impl Plugin for ParametricCadModellingBasePlugin {
         app // app
             // picking
             .add_plugins(DefaultPickingPlugins.build())
-            .insert_resource(State::new(DebugPickingMode::Disabled)) // to disable debug overlay
+            .insert_resource(DebugPickingMode::Disabled) // to disable debug overlay
             // picking events...
             .add_event::<TransformCursorEvent>()
             .add_event::<CursorPointerMoveEvent>()
