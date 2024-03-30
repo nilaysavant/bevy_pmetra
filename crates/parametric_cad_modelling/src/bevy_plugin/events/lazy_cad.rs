@@ -29,4 +29,6 @@ pub struct SpawnMeshesBuilder<Params: ParametricLazyCad + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,
     pub meshes_builder: CadMeshesLazyBuilder<Params>,
+    /// Index count at the time of creation. Used to check for the latest mesh build.
+    pub created_at_idx: usize,
 }

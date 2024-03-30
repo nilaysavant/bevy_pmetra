@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use bevy::{pbr::NotShadowCaster, prelude::*};
+use bevy::{pbr::NotShadowCaster, prelude::*, utils::HashMap};
 use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
@@ -13,7 +13,7 @@ use crate::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
-        resources::{MeshesBuilderQueue, MeshesBuilderQueueInspector},
+        resources::{MeshesBuilderQueue, MeshesBuilderQueueInspector, MeshesBuilderFinishedResultsMap},
     },
     cad_core::{
         builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
@@ -268,6 +268,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
     >,
     mut spawn_meshes_builder_evt: EventWriter<SpawnMeshesBuilder<Params>>,
     mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
+    mut builder_creation_index: Local<usize>,
 ) {
     for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
@@ -287,10 +288,12 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
             //     meshes_builder: meshes_builder.clone(),
             //     belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
             // });
+            *builder_creation_index += 1;
             builder_queue.push_back(SpawnMeshesBuilder {
                 shell_name: shell_name.clone(),
                 meshes_builder: meshes_builder.clone(),
                 belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
+                created_at_idx: *builder_creation_index,
             });
         }
     }
@@ -310,6 +313,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     mut task_pool: AsyncTaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
     mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
     mut builder_queue_inspector: ResMut<MeshesBuilderQueueInspector>,
+    mut meshes_builder_task_results_map: ResMut<MeshesBuilderFinishedResultsMap<Params>>,
 ) {
     builder_queue_inspector.meshes_builder_queue_size = builder_queue.len();
     for _ in 0..2 {
@@ -322,6 +326,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
                 belongs_to_root,
                 shell_name,
                 meshes_builder,
+                created_at_idx,
             } = spawn_meshes_builder.clone();
             let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
                 warn!("Could not build bevy_mesh for shell_name: {:?}", shell_name);
@@ -335,42 +340,71 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
         });
     }
 
-    // Poll for completed tasks to get created meshes and spawn builders...
-    for status in task_pool.iter_poll() {
-        if let AsyncTaskStatus::Finished(Ok((
-            bevy_mesh,
-            SpawnMeshesBuilder {
-                belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
-                shell_name,
-                meshes_builder,
-            },
-        ))) = status
-        {
-            let mesh_hdl = meshes.add(bevy_mesh);
-
-            for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
-                let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
-                    continue;
-                };
-                if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
-                    |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
-                        **cur_shell_name == shell_name
-                            && *cur_mesh_name == mesh_name
-                            && cur_bel_root.0 == root_ent
-                    },
-                ) {
-                    // if mesh_builder already exists, update it...
-                    *cur_mesh_builder = mesh_builder;
-                } else {
-                    // Spawn new mesh_builder...
-                    commands.spawn((
-                        shell_name.clone(),
-                        mesh_name.clone(),
-                        mesh_builder,
-                        BelongsToCadGeneratedRoot(root_ent),
-                    ));
-                };
+    let finished_task_results = task_pool
+        .iter_poll()
+        .filter_map(|status| {
+            if let AsyncTaskStatus::Finished(Ok(result)) = status {
+                Some(result)
+            } else {
+                None
             }
+        })
+        .collect::<Vec<_>>();
+    for task_result in finished_task_results.iter() {
+        let SpawnMeshesBuilder {
+            belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
+            created_at_idx,
+            shell_name,
+            ..
+        } = &task_result.1;
+        if let Some(current_result) =
+            meshes_builder_task_results_map.get(&(*root_ent, shell_name.clone()))
+        {
+            if current_result.1.created_at_idx < *created_at_idx {
+                meshes_builder_task_results_map
+                    .insert((*root_ent, shell_name.clone()), task_result.clone());
+            }
+        } else {
+            meshes_builder_task_results_map
+                .insert((*root_ent, shell_name.clone()), task_result.clone());
+        }
+    }
+
+    // Poll for completed tasks to get created meshes and spawn builders...
+    for (
+        bevy_mesh,
+        SpawnMeshesBuilder {
+            belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
+            shell_name,
+            meshes_builder,
+            created_at_idx,
+        },
+    ) in meshes_builder_task_results_map.values()
+    {
+        let mesh_hdl = meshes.add(bevy_mesh.clone());
+
+        for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
+            let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
+                continue;
+            };
+            if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
+                |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
+                    **cur_shell_name == *shell_name
+                        && *cur_mesh_name == mesh_name
+                        && cur_bel_root.0 == *root_ent
+                },
+            ) {
+                // if mesh_builder already exists, update it...
+                *cur_mesh_builder = mesh_builder;
+            } else {
+                // Spawn new mesh_builder...
+                commands.spawn((
+                    shell_name.clone(),
+                    mesh_name.clone(),
+                    mesh_builder,
+                    BelongsToCadGeneratedRoot(*root_ent),
+                ));
+            };
         }
     }
 }

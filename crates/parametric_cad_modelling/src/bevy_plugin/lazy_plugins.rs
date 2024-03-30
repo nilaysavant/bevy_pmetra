@@ -17,7 +17,7 @@ use super::{
         cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
         lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
     },
-    resources::{MeshesBuilderQueue, MeshesBuilderQueueInspector},
+    resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
         lazy_cad::{
             cursor::{
@@ -148,6 +148,7 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
             .add_event::<SpawnMeshesBuilder<Params>>()
             .init_resource::<MeshesBuilderQueue<Params>>()
             .init_resource::<MeshesBuilderQueueInspector>()
+            .init_resource::<MeshesBuilderFinishedResultsMap<Params>>()
             // Generate Model systems...
             .add_systems(
                 Update,
