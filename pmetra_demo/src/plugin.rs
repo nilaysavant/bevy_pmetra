@@ -6,8 +6,9 @@ use bevy_inspector_egui::quick::{
 use bevy_rapier3d::prelude::*;
 
 use bevy_pmetra::{
-    bevy_plugin::lazy_plugins::{
-        ParametricLazyCadModellingBasePlugin, ParametricLazyCadParamsPlugin,
+    bevy_plugin::{
+        lazy_plugins::{ParametricLazyCadModellingBasePlugin, ParametricLazyCadParamsPlugin},
+        resources::MeshesBuilderQueueInspector,
     },
     prelude::*,
 };
@@ -133,6 +134,12 @@ impl Plugin for PmetraDemoPlugin {
             .register_type::<RoundRectCuboid>()
             .add_plugins(
                 FilterQueryInspectorPlugin::<With<CadGeneratedRoot>>::default()
+                    .run_if(toggle_inspector_is_active),
+            )
+            // Queue Inspector
+            .register_type::<MeshesBuilderQueueInspector>()
+            .add_plugins(
+                ResourceInspectorPlugin::<MeshesBuilderQueueInspector>::default()
                     .run_if(toggle_inspector_is_active),
             )
             .add_plugins(WorldInspectorPlugin::default().run_if(toggle_inspector_is_active))

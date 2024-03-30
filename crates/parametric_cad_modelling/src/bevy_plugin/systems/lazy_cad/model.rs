@@ -13,6 +13,7 @@ use crate::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
+        resources::{MeshesBuilderQueue, MeshesBuilderQueueInspector},
     },
     cad_core::{
         builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
@@ -266,6 +267,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
         Changed<CadShellsByName>,
     >,
     mut spawn_meshes_builder_evt: EventWriter<SpawnMeshesBuilder<Params>>,
+    mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
 ) {
     for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
@@ -280,7 +282,12 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
             continue;
         };
         for (shell_name, meshes_builder) in meshes_builders_by_shell.meshes_builders.iter() {
-            spawn_meshes_builder_evt.send(SpawnMeshesBuilder {
+            // spawn_meshes_builder_evt.send(SpawnMeshesBuilder {
+            //     shell_name: shell_name.clone(),
+            //     meshes_builder: meshes_builder.clone(),
+            //     belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
+            // });
+            builder_queue.push_back(SpawnMeshesBuilder {
                 shell_name: shell_name.clone(),
                 meshes_builder: meshes_builder.clone(),
                 belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
@@ -301,8 +308,14 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
     mut task_pool: AsyncTaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
+    mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
+    mut builder_queue_inspector: ResMut<MeshesBuilderQueueInspector>,
 ) {
-    for spawn_meshes_builder in events.read() {
+    builder_queue_inspector.meshes_builder_queue_size = builder_queue.len();
+    for _ in 0..2 {
+        let Some(spawn_meshes_builder) = builder_queue.pop_front() else {
+            break;
+        };
         let spawn_meshes_builder = spawn_meshes_builder.clone();
         task_pool.spawn(async move {
             let SpawnMeshesBuilder {
