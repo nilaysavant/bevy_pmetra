@@ -315,7 +315,10 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     mut builder_queue_inspector: ResMut<MeshesBuilderQueueInspector>,
     mut meshes_builder_task_results_map: ResMut<MeshesBuilderFinishedResultsMap<Params>>,
 ) {
+    // Update inspector...
     builder_queue_inspector.meshes_builder_queue_size = builder_queue.len();
+
+    // Spawn a set num of tasks per frame from queue...
     for _ in 0..2 {
         let Some(spawn_meshes_builder) = builder_queue.pop_front() else {
             break;
@@ -340,6 +343,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
         });
     }
 
+    // Collect finished tasks...
     let finished_task_results = task_pool
         .iter_poll()
         .filter_map(|status| {
@@ -350,6 +354,8 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
             }
         })
         .collect::<Vec<_>>();
+    // Store only the latest result per shell/root in the map.
+    // This will prevent overriding from older tasks and prevent flashing jitter...
     for task_result in finished_task_results.iter() {
         let SpawnMeshesBuilder {
             belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
