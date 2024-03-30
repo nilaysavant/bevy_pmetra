@@ -24,7 +24,7 @@ impl<Params: ParametricLazyCad + Component + Default> Default for GenerateLazyCa
 }
 
 /// Event used to spawn individual mesh builders for parallel meshing.
-#[derive(Debug, Event, Reflect)]
+#[derive(Debug, Event, Reflect, Clone)]
 pub struct SpawnMeshesBuilder<Params: ParametricLazyCad + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,

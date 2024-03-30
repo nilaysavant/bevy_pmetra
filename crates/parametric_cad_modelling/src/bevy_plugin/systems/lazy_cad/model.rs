@@ -1,4 +1,6 @@
+use anyhow::{anyhow, Result};
 use bevy::{pbr::NotShadowCaster, prelude::*};
+use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
 };
@@ -298,41 +300,64 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     )>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
+    mut task_pool: AsyncTaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
 ) {
-    for SpawnMeshesBuilder {
-        shell_name,
-        meshes_builder,
-        belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
-    } in events.read()
-    {
-        let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
-            warn!("Could not build bevy_mesh for shell_name: {:?}", shell_name);
-            continue;
-        };
-        let mesh_hdl = meshes.add(bevy_mesh);
-
-        for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
-            let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
-                continue;
-            };
-            if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
-                |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
-                    *cur_shell_name == shell_name
-                        && *cur_mesh_name == mesh_name
-                        && cur_bel_root.0 == *root_ent
-                },
-            ) {
-                // if mesh_builder already exists, update it...
-                *cur_mesh_builder = mesh_builder;
-            } else {
-                // Spawn new mesh_builder...
-                commands.spawn((
-                    shell_name.clone(),
-                    mesh_name.clone(),
-                    mesh_builder,
-                    BelongsToCadGeneratedRoot(*root_ent),
+    for spawn_meshes_builder in events.read() {
+        let spawn_meshes_builder = spawn_meshes_builder.clone();
+        task_pool.spawn(async move {
+            let SpawnMeshesBuilder {
+                belongs_to_root,
+                shell_name,
+                meshes_builder,
+            } = spawn_meshes_builder.clone();
+            let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
+                warn!("Could not build bevy_mesh for shell_name: {:?}", shell_name);
+                return Err(anyhow!(
+                    "Could not build bevy_mesh for shell_name: {:?}",
+                    shell_name
                 ));
             };
+
+            Ok((bevy_mesh, spawn_meshes_builder))
+        });
+    }
+
+    // Poll for completed tasks to get created meshes and spawn builders...
+    for status in task_pool.iter_poll() {
+        if let AsyncTaskStatus::Finished(Ok((
+            bevy_mesh,
+            SpawnMeshesBuilder {
+                belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
+                shell_name,
+                meshes_builder,
+            },
+        ))) = status
+        {
+            let mesh_hdl = meshes.add(bevy_mesh);
+
+            for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
+                let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
+                    continue;
+                };
+                if let Some((_, _, _, mut cur_mesh_builder, _)) = mesh_builders.iter_mut().find(
+                    |(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
+                        **cur_shell_name == shell_name
+                            && *cur_mesh_name == mesh_name
+                            && cur_bel_root.0 == root_ent
+                    },
+                ) {
+                    // if mesh_builder already exists, update it...
+                    *cur_mesh_builder = mesh_builder;
+                } else {
+                    // Spawn new mesh_builder...
+                    commands.spawn((
+                        shell_name.clone(),
+                        mesh_name.clone(),
+                        mesh_builder,
+                        BelongsToCadGeneratedRoot(root_ent),
+                    ));
+                };
+            }
         }
     }
 }
