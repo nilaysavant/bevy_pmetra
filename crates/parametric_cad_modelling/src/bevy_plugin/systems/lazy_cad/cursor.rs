@@ -279,27 +279,34 @@ pub fn update_params_from_cursors<Params: ParametricLazyCad + Component>(
 }
 
 pub fn draw_cursor_gizmo(
-    cad_meshes: Query<(Entity, &PickSelection), With<CadGeneratedMesh>>,
+    cad_generated: Query<(Entity, &CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     cursors: Query<
-        (&CadGeneratedCursorConfig, &Transform),
+        (
+            &BelongsToCadGeneratedRoot,
+            &CadGeneratedCursorConfig,
+            &Transform,
+        ),
         (With<CadGeneratedCursor>, Without<CadGeneratedMesh>),
     >,
     mut gizmos: Gizmos,
 ) {
-    let Some((selected_cad_mesh, ..)) = cad_meshes
-        .iter()
-        .find(|(_, selection, ..)| selection.is_selected)
-    else {
-        return;
-    };
-    for (config, transform) in cursors.iter() {
-        // draw outline circle...
-        gizmos.circle(
-            transform.translation,
-            transform.local_z(),
-            config.cursor_radius * transform.scale.x,
-            Color::WHITE,
-        );
+    for (root_ent, selection_state) in cad_generated.iter() {
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), config, transform) in cursors.iter() {
+            if cur_root_ent != root_ent {
+                continue;
+            }
+            if !matches!(selection_state, CadGeneratedRootSelectionState::Selected) {
+                // if not selected don't draw outline...
+                continue;
+            }
+            // draw outline circle...
+            gizmos.circle(
+                transform.translation,
+                transform.local_z(),
+                config.cursor_radius * transform.scale.x,
+                Color::WHITE,
+            );
+        }
     }
 }
 
