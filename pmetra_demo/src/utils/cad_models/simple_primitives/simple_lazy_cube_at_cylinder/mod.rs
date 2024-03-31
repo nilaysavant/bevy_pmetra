@@ -83,22 +83,26 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
-        let cad_meshes_lazy_builders_by_cad_shell =
+        let mut cad_meshes_lazy_builders_by_cad_shell =
             CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::Cylinder.to_string()),
                     CadMeshIds::Cylinder.to_string(),
                     cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
-                )?
-                .add_mesh_builder(
-                    CadShellName(CadShellIds::Cube.to_string()),
-                    CadMeshIds::Cube.to_string(),
-                    cube_mesh_builder(
-                        self,
-                        CadShellName(CadShellIds::Cube.to_string()),
-                        shells_by_name,
-                    )?,
                 )?;
+
+        for i in 0..8 {
+            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
+                CadShellName(CadShellIds::Cube.to_string()),
+                CadMeshIds::Cube.to_string() + &i.to_string(),
+                cube_mesh_builder(
+                    self,
+                    CadShellName(CadShellIds::Cube.to_string()),
+                    shells_by_name,
+                    -(i as f32 * std::f32::consts::TAU / 8. + std::f32::consts::FRAC_PI_8),
+                )?,
+            )?;
+        }
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
     }
@@ -136,7 +140,7 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.;
-                    let new_value = self.cube_side_length + delta.z as f64 * sensitivity;
+                    let new_value = self.cube_side_length + delta.y as f64 * sensitivity;
                     self.cube_side_length = new_value.clamp(0.01, std::f64::MAX);
                 }
             }

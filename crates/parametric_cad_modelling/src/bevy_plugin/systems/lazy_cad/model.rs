@@ -13,7 +13,9 @@ use crate::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
         },
-        resources::{MeshesBuilderQueue, MeshesBuilderQueueInspector, MeshesBuilderFinishedResultsMap},
+        resources::{
+            MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
+        },
     },
     cad_core::{
         builders::{CadCursor, CadCursorName, CadMeshName, CadShell},

@@ -67,6 +67,7 @@ pub fn cube_mesh_builder(
     params: &SimpleLazyCubeAtCylinder,
     shell_name: CadShellName,
     shells_by_name: &CadShellsByName,
+    rot_y: f32,
 ) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
     let SimpleLazyCubeAtCylinder {
         cylinder_radius,
@@ -92,10 +93,7 @@ pub fn cube_mesh_builder(
     let mut transform = Transform::from_rotation(rotation).with_translation(
         cylinder_v0.point().as_bevy_vec3() + Vec3::Y * (*cylinder_height as f32 / 2.),
     );
-    transform.rotate_around(
-        Vec3::ZERO,
-        Quat::from_rotation_y(-std::f32::consts::FRAC_PI_4),
-    );
+    transform.rotate_around(Vec3::ZERO, Quat::from_rotation_y(rot_y));
 
     let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
@@ -145,11 +143,12 @@ pub fn build_side_length_cursor(
         params,
         CadShellName(CadShellIds::Cube.to_string()),
         shells_by_name,
+        -std::f32::consts::FRAC_PI_8,
     )?;
     let mesh_transform = cube_builder.transform;
 
     let local_cursor_pos =
-        face_centroid.as_vec3() + Vec3::Z * (*cube_side_length as f32 / 2. + 0.1);
+        face_centroid.as_vec3() - Vec3::X * (*cube_side_length as f32 / 2. + 0.1);
     let cursor_pos = mesh_transform.transform_point(local_cursor_pos);
     let mut cursor_transform =
         Transform::from_translation(cursor_pos).with_rotation(mesh_transform.rotation);
@@ -159,7 +158,7 @@ pub fn build_side_length_cursor(
         normal: *mesh_transform.up(),
         transform: cursor_transform,
         cursor_type: CadCursorType::Linear {
-            direction: *mesh_transform.local_z(),
+            direction: *mesh_transform.local_x(),
             limit_min: None,
             limit_max: None,
         },
