@@ -501,7 +501,6 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
                     },
                     CadGeneratedMeshOutlines(outlines.clone()),
                 ))
-                .insert(PickableBundle::default())
                 .insert((
                     Name::new(mesh_name.0.clone()),
                     CadGeneratedMesh,
