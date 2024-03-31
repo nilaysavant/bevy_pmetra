@@ -4,12 +4,19 @@ use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
 };
-use truck_base::id;
 
 use crate::{
     bevy_plugin::{
         cleanup_manager::Cleanup,
-        components::cad::{self, CadGeneratedRoot},
+        components::{
+            cad::{
+                BelongsToCadGeneratedRoot, CadGeneratedCursor, CadGeneratedCursorConfig,
+                CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
+                CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState, CadGeneratedRoot,
+                CadGeneratedRootSelectionState,
+            },
+            wire_frame::WireFrameDisplaySettings,
+        },
         events::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
@@ -24,12 +31,6 @@ use crate::{
             CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, CadShellsByName,
             ParametricLazyCad,
         },
-    },
-    prelude::{
-        BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot, CadGeneratedCursor,
-        CadGeneratedCursorConfig, CadGeneratedCursorPreviousTransform, CadGeneratedCursorState,
-        CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
-        WireFrameDisplaySettings,
     },
 };
 
@@ -59,7 +60,12 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
 
         // Spawn root...
         let root = commands
-            .spawn((SpatialBundle::default(), CadGeneratedRoot, params.clone()))
+            .spawn((
+                SpatialBundle::default(),
+                CadGeneratedRoot,
+                CadGeneratedRootSelectionState::default(),
+                params.clone(),
+            ))
             .id();
 
         // Get the shell builders from params...

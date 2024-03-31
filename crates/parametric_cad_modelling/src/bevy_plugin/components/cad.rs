@@ -6,6 +6,16 @@ use crate::cad_core::builders::{CadCursorType, CadMeshOutlines};
 #[derive(Debug, Component, Reflect)]
 pub struct CadGeneratedRoot;
 
+/// Root level selection state.
+#[derive(Debug, Component, Reflect, Default)]
+pub enum CadGeneratedRootSelectionState {
+    /// No selection.
+    #[default]
+    None,
+    /// Selected.
+    Selected,
+}
+
 /// Marker indicating which [`CadGenerated`] [`Entity`] it belongs to.
 #[derive(Debug, Component, Clone, Reflect)]
 pub struct BelongsToCadGeneratedRoot(pub Entity);

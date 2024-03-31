@@ -8,7 +8,9 @@ use bevy::{
 use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlugins};
 
 use crate::{
-    bevy_plugin::components::wire_frame::WireFrameDisplaySettings,
+    bevy_plugin::components::{
+        cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
+    },
     cad_core::lazy_builders::ParametricLazyCad,
 };
 
@@ -25,7 +27,10 @@ use super::{
                 draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
                 update_params_from_cursors,
             },
-            mesh::{handle_mesh_selection, show_mesh_local_debug_axis},
+            mesh::{
+                handle_mesh_selection, show_mesh_local_debug_axis,
+                update_root_selection_based_on_mesh_selection,
+            },
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle, shells_to_cursors,
                 shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
@@ -100,6 +105,7 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
                 (
                     generate_mesh_outlines,
                     handle_mesh_selection,
+                    update_root_selection_based_on_mesh_selection,
                     show_mesh_local_debug_axis,
                 ),
             )
@@ -118,6 +124,8 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
             )
             // cleanup...
             .add_plugins(CleanupManagerPlugin)
+            // Register component types..
+            .register_type::<CadGeneratedRootSelectionState>()
             // wire frame...
             .register_type::<WireFrameDisplaySettings>()
             .add_systems(

@@ -6,7 +6,7 @@ use crate::{
         BelongsToCadGeneratedMesh, CadGeneratedCursor, CadGeneratedMesh,
         CadGeneratedMeshOutlinesState,
     },
-    prelude::BelongsToCadGeneratedRoot,
+    prelude::{BelongsToCadGeneratedRoot, CadGeneratedRoot, CadGeneratedRootSelectionState},
 };
 
 pub fn mesh_pointer_move(
@@ -55,7 +55,6 @@ pub fn handle_mesh_selection(
         ),
         (With<CadGeneratedMesh>, Changed<PickSelection>),
     >,
-    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
 ) {
     for (cad_mesh_ent, selection, mut outlines_state, &BelongsToCadGeneratedRoot(root_ent)) in
         cad_meshes.iter_mut()
@@ -65,12 +64,33 @@ pub fn handle_mesh_selection(
         } else {
             *outlines_state = CadGeneratedMeshOutlinesState::default();
         }
+    }
+}
+
+pub fn update_root_selection_based_on_mesh_selection(
+    mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
+    cad_meshes: Query<(Entity, &PickSelection, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
+    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
+) {
+    for (root_ent, mut root_selection) in cad_generated.iter_mut() {
+        let any_mesh_selected =
+            cad_meshes
+                .iter()
+                .any(|(_, selection, &BelongsToCadGeneratedRoot(cur_root_ent))| {
+                    cur_root_ent == root_ent && selection.is_selected
+                });
+        if any_mesh_selected {
+            *root_selection = CadGeneratedRootSelectionState::Selected;
+        } else {
+            *root_selection = CadGeneratedRootSelectionState::None;
+        }
+        // also update cursor visibility based on mesh selection...
         for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_cursors.iter_mut() {
             if cur_root_ent != root_ent {
                 continue;
             }
-            // if belongs to same root as mesh set to visible else hide cursors...
-            if selection.is_selected {
+            // if any mesh is selected show cursors else hide cursors...
+            if any_mesh_selected {
                 *visibility = Visibility::Visible;
             } else {
                 *visibility = Visibility::Hidden;

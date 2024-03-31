@@ -91,7 +91,7 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
                     cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
                 )?;
 
-        let cubes_count = (self.cylinder_radius * 4.).floor() as i32;
+        let cubes_count = (self.cylinder_radius * 4.).floor().max(6.) as i32;
         for i in 0..cubes_count {
             cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                 CadShellName(CadShellIds::Cube.to_string()),
