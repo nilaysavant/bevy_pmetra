@@ -70,7 +70,6 @@ pub fn handle_mesh_selection(
 pub fn update_root_selection_based_on_mesh_selection(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     cad_meshes: Query<(Entity, &PickSelection, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
-    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
 ) {
     for (root_ent, mut root_selection) in cad_generated.iter_mut() {
         let any_mesh_selected =
@@ -83,18 +82,6 @@ pub fn update_root_selection_based_on_mesh_selection(
             *root_selection = CadGeneratedRootSelectionState::Selected;
         } else {
             *root_selection = CadGeneratedRootSelectionState::None;
-        }
-        // also update cursor visibility based on mesh selection...
-        for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_cursors.iter_mut() {
-            if cur_root_ent != root_ent {
-                continue;
-            }
-            // if any mesh is selected show cursors else hide cursors...
-            if any_mesh_selected {
-                *visibility = Visibility::Visible;
-            } else {
-                *visibility = Visibility::Hidden;
-            }
         }
     }
 }

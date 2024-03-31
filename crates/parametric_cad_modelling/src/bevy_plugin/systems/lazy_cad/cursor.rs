@@ -22,7 +22,27 @@ use crate::{
         lazy_builders::ParametricLazyCad,
     },
     math::get_rotation_from_normals,
+    prelude::CadGeneratedRootSelectionState,
 };
+
+pub fn update_cursor_visibility_based_on_root_selection(
+    cad_generated: Query<(Entity, &CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
+    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
+) {
+    for (root_ent, root_selection) in cad_generated.iter() {
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_cursors.iter_mut() {
+            if cur_root_ent != root_ent {
+                continue;
+            }
+            // if any mesh is selected show cursors else hide cursors...
+            if matches!(root_selection, CadGeneratedRootSelectionState::Selected) {
+                *visibility = Visibility::Visible;
+            } else {
+                *visibility = Visibility::Hidden;
+            }
+        }
+    }
+}
 
 pub fn cursor_drag_start(
     mut commands: Commands,

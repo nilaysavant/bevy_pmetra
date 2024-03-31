@@ -25,7 +25,7 @@ use super::{
         lazy_cad::{
             cursor::{
                 draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
-                update_params_from_cursors,
+                update_cursor_visibility_based_on_root_selection, update_params_from_cursors,
             },
             mesh::{
                 handle_mesh_selection, show_mesh_local_debug_axis,
@@ -114,7 +114,7 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
                 Update,
                 (
                     (
-                        //
+                        update_cursor_visibility_based_on_root_selection,
                         transform_cursor,
                         scale_cursors_based_on_zoom_level,
                     )
