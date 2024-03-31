@@ -378,7 +378,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
         }
     }
 
-    // Poll for completed tasks to get created meshes and spawn builders...
+    // Spawn builders from task results map...
     for (
         bevy_mesh,
         SpawnMeshesBuilder {
