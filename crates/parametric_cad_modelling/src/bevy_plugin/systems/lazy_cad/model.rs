@@ -8,6 +8,7 @@ use truck_base::id;
 
 use crate::{
     bevy_plugin::{
+        cleanup_manager::Cleanup,
         components::cad::{self, CadGeneratedRoot},
         events::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
@@ -49,10 +50,10 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
     {
         if *remove_existing_models {
             for entity in cad_generated.iter() {
-                let Some(ent_commands) = commands.get_entity(entity) else {
+                let Some(mut ent_commands) = commands.get_entity(entity) else {
                     continue;
                 };
-                ent_commands.despawn_recursive();
+                ent_commands.insert(Cleanup::Recursive);
             }
         }
 
@@ -303,13 +304,16 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
 
 pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
-    mut mesh_builders: Query<(
-        Entity,
-        &CadShellName,
-        &CadMeshName,
-        &mut CadMeshLazyBuilder<Params>,
-        &BelongsToCadGeneratedRoot,
-    )>,
+    mut mesh_builders: Query<
+        (
+            Entity,
+            &CadShellName,
+            &CadMeshName,
+            &mut CadMeshLazyBuilder<Params>,
+            &BelongsToCadGeneratedRoot,
+        ),
+        Without<Cleanup>,
+    >,
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
     mut task_pool: AsyncTaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
@@ -390,6 +394,19 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     ) in meshes_builder_task_results_map.values()
     {
         let mesh_hdl = meshes.add(bevy_mesh.clone());
+
+        // cleanup old mesh builders + mesh bundles (that are not being updated/reused anymore)...
+        let mesh_builders_to_be_cleaned =
+            mesh_builders
+                .iter()
+                .filter(|(_, cur_shell_name, cur_mesh_name, _, cur_bel_root)| {
+                    **cur_shell_name == *shell_name
+                        && !meshes_builder.mesh_builders.contains_key(*cur_mesh_name)
+                        && cur_bel_root.0 == *root_ent
+                });
+        for (entity, _, _, _, _) in mesh_builders_to_be_cleaned {
+            commands.entity(entity).insert(Cleanup::Recursive);
+        }
 
         for (mesh_name, mesh_builder) in meshes_builder.mesh_builders.iter() {
             let Ok(mesh_builder) = mesh_builder.clone().set_mesh_hdl(mesh_hdl.clone()) else {
