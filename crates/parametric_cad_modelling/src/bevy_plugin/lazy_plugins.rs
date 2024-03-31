@@ -13,6 +13,7 @@ use crate::{
 };
 
 use super::{
+    cleanup_manager::CleanupManagerPlugin,
     events::{
         cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
         lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
@@ -115,6 +116,8 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
                     draw_cursor_gizmo,
                 ),
             )
+            // cleanup...
+            .add_plugins(CleanupManagerPlugin)
             // wire frame...
             .register_type::<WireFrameDisplaySettings>()
             .add_systems(
