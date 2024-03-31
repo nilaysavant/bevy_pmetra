@@ -114,6 +114,7 @@ impl Plugin for MyBevyCustomLogPlugin {
                 .map(|(k, v)| format!("{}={}", k, v))
                 .collect::<Vec<_>>()
                 .join(","),
+            ..Default::default()
         });
     }
 }
