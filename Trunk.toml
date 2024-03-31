@@ -1,0 +1,18 @@
+[build]
+# The following is used to display a loading text while downloading the WASM binary...
+# ref: https://github.com/GoogleChromeLabs/wasm-bindgen-rayon/issues/11#issuecomment-932397527
+pattern_script = '''<script type="module">
+    import init from '{base}{js}';
+    const loadingTextElm = document.getElementById("wasm-loading-text");
+    async function main () {
+        try  {
+            if(loadingTextElm) loadingTextElm.style.display = 'block';
+            await init('{base}{wasm}');
+            if(loadingTextElm) loadingTextElm.style.display = 'none';
+        } catch (e) {
+            console.error(e);
+            if(loadingTextElm) loadingTextElm.style.display = 'none';
+        }
+    }
+    main();
+</script>'''

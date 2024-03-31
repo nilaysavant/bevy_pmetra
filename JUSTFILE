@@ -17,6 +17,32 @@ build-release-demo:
 build:
   cargo build
 
+# Build and serve the pmetra demo web release.
+build-serve-pmetra-demo: build-pmetra-demo-web serve-pmetra-demo-web-release
+
+# Build the web release version of the pmetra demo.
+build-pmetra-demo-web:
+  #!/bin/bash
+
+  echo "trunk build in release mode..."
+  trunk build --release --no-default-features
+  echo "trunk build in release mode... done!"
+
+  echo "cd into dist..."
+  cd dist
+
+  echo "fix paths (from absolute to relative) in index.html..."
+  sed -i -e 's/href="/href="./g' index.html
+  sed -i -e "s/'\//'.\//g" index.html
+  echo "fix paths (from absolute to relative) in index.html... done!"
+
+# Serve demo web release build.
+serve-pmetra-demo-web-release:
+  #!/bin/bash
+
+  # Serve dist
+  serve -s dist 
+
 # Run all tests.
 test:
   cargo test
