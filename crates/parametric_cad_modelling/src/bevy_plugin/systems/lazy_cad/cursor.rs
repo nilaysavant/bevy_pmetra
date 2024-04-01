@@ -82,39 +82,43 @@ pub fn cursor_drag_start(
     let transform = Transform::from_translation(cursor_transform.translation)
         // Get rotation by sub rotations...
         .with_rotation(rotation);
-    commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(100.)),
-            material: materials.add(StandardMaterial {
-                base_color: Color::WHITE.with_a(0.0),
-                alpha_mode: AlphaMode::Blend,
-                double_sided: true,
-                cull_mode: None,
+    let drag_plane = commands
+        .spawn((
+            PbrBundle {
+                mesh: meshes.add(shape::Plane::from_size(100.)),
+                material: materials.add(StandardMaterial {
+                    base_color: Color::WHITE.with_a(0.0),
+                    alpha_mode: AlphaMode::Blend,
+                    double_sided: true,
+                    cull_mode: None,
+                    ..default()
+                }),
+                transform,
                 ..default()
-            }),
-            transform,
-            ..default()
-        },
-        CadGeneratedCursorDragPlane,
-        BelongsToCadGeneratedCursor(cursor),
-        BelongsToCadGeneratedRoot(*cad_root),
-        // picking
-        PickableBundle::default(), // <- Makes the mesh pickable.
-        NoBackfaceCulling,
-        // Disable highlighting...
-        Highlight::<StandardMaterial> {
-            hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                ..mat.to_owned()
-            })),
-            pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                ..mat.to_owned()
-            })),
-            selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                ..mat.to_owned()
-            })),
-        },
-        On::<Pointer<Move>>::send_event::<TransformCursorEvent>(),
-    ));
+            },
+            CadGeneratedCursorDragPlane,
+            BelongsToCadGeneratedCursor(cursor),
+            BelongsToCadGeneratedRoot(*cad_root),
+            // picking
+            PickableBundle::default(), // <- Makes the mesh pickable.
+            NoBackfaceCulling,
+            // Disable highlighting...
+            Highlight::<StandardMaterial> {
+                hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                    ..mat.to_owned()
+                })),
+                pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                    ..mat.to_owned()
+                })),
+                selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
+                    ..mat.to_owned()
+                })),
+            },
+            On::<Pointer<Move>>::send_event::<TransformCursorEvent>(),
+        ))
+        .id();
+    // Add drag plane as child of root for proper transform...
+    commands.entity(*cad_root).add_child(drag_plane);
     // Disable picking on cursor, etc...
     commands.entity(cursor).insert(Pickable::IGNORE);
     // Disable picking on all meshes belonging to current root...
