@@ -62,7 +62,7 @@ pub fn spawn_cad_model(
     }
 }
 
-pub fn add_collider_to_generated_cad_model<Params: ParametricLazyCad + Component>(
+pub fn add_collider_to_generated_cad_model(
     mut commands: Commands,
     meshes: Res<Assets<Mesh>>,
     cad_meshes: Query<

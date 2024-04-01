@@ -35,7 +35,9 @@ use crate::{
             simple_cube_at_cylinder::SimpleCubeAtCylinder,
             simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
         },
-        space_station::{lazy_tower_extension::LazyTowerExtension, RoundCabinSegment, RoundRectCuboid},
+        space_station::{
+            lazy_tower_extension::LazyTowerExtension, RoundCabinSegment, RoundRectCuboid,
+        },
     },
 };
 
@@ -112,10 +114,7 @@ impl Plugin for PmetraDemoPlugin {
             .register_type::<CadGeneratedModelSpawner>()
             .add_plugins(ResourceInspectorPlugin::<CadGeneratedModelSpawner>::default())
             .add_systems(Update, (spawn_cad_model, fire_balls_at_look_point))
-            .add_systems(
-                PostUpdate,
-                add_collider_to_generated_cad_model::<SimpleLazyCubeAtCylinder>,
-            )
+            .add_systems(PostUpdate, add_collider_to_generated_cad_model)
             // scene...
             .add_systems(
                 Startup,
