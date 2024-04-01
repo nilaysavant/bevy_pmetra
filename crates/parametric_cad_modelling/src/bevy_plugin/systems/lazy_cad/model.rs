@@ -376,6 +376,10 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
             }
         })
         .collect::<Vec<_>>();
+    if finished_task_results.is_empty() {
+        // clear map if no tasks...
+        meshes_builder_task_results_map.clear();
+    }
     // Store only the latest result per shell/root in the map.
     // This will prevent overriding from older tasks and prevent flashing jitter...
     for task_result in finished_task_results.iter() {
@@ -472,7 +476,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
             &CadMeshLazyBuilder<Params>,
             &BelongsToCadGeneratedRoot,
         ),
-        Changed<CadMeshLazyBuilder<Params>>,
+        (Changed<CadMeshLazyBuilder<Params>>, Without<Cleanup>),
     >,
 ) {
     for (
