@@ -9,9 +9,12 @@ use bevy_pmetra::{
     },
     math::get_rotation_from_normals,
     prelude::*,
-    re_exports::truck_modeling::{
-        builder, control_point::ControlPoint, Curve, Edge, ParametricSurface3D, Point3, Rad, Shell,
-        Vector3, Vertex, Wire,
+    re_exports::{
+        truck_modeling::{
+            builder, control_point::ControlPoint, Curve, Edge, ParametricSurface3D, Point3, Rad,
+            Shell, Vector3, Vertex, Wire,
+        },
+        truck_topology::{VertexDisplayFormat, WireDisplayFormat},
     },
 };
 use itertools::Itertools;
@@ -64,11 +67,11 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
         0.,
         straight_beam_l_sect_thickness,
     );
-    let a = DVec3::new(0., 0., straight_beam_l_sect_thickness);
+    let a = DVec3::new(0., 0., straight_beam_l_sect_side_len);
     let e = a + DVec3::new(straight_beam_l_sect_thickness, 0., 0.);
 
     // Create wire...
-    let points = [o, b, c, d, e, a, o];
+    let points = [o, b, c, d, e, a];
     let vertices = points
         .iter()
         .map(|p| Vertex::new(Point3::from(p.to_array())))
@@ -78,9 +81,16 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
         let edge = builder::line(v0, v1);
         wire.push_back(edge);
     }
+    wire.invert(); // invert since anticlockwise is positive face.
+
+    println!(
+        "wire: {:?}",
+        wire.display(WireDisplayFormat::VerticesList {
+            vertex_format: VertexDisplayFormat::AsPoint
+        })
+    );
     // Checks for wire...
     debug_assert!(wire.is_closed());
-    debug_assert!(wire.vertex_iter().count() == 7);
 
     // Extrude wire and create shell...
     let face =
@@ -169,9 +179,9 @@ mod tests {
     #[test]
     pub fn test_shell_builder() {
         let params = LazyTowerExtension {
-            tower_length: 10.,
-            straight_beam_l_sect_side_len: 1.,
-            straight_beam_l_sect_thickness: 0.1,
+            tower_length: 1.0,
+            straight_beam_l_sect_side_len: 0.25,
+            straight_beam_l_sect_thickness: 0.05,
         };
 
         let shell = build_straight_beam_shell(&params).unwrap();
