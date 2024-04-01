@@ -5,6 +5,7 @@ use bevy_mod_picking::{
 
 use crate::{
     bevy_plugin::{
+        cleanup_manager::Cleanup,
         components::{
             cad::{
                 BelongsToCadGeneratedCursor, BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot,
@@ -197,8 +198,15 @@ pub fn cursor_drag_end(
 
 pub fn transform_cursor(
     mut events: EventReader<TransformCursorEvent>,
-    cursor_drag_planes: Query<&BelongsToCadGeneratedCursor, With<CadGeneratedCursorDragPlane>>,
-    mut cursors: Query<(&mut Transform, &CadGeneratedCursorConfig), With<CadGeneratedCursor>>,
+    cad_generated: Query<(Entity, &Transform), (With<CadGeneratedRoot>, Without<Cleanup>)>,
+    cursor_drag_planes: Query<
+        (&BelongsToCadGeneratedRoot, &BelongsToCadGeneratedCursor),
+        With<CadGeneratedCursorDragPlane>,
+    >,
+    mut cursors: Query<
+        (&mut Transform, &CadGeneratedCursorConfig),
+        (With<CadGeneratedCursor>, Without<CadGeneratedRoot>),
+    >,
 ) {
     for TransformCursorEvent { target, hit } in events.read() {
         let drag_plane = *target;
@@ -206,10 +214,17 @@ pub fn transform_cursor(
             error!("No hit point found!");
             return;
         };
-        let Ok(BelongsToCadGeneratedCursor(cursor)) = cursor_drag_planes.get(drag_plane) else {
+        let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedCursor(cursor))) =
+            cursor_drag_planes.get(drag_plane)
+        else {
             error!("drag plane not found!");
             return;
         };
+        let Ok((_, root_transform)) = cad_generated.get(root_ent) else {
+            continue;
+        };
+        let root_transform_inverse_affine = root_transform.compute_affine().inverse();
+        let hit_point_local_space = root_transform_inverse_affine.transform_point3(hit_point);
         let Ok((
             mut transform,
             CadGeneratedCursorConfig {
@@ -224,7 +239,7 @@ pub fn transform_cursor(
         };
         match cursor_type {
             CadCursorType::Planer => {
-                transform.translation = hit_point;
+                transform.translation = hit_point_local_space;
             }
             CadCursorType::Linear {
                 direction,
@@ -232,8 +247,8 @@ pub fn transform_cursor(
                 limit_max,
             } => {
                 let original_translation = transform.translation;
-                let new_local_translation =
-                    (hit_point - original_translation).project_onto_normalized(*direction);
+                let new_local_translation = (hit_point_local_space - original_translation)
+                    .project_onto_normalized(*direction);
                 if let (Some(limit_min), Some(limit_max)) = (limit_min, limit_max) {
                     transform.translation = (transform.translation + new_local_translation)
                         .clamp(*limit_min, *limit_max);
