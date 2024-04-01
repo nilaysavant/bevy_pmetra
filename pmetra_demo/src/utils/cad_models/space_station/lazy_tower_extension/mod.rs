@@ -13,7 +13,9 @@ use bevy_pmetra::{
 use strum::{Display, EnumString};
 
 use self::{
-    cuboid_enclosure::{build_cuboid_enclosure_shell, cuboid_enclosure_mesh_builder},
+    cuboid_enclosure::{
+        build_cuboid_enclosure_shell, build_tower_length_cursor, cuboid_enclosure_mesh_builder,
+    },
     straight_beam::{build_straight_beam_shell, straight_beam_mesh_builder},
 };
 
@@ -109,12 +111,10 @@ impl ParametricLazyCad for LazyTowerExtension {
     }
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let cursors = CadCursors::default()
-        // .add_cursor(
-        //     CadCursorIds::CylinderRadius.to_string().into(),
-        //     build_radius_cursor(self, shells_by_name)?,
-        // )?
-        ;
+        let cursors = CadCursors::default().add_cursor(
+            CadCursorIds::TowerLengthCursor.to_string().into(),
+            build_tower_length_cursor(self, shells_by_name)?,
+        )?;
 
         Ok(cursors)
     }
@@ -125,37 +125,25 @@ impl ParametricLazyCad for LazyTowerExtension {
         prev_transform: Transform,
         new_transform: Transform,
     ) {
-        // match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-        //     CadCursorIds::CylinderRadius => {
-        //         let delta = new_transform.translation - prev_transform.translation;
-        //         if delta.length() > 0. {
-        //             let sensitivity = 1.;
-        //             let new_value = self.cylinder_radius + delta.x as f64 * sensitivity;
-        //             self.cylinder_radius = new_value.clamp(0.01, std::f64::MAX);
-        //         }
-        //     }
-        //     CadCursorIds::CubeSideLength => {
-        //         let delta = new_transform.translation - prev_transform.translation;
-        //         if delta.length() > 0. {
-        //             let sensitivity = 1.;
-        //             let new_value = self.cube_side_length + delta.y as f64 * sensitivity;
-        //             self.cube_side_length = new_value.clamp(0.01, std::f64::MAX);
-        //         }
-        //     }
-        // }
+        match CadCursorIds::from_str(&cursor_name.0).unwrap() {
+            CadCursorIds::TowerLengthCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.;
+                    let new_value = self.tower_length + delta.y as f64 * sensitivity;
+                    self.tower_length = new_value.clamp(0.01, std::f64::MAX);
+                }
+            }
+        }
     }
 
     fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String> {
-        // let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-        //     CadCursorIds::CylinderRadius => {
-        //         format!("cylinder_radius : {:.3}", self.cylinder_radius)
-        //     }
-        //     CadCursorIds::CubeSideLength => {
-        //         format!("cube_side_length : {:.3}", self.cube_side_length)
-        //     }
-        // };
+        let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
+            CadCursorIds::TowerLengthCursor => {
+                format!("tower_length : {:.3}", self.tower_length)
+            }
+        };
 
-        // Ok(tooltip)
-        todo!()
+        Ok(tooltip)
     }
 }

@@ -90,6 +90,30 @@ pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadSh
     let solid = builder::tsweep(&face, Vector3::from((DVec3::Y * tower_length).to_array()));
     let shell = Shell::try_from_solid(&solid)?;
 
+    // Add tags...
+    let top_face = shell
+        .face_iter()
+        .find(|f| {
+            let normal = f.oriented_surface().normal(0.5, 0.5);
+            normal == Vector3::unit_y()
+        })
+        .ok_or_else(|| anyhow!("Could not find top face!"))?;
+    tagged_elements.insert(
+        CadElementTag("TopFace".into()),
+        CadElement::Face(top_face.clone()),
+    );
+    let front_face = shell
+        .face_iter()
+        .find(|f| {
+            let normal = f.oriented_surface().normal(0.5, 0.5);
+            normal == Vector3::unit_z()
+        })
+        .ok_or_else(|| anyhow!("Could not find top face!"))?;
+    tagged_elements.insert(
+        CadElementTag("FrontFace".into()),
+        CadElement::Face(front_face.clone()),
+    );
+
     Ok(CadShell {
         shell,
         tagged_elements,
@@ -116,52 +140,49 @@ pub fn cuboid_enclosure_mesh_builder(
     Ok(mesh_builder)
 }
 
-// pub fn build_radius_cursor(
-//     params: &SimpleLazyCubeAtCylinder,
-//     cad_shells_by_name: &CadShellsByName,
-// ) -> Result<CadCursor> {
-//     let SimpleLazyCubeAtCylinder {
-//         cylinder_radius,
-//         cylinder_height,
-//         cube_attach_angle,
-//         cube_side_length,
-//     } = params;
+pub fn build_tower_length_cursor(
+    params: &LazyTowerExtension,
+    cad_shells_by_name: &CadShellsByName,
+) -> Result<CadCursor> {
+    let &LazyTowerExtension { tower_length, .. } = params;
 
-//     let cad_shell = cad_shells_by_name
-//         .get(&CadShellName(CadShellIds::Cylinder.to_string()))
-//         .ok_or_else(|| anyhow!("Could not get cylinder shell!"))?;
+    let cad_shell = cad_shells_by_name
+        .get(&CadShellName(CadShellIds::CuboidEnclosure.to_string()))
+        .ok_or_else(|| anyhow!("Could not get CuboidEnclosure shell!"))?;
 
-//     let Some(CadElement::Vertex(vertex_v0)) =
-//         cad_shell.get_element_by_tag(CadElementTag::new("VertexV0"))
-//     else {
-//         return Err(anyhow!("Could not find vertex!"));
-//     };
-//     let Some(CadElement::Face(face)) =
-//         cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
-//     else {
-//         return Err(anyhow!("Could not find face!"));
-//     };
-//     let face_normal = face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
-//     let face_boundaries = face.boundaries();
-//     let face_wire = face_boundaries.last().expect("No wire found!");
-//     let face_centroid = face_wire.get_centroid();
-//     let right_direction = (vertex_v0.point().as_bevy_vec3() - face_centroid.as_vec3()).normalize();
-//     let mesh_transform = Transform::default();
-//     let cursor_transform = Transform::from_translation(
-//         mesh_transform.translation
-//             + face_centroid.as_vec3()
-//             + right_direction * (*cylinder_radius as f32 + 0.1),
-//     )
-//     .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
+    let Some(CadElement::Face(top_face)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("TopFace"))
+    else {
+        return Err(anyhow!("Could not find TopFace!"));
+    };
+    let top_face_normal = top_face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
+    let top_face_boundaries = top_face.boundaries();
+    let top_face_wire = top_face_boundaries.last().expect("No wire found!");
+    let top_face_centroid = top_face_wire.get_centroid();
 
-//     Ok(CadCursor {
-//         normal: face_normal,
-//         transform: cursor_transform,
-//         cursor_type: CadCursorType::Linear {
-//             direction: right_direction,
-//             limit_min: None,
-//             limit_max: None,
-//         },
-//         ..default()
-//     })
-// }
+    let Some(CadElement::Face(front_face)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("FrontFace"))
+    else {
+        return Err(anyhow!("Could not find FrontFace!"));
+    };
+    let front_face_normal = front_face
+        .oriented_surface()
+        .normal(0.5, 0.5)
+        .as_bevy_vec3();
+
+    let cursor_transform = Transform::from_translation(
+        top_face_centroid.as_vec3() + top_face_normal * tower_length as f32 * 0.5,
+    )
+    .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
+
+    Ok(CadCursor {
+        normal: top_face_normal,
+        transform: cursor_transform,
+        cursor_type: CadCursorType::Linear {
+            direction: top_face_normal,
+            limit_min: None,
+            limit_max: None,
+        },
+        ..default()
+    })
+}
