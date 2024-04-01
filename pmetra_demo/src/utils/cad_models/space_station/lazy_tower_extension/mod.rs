@@ -160,11 +160,13 @@ impl ParametricLazyCad for LazyTowerExtension {
         }
         // Create cross beams...
         let cross_beam_angle_z = std::f64::consts::FRAC_PI_2
-            - (self.cross_seg_length / self.enclosure_profile_width).atan();
+            - (self.cross_seg_length
+                / (self.enclosure_profile_width - self.straight_beam_l_sect_side_len - 0.025))
+                .atan();
         let org_transform = Transform::from_translation(Vec3::new(
             -self.enclosure_profile_width as f32 / 2.,
             0.,
-            self.enclosure_profile_depth as f32 / 2.,
+            self.enclosure_profile_depth as f32 / 2. - self.straight_beam_l_sect_thickness as f32,
         ))
         .with_rotation(Quat::from_euler(
             EulerRot::XYZ,
@@ -174,6 +176,7 @@ impl ParametricLazyCad for LazyTowerExtension {
         ));
         for idx in 0..2 {
             let mut transform = org_transform;
+            transform.rotate_y(std::f32::consts::FRAC_PI_2 * if idx % 2 == 0 { 0. } else { 1. });
             transform.rotate_z(cross_beam_angle_z as f32 * if idx % 2 == 0 { -1. } else { 1. });
             transform.translation.x += if idx % 2 == 0 {
                 0.
