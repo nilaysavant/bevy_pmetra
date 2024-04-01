@@ -42,7 +42,7 @@ use super::{
 pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut events: EventReader<GenerateLazyCadModel<Params>>,
-    cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>)>,
+    cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>, Without<Cleanup>)>,
 ) {
     for GenerateLazyCadModel {
         params,
@@ -50,8 +50,9 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
     } in events.read()
     {
         if *remove_existing_models {
-            for entity in cad_generated.iter() {
-                let Some(mut ent_commands) = commands.get_entity(entity) else {
+            for root_ent in cad_generated.iter() {
+                // Remove root and its descendants...
+                let Some(mut ent_commands) = commands.get_entity(root_ent) else {
                     continue;
                 };
                 ent_commands.insert(Cleanup::Recursive);
@@ -59,7 +60,7 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
         }
 
         // Spawn root...
-        let root = commands
+        let root_ent = commands
             .spawn((
                 SpatialBundle::default(),
                 CadGeneratedRoot,
@@ -92,12 +93,19 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
             };
             shells_by_name.insert(shell_name.clone(), cad_shell);
         }
-        commands.spawn((shells_by_name, BelongsToCadGeneratedRoot(root)));
+        // Spawn shells by name and add to root...
+        let shells_by_name_ent = commands
+            .spawn((shells_by_name, BelongsToCadGeneratedRoot(root_ent)))
+            .id();
+        commands.entity(root_ent).add_child(shells_by_name_ent);
     }
 }
 
 pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Component + Clone>(
-    cad_generated: Query<(Entity, &Params), (Changed<Params>, With<CadGeneratedRoot>)>,
+    cad_generated: Query<
+        (Entity, &Params),
+        (Changed<Params>, With<CadGeneratedRoot>, Without<Cleanup>),
+    >,
     mut shells_by_name_entities: Query<(Entity, &BelongsToCadGeneratedRoot, &mut CadShellsByName)>,
 ) {
     for (root_ent, params) in cad_generated.iter() {
@@ -137,7 +145,7 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Compon
 
 pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
-    cad_generated: Query<&Params, With<CadGeneratedRoot>>,
+    cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
         (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
@@ -260,9 +268,10 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
                         On::<Pointer<DragStart>>::run(cursor_drag_start),
                         On::<Pointer<DragEnd>>::run(cursor_drag_end),
                     ))
-                    .insert(NoDeselect) // Prevent de-select other ent when cursor is interacted with.
+                    // Prevent de-select other ent when cursor is interacted with.
+                    .insert(NoDeselect)
                     .id();
-                // Add cursor to root
+                // Add cursor to root...
                 commands.entity(root_ent).add_child(cursor);
             }
         }
@@ -270,7 +279,7 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
 }
 
 pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clone>(
-    cad_generated: Query<&Params, With<CadGeneratedRoot>>,
+    cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
         (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
@@ -310,6 +319,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
 
 pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
+    cad_generated: Query<Entity, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     mut mesh_builders: Query<
         (
             Entity,
@@ -375,6 +385,10 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
             shell_name,
             ..
         } = &task_result.1;
+        if !cad_generated.contains(*root_ent) {
+            // If root is not available, skip...
+            continue;
+        }
         if let Some(current_result) =
             meshes_builder_task_results_map.get(&(*root_ent, shell_name.clone()))
         {
@@ -428,13 +442,18 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
                 // if mesh_builder already exists, update it...
                 *cur_mesh_builder = mesh_builder;
             } else {
-                // Spawn new mesh_builder...
-                commands.spawn((
-                    shell_name.clone(),
-                    mesh_name.clone(),
-                    mesh_builder,
-                    BelongsToCadGeneratedRoot(*root_ent),
-                ));
+                // Spawn new mesh_builder and add to root(if exists)...
+                let Some(mut root_ent_commands) = commands.get_entity(*root_ent) else {
+                    continue;
+                };
+                root_ent_commands.with_children(|commands| {
+                    commands.spawn((
+                        shell_name.clone(),
+                        mesh_name.clone(),
+                        mesh_builder,
+                        BelongsToCadGeneratedRoot(*root_ent),
+                    ));
+                });
             };
         }
     }
@@ -443,6 +462,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
 pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    cad_generated: Query<Entity, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     mut mesh_builders: Query<
         (
             Entity,
@@ -464,6 +484,13 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
         BelongsToCadGeneratedRoot(root_ent),
     ) in mesh_builders.iter_mut()
     {
+        if !cad_generated.contains(*root_ent) {
+            // If root is not available, skip...
+            continue;
+        }
+        let Some(mut ent_commands) = commands.get_entity(entity) else {
+            continue;
+        };
         let cad_mesh = match mesh_builder.build() {
             Ok(cad_mesh) => cad_mesh,
             Err(e) => {
@@ -485,7 +512,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
 
         if cad_generated_mesh.is_some() {
             // If mesh already exists, update it...
-            commands.entity(entity).insert((
+            ent_commands.insert((
                 MaterialMeshBundle {
                     material: material_hdl.clone(),
                     mesh: mesh_hdl,
@@ -495,9 +522,8 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
                 CadGeneratedMeshOutlines(outlines.clone()),
             ));
         } else {
-            // Spawn a new mesh...
-            let mesh_entity = commands
-                .entity(entity)
+            // Insert a new mesh comp if does not exist...
+            ent_commands
                 .insert((
                     MaterialMeshBundle {
                         material: material_hdl.clone(),
@@ -525,14 +551,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
                     // Add drag plane on drag start...
                     On::<Pointer<Move>>::run(mesh_pointer_move),
                     On::<Pointer<Out>>::run(mesh_pointer_out),
-                ))
-                .id();
-            // Add the spawned mesh as child of the root...
-            let Some(mut root_ent_commands) = commands.get_entity(*root_ent) else {
-                warn!("Could not get commands for entity: {:?}", *root_ent);
-                continue;
-            };
-            root_ent_commands.push_children(&[mesh_entity]);
+                ));
         }
     }
 }
