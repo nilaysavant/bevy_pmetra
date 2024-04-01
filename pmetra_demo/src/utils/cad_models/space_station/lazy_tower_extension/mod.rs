@@ -19,7 +19,6 @@ use self::{
     straight_beam::{build_straight_beam_shell, straight_beam_mesh_builder},
 };
 
-pub mod common;
 pub mod cuboid_enclosure;
 pub mod straight_beam;
 
