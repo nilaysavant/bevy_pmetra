@@ -35,6 +35,29 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
     })
 }
 
+/// Cross Beam Shell Builder.
+pub fn build_cross_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
+    let LazyTowerExtension {
+        cross_beam_length,
+        cross_beam_l_sect_side_len,
+        cross_beam_l_sect_thickness,
+        ..
+    } = params.clone();
+
+    let mut tagged_elements = CadTaggedElements::default();
+
+    let shell = l_beam_shell(
+        cross_beam_l_sect_side_len,
+        cross_beam_l_sect_thickness,
+        cross_beam_length,
+    )?;
+
+    Ok(CadShell {
+        shell,
+        tagged_elements,
+    })
+}
+
 /// Get L-shaped beam shell.
 ///
 /// # Args
@@ -106,6 +129,26 @@ pub fn straight_beam_mesh_builder(
     let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::RED.into())?;
+
+    Ok(mesh_builder)
+}
+
+pub fn cross_beam_mesh_builder(
+    params: &LazyTowerExtension,
+    shell_name: CadShellName,
+    transform: Transform,
+) -> Result<CadMeshLazyBuilder<LazyTowerExtension>> {
+    let LazyTowerExtension {
+        cross_beam_length,
+        cross_beam_l_sect_side_len,
+        cross_beam_l_sect_thickness,
+        ..
+    } = &params;
+    // spawn entity with generated mesh...
+
+    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+        .set_transform(transform)?
+        .set_base_material(Color::YELLOW.into())?;
 
     Ok(mesh_builder)
 }
