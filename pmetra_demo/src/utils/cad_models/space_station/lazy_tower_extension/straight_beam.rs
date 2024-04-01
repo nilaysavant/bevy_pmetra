@@ -102,6 +102,7 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
 pub fn straight_beam_mesh_builder(
     params: &LazyTowerExtension,
     shell_name: CadShellName,
+    transform: Transform,
 ) -> Result<CadMeshLazyBuilder<LazyTowerExtension>> {
     let LazyTowerExtension {
         tower_length,
@@ -110,7 +111,6 @@ pub fn straight_beam_mesh_builder(
         ..
     } = &params;
     // spawn entity with generated mesh...
-    let transform = Transform::default();
 
     let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?

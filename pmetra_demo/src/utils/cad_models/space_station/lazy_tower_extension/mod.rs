@@ -88,7 +88,7 @@ impl ParametricLazyCad for LazyTowerExtension {
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
-        let cad_meshes_lazy_builders_by_cad_shell =
+        let mut cad_meshes_lazy_builders_by_cad_shell =
             CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::CuboidEnclosure.to_string()),
@@ -97,15 +97,44 @@ impl ParametricLazyCad for LazyTowerExtension {
                         self,
                         CadShellName(CadShellIds::CuboidEnclosure.to_string()),
                     )?,
-                )?
-                .add_mesh_builder(
-                    CadShellName(CadShellIds::StraightBeam.to_string()),
-                    CadMeshIds::StraightBeam.to_string(),
-                    straight_beam_mesh_builder(
-                        self,
-                        CadShellName(CadShellIds::StraightBeam.to_string()),
-                    )?,
                 )?;
+        let beam_transforms = [
+            Transform::from_translation(Vec3::new(
+                -self.enclosure_profile_width as f32 / 2.,
+                0.,
+                -self.enclosure_profile_depth as f32 / 2.,
+            ))
+            .with_rotation(Quat::from_rotation_y(0.)),
+            Transform::from_translation(Vec3::new(
+                self.enclosure_profile_width as f32 / 2.,
+                0.,
+                -self.enclosure_profile_depth as f32 / 2.,
+            ))
+            .with_rotation(Quat::from_rotation_y(-std::f32::consts::FRAC_PI_2)),
+            Transform::from_translation(Vec3::new(
+                self.enclosure_profile_width as f32 / 2.,
+                0.,
+                self.enclosure_profile_depth as f32 / 2.,
+            ))
+            .with_rotation(Quat::from_rotation_y(-std::f32::consts::PI)),
+            Transform::from_translation(Vec3::new(
+                -self.enclosure_profile_width as f32 / 2.,
+                0.,
+                self.enclosure_profile_depth as f32 / 2.,
+            ))
+            .with_rotation(Quat::from_rotation_y(std::f32::consts::FRAC_PI_2)),
+        ];
+        for (idx, transform) in beam_transforms.iter().enumerate() {
+            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
+                CadShellName(CadShellIds::StraightBeam.to_string()),
+                CadMeshIds::StraightBeam.to_string() + &idx.to_string(),
+                straight_beam_mesh_builder(
+                    self,
+                    CadShellName(CadShellIds::StraightBeam.to_string()),
+                    *transform,
+                )?,
+            )?;
+        }
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
     }
