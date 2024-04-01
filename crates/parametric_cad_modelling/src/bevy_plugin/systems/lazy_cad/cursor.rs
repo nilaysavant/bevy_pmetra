@@ -288,14 +288,14 @@ pub fn draw_cursor_gizmo(
         (
             &BelongsToCadGeneratedRoot,
             &CadGeneratedCursorConfig,
-            &Transform,
+            &GlobalTransform,
         ),
         (With<CadGeneratedCursor>, Without<CadGeneratedMesh>),
     >,
     mut gizmos: Gizmos,
 ) {
     for (root_ent, selection_state) in cad_generated.iter() {
-        for (&BelongsToCadGeneratedRoot(cur_root_ent), config, transform) in cursors.iter() {
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), config, glob_transform) in cursors.iter() {
             if cur_root_ent != root_ent {
                 continue;
             }
@@ -303,6 +303,7 @@ pub fn draw_cursor_gizmo(
                 // if not selected don't draw outline...
                 continue;
             }
+            let transform = glob_transform.compute_transform();
             // draw outline circle...
             gizmos.circle(
                 transform.translation,
