@@ -32,8 +32,8 @@ impl Default for LazyTowerExtension {
     fn default() -> Self {
         Self {
             tower_length: 1.0,
-            straight_beam_l_sect_side_len: 0.25,
-            straight_beam_l_sect_thickness: 0.05,
+            straight_beam_l_sect_side_len: 0.05,
+            straight_beam_l_sect_thickness: 0.01,
         }
     }
 }
