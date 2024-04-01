@@ -20,33 +20,9 @@ use bevy_pmetra::{
 use itertools::Itertools;
 use strum::{Display, EnumString};
 
-use super::{CadShellIds, LazyTowerExtension};
+use super::{common::l_beam_shell, CadShellIds, LazyTowerExtension};
 
 /// Straight Beam Shell Builder.
-///
-/// The beam has a L-shaped cross section.
-///
-/// ```
-/// O -> x
-/// |
-/// z
-///
-/// ao = ob = straight_beam_l_sect_side_len
-/// bc = ae = straight_beam_l_sect_thickness
-/// o : Located at origin(0,0, 0)
-///
-///  o ---------- b  ^
-///  | *--------- c  V
-///  | | d
-///  | |
-///  | |
-///  a e
-///
-/// ```
-///
-///
-///
-///
 pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
     let LazyTowerExtension {
         tower_length,
@@ -57,41 +33,11 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
 
     let mut tagged_elements = CadTaggedElements::default();
 
-    // Create the L-Shaped Cross section of beam...
-
-    // Create points...
-    let o = DVec3::ZERO;
-    let b = DVec3::new(straight_beam_l_sect_side_len, 0., 0.);
-    let c = b + DVec3::new(0., 0., straight_beam_l_sect_thickness);
-    let d = DVec3::new(
+    let shell = l_beam_shell(
+        straight_beam_l_sect_side_len,
         straight_beam_l_sect_thickness,
-        0.,
-        straight_beam_l_sect_thickness,
-    );
-    let a = DVec3::new(0., 0., straight_beam_l_sect_side_len);
-    let e = a + DVec3::new(straight_beam_l_sect_thickness, 0., 0.);
-
-    // Create wire...
-    let points = [o, b, c, d, e, a];
-    let vertices = points
-        .iter()
-        .map(|p| Vertex::new(Point3::from(p.to_array())))
-        .collect::<Vec<_>>();
-    let mut wire = Wire::new();
-    for (v0, v1) in vertices.iter().circular_tuple_windows() {
-        let edge = builder::line(v0, v1);
-        wire.push_back(edge);
-    }
-    wire.invert(); // invert since anticlockwise is positive face.
-
-    // Checks for wire...
-    debug_assert!(wire.is_closed());
-
-    // Extrude wire and create shell...
-    let face =
-        builder::try_attach_plane(&[wire]).with_context(|| "Could not attach plane to wire")?;
-    let solid = builder::tsweep(&face, Vector3::from((DVec3::Y * tower_length).to_array()));
-    let shell = Shell::try_from_solid(&solid)?;
+        tower_length,
+    )?;
 
     Ok(CadShell {
         shell,
