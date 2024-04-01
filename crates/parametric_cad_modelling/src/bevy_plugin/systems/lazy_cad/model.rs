@@ -169,7 +169,7 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
     {
         // Get params from root...
         let Ok(params) = cad_generated.get(root_ent) else {
-            warn!("Could not get `CadGeneratedRoot` with associated params!");
+            // warn!("Could not get `CadGeneratedRoot` with associated params!");
             continue;
         };
         // Cursors...
@@ -293,7 +293,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
     {
         // Get params from root...
         let Ok(params) = cad_generated.get(root_ent) else {
-            warn!("Could not get `CadGeneratedRoot` with associated params!");
+            // warn!("Could not get `CadGeneratedRoot` with associated params!");
             continue;
         };
         let Ok(meshes_builders_by_shell) = params.meshes_builders_by_shell(shells_by_name) else {
