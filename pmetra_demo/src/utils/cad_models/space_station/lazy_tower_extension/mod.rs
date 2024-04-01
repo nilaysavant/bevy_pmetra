@@ -13,14 +13,14 @@ use bevy_pmetra::{
 use strum::{Display, EnumString};
 
 use self::{
+    beams::{build_straight_beam_shell, straight_beam_mesh_builder},
     cuboid_enclosure::{
         build_cuboid_enclosure_shell, build_tower_length_cursor, cuboid_enclosure_mesh_builder,
     },
-    straight_beam::{build_straight_beam_shell, straight_beam_mesh_builder},
 };
 
+pub mod beams;
 pub mod cuboid_enclosure;
-pub mod straight_beam;
 
 /// Basic Parametric Station Segment.
 #[derive(Debug, Reflect, Component, Clone, InspectorOptions)]
