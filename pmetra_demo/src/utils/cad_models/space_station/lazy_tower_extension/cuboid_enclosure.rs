@@ -11,8 +11,8 @@ use bevy_pmetra::{
     prelude::*,
     re_exports::{
         truck_modeling::{
-            builder, control_point::ControlPoint, Curve, Edge, ParametricSurface3D, Point3, Rad,
-            Shell, Vector3, Vertex, Wire,
+            builder, cgmath::AbsDiffEq, control_point::ControlPoint, Curve, Edge,
+            ParametricSurface3D, Point3, Rad, Shell, Vector3, Vertex, Wire,
         },
         truck_topology::{VertexDisplayFormat, WireDisplayFormat},
     },
@@ -95,7 +95,7 @@ pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadSh
         .face_iter()
         .find(|f| {
             let normal = f.oriented_surface().normal(0.5, 0.5);
-            normal == Vector3::unit_y()
+            normal.abs_diff_eq(&Vector3::unit_y(), Point3::default_epsilon())
         })
         .ok_or_else(|| anyhow!("Could not find top face!"))?;
     tagged_elements.insert(
@@ -106,7 +106,7 @@ pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadSh
         .face_iter()
         .find(|f| {
             let normal = f.oriented_surface().normal(0.5, 0.5);
-            normal == Vector3::unit_z()
+            normal.abs_diff_eq(&Vector3::unit_z(), Point3::default_epsilon())
         })
         .ok_or_else(|| anyhow!("Could not find top face!"))?;
     tagged_elements.insert(
