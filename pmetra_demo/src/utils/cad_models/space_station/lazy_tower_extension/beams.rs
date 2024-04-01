@@ -38,11 +38,14 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
 /// Cross Beam Shell Builder.
 pub fn build_cross_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
     let LazyTowerExtension {
-        cross_beam_length,
+        cross_seg_length,
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
+        enclosure_profile_width,
         ..
     } = params.clone();
+
+    let cross_beam_length = (cross_seg_length.powi(2) + enclosure_profile_width.powi(2)).sqrt();
 
     let mut tagged_elements = CadTaggedElements::default();
 
@@ -139,7 +142,6 @@ pub fn cross_beam_mesh_builder(
     transform: Transform,
 ) -> Result<CadMeshLazyBuilder<LazyTowerExtension>> {
     let LazyTowerExtension {
-        cross_beam_length,
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
         ..

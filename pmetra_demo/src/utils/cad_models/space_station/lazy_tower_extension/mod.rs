@@ -31,14 +31,14 @@ pub mod cuboid_enclosure;
 pub struct LazyTowerExtension {
     #[inspector(min = 0.1)]
     pub tower_length: f64,
+    #[inspector(min = 0.1)]
+    pub cross_seg_length: f64,
     // Straight Beams...
     #[inspector(min = 0.1)]
     pub straight_beam_l_sect_side_len: f64,
     #[inspector(min = 0.1)]
     pub straight_beam_l_sect_thickness: f64,
     // Cross Beams...
-    #[inspector(min = 0.1)]
-    pub cross_beam_length: f64,
     #[inspector(min = 0.1)]
     pub cross_beam_l_sect_side_len: f64,
     #[inspector(min = 0.1)]
@@ -54,9 +54,9 @@ impl Default for LazyTowerExtension {
     fn default() -> Self {
         Self {
             tower_length: 1.0,
+            cross_seg_length: 0.5,
             straight_beam_l_sect_side_len: 0.05,
             straight_beam_l_sect_thickness: 0.01,
-            cross_beam_length: 0.75,
             cross_beam_l_sect_side_len: 0.05,
             cross_beam_l_sect_thickness: 0.01,
             enclosure_profile_width: 0.5,
@@ -159,10 +159,8 @@ impl ParametricLazyCad for LazyTowerExtension {
             )?;
         }
         // Create cross beams...
-        let cross_seg_len =
-            (self.cross_beam_length.powi(2) - self.enclosure_profile_width.powi(2)).sqrt();
         let cross_beam_angle_z = std::f64::consts::FRAC_PI_2
-            - (self.enclosure_profile_width / self.cross_beam_length).acos();
+            - (self.cross_seg_length / self.enclosure_profile_width).atan();
         let org_transform = Transform::from_translation(Vec3::new(
             -self.enclosure_profile_width as f32 / 2.,
             0.,
@@ -182,7 +180,7 @@ impl ParametricLazyCad for LazyTowerExtension {
             } else {
                 self.enclosure_profile_width as f32
             };
-            transform.translation.y += idx as f32 * cross_seg_len as f32;
+            transform.translation.y += idx as f32 * self.cross_seg_length as f32;
 
             cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                 CadShellName(CadShellIds::CrossBeam.to_string()),
