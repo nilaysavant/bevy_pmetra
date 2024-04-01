@@ -12,8 +12,12 @@ use bevy_pmetra::{
 };
 use strum::{Display, EnumString};
 
-use self::straight_beam::{build_straight_beam_shell, straight_beam_mesh_builder};
+use self::{
+    cuboid_enclosure::{build_cuboid_enclosure_shell, cuboid_enclosure_mesh_builder},
+    straight_beam::{build_straight_beam_shell, straight_beam_mesh_builder},
+};
 
+pub mod cuboid_enclosure;
 pub mod straight_beam;
 
 /// Basic Parametric Station Segment.
@@ -26,6 +30,10 @@ pub struct LazyTowerExtension {
     pub straight_beam_l_sect_side_len: f64,
     #[inspector(min = 0.1)]
     pub straight_beam_l_sect_thickness: f64,
+    #[inspector(min = 0.1)]
+    pub enclosure_profile_width: f64,
+    #[inspector(min = 0.1)]
+    pub enclosure_profile_depth: f64,
 }
 
 impl Default for LazyTowerExtension {
@@ -34,17 +42,21 @@ impl Default for LazyTowerExtension {
             tower_length: 1.0,
             straight_beam_l_sect_side_len: 0.05,
             straight_beam_l_sect_thickness: 0.01,
+            enclosure_profile_width: 0.5,
+            enclosure_profile_depth: 0.5,
         }
     }
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CadShellIds {
+    CuboidEnclosure,
     StraightBeam,
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CadMeshIds {
+    CuboidEnclosure,
     StraightBeam,
 }
 
@@ -56,6 +68,10 @@ pub enum CadCursorIds {
 impl ParametricLazyModelling for LazyTowerExtension {
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
+            .add_shell_builder(
+                CadShellName(CadShellIds::CuboidEnclosure.to_string()),
+                build_cuboid_enclosure_shell,
+            )?
             .add_shell_builder(
                 CadShellName(CadShellIds::StraightBeam.to_string()),
                 build_straight_beam_shell,
@@ -70,8 +86,16 @@ impl ParametricLazyCad for LazyTowerExtension {
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
-        let mut cad_meshes_lazy_builders_by_cad_shell =
+        let cad_meshes_lazy_builders_by_cad_shell =
             CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
+                .add_mesh_builder(
+                    CadShellName(CadShellIds::CuboidEnclosure.to_string()),
+                    CadMeshIds::CuboidEnclosure.to_string(),
+                    cuboid_enclosure_mesh_builder(
+                        self,
+                        CadShellName(CadShellIds::CuboidEnclosure.to_string()),
+                    )?,
+                )?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::StraightBeam.to_string()),
                     CadMeshIds::StraightBeam.to_string(),
