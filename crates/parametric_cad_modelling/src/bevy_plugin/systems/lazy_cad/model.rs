@@ -341,7 +341,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     builder_queue_inspector.meshes_builder_queue_size = builder_queue.len();
 
     // Spawn a set num of tasks per frame from queue...
-    for _ in 0..2 {
+    for _ in 0..10 {
         let Some(spawn_meshes_builder) = builder_queue.pop_front() else {
             break;
         };
