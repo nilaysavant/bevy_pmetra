@@ -170,10 +170,9 @@ pub fn build_tower_length_cursor(
         .normal(0.5, 0.5)
         .as_bevy_vec3();
 
-    let cursor_transform = Transform::from_translation(
-        top_face_centroid.as_vec3() + top_face_normal * tower_length as f32 * 0.5,
-    )
-    .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
+    let cursor_transform =
+        Transform::from_translation(top_face_centroid.as_vec3() + top_face_normal * 0.1)
+            .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
 
     Ok(CadCursor {
         normal: front_face_normal,
