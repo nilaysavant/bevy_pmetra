@@ -176,7 +176,7 @@ pub fn build_tower_length_cursor(
     .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
 
     Ok(CadCursor {
-        normal: top_face_normal,
+        normal: front_face_normal,
         transform: cursor_transform,
         cursor_type: CadCursorType::Linear {
             direction: top_face_normal,
