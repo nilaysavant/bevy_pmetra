@@ -35,7 +35,7 @@ use crate::{
             simple_cube_at_cylinder::SimpleCubeAtCylinder,
             simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
         },
-        space_station::{RoundCabinSegment, RoundRectCuboid},
+        space_station::{lazy_tower_extension::LazyTowerExtension, RoundCabinSegment, RoundRectCuboid},
     },
 };
 
@@ -106,6 +106,7 @@ impl Plugin for PmetraDemoPlugin {
                     allow_wire_frames: true,
                 },
                 ParametricLazyCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
+                ParametricLazyCadParamsPlugin::<LazyTowerExtension>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()
@@ -130,6 +131,7 @@ impl Plugin for PmetraDemoPlugin {
             .register_type::<RoundCabinSegment>()
             .register_type::<SimpleCubeAtCylinder>()
             .register_type::<SimpleLazyCubeAtCylinder>()
+            .register_type::<LazyTowerExtension>()
             .register_type::<SimpleGear>()
             .register_type::<RoundRectCuboid>()
             .add_plugins(

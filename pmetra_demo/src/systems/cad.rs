@@ -12,7 +12,10 @@ use crate::{
         simple_primitives::{
             simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder, SimpleCubeAtCylinder,
         },
-        space_station::{round_cabin_segment::CadMaterialIds, RoundCabinSegment},
+        space_station::{
+            lazy_tower_extension::LazyTowerExtension, round_cabin_segment::CadMaterialIds,
+            RoundCabinSegment,
+        },
     },
 };
 
@@ -26,6 +29,7 @@ pub fn spawn_cad_model(
     mut spawn_lazy_simple_cube_at_cylinder: EventWriter<
         GenerateLazyCadModel<SimpleLazyCubeAtCylinder>,
     >,
+    mut lazy_tower_extension: EventWriter<GenerateLazyCadModel<LazyTowerExtension>>,
     mut asset_server: ResMut<AssetServer>,
 ) {
     if !cad_model_spawner.is_changed() {
@@ -51,6 +55,9 @@ pub fn spawn_cad_model(
         }
         CadGeneratedModelParamsId::SimplLazyCubeAtCylinder => {
             spawn_lazy_simple_cube_at_cylinder.send(GenerateLazyCadModel::default());
+        }
+        CadGeneratedModelParamsId::LazyTowerExtension => {
+            lazy_tower_extension.send(GenerateLazyCadModel::default());
         }
     }
 }
