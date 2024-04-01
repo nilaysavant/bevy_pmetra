@@ -33,7 +33,7 @@ use super::{CadShellIds, LazyTowerExtension};
 ///
 /// ao = ob = straight_beam_l_sect_side_len
 /// bc = ae = straight_beam_l_sect_thickness
-/// o : Located at origin(0,0)
+/// o : Located at origin(0,0, 0)
 ///
 ///  o ---------- b  ^
 ///  | *--------- c  V
@@ -52,6 +52,7 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
         tower_length,
         straight_beam_l_sect_side_len,
         straight_beam_l_sect_thickness,
+        ..
     } = params.clone();
 
     let mut tagged_elements = CadTaggedElements::default();
@@ -83,12 +84,6 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
     }
     wire.invert(); // invert since anticlockwise is positive face.
 
-    println!(
-        "wire: {:?}",
-        wire.display(WireDisplayFormat::VerticesList {
-            vertex_format: VertexDisplayFormat::AsPoint
-        })
-    );
     // Checks for wire...
     debug_assert!(wire.is_closed());
 
@@ -112,6 +107,7 @@ pub fn straight_beam_mesh_builder(
         tower_length,
         straight_beam_l_sect_side_len,
         straight_beam_l_sect_thickness,
+        ..
     } = &params;
     // spawn entity with generated mesh...
     let transform = Transform::default();
@@ -182,6 +178,7 @@ mod tests {
             tower_length: 1.0,
             straight_beam_l_sect_side_len: 0.25,
             straight_beam_l_sect_thickness: 0.05,
+            ..Default::default()
         };
 
         let shell = build_straight_beam_shell(&params).unwrap();
