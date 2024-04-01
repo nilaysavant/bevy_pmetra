@@ -31,8 +31,6 @@ pub mod cuboid_enclosure;
 pub struct LazyTowerExtension {
     #[inspector(min = 0.1)]
     pub tower_length: f64,
-    #[inspector(min = 0)]
-    pub num_of_cross_segments: u32,
     // Straight Beams...
     #[inspector(min = 0.1)]
     pub straight_beam_l_sect_side_len: f64,
@@ -54,7 +52,6 @@ impl Default for LazyTowerExtension {
     fn default() -> Self {
         Self {
             tower_length: 1.0,
-            num_of_cross_segments: 2,
             straight_beam_l_sect_side_len: 0.05,
             straight_beam_l_sect_thickness: 0.01,
             cross_beam_l_sect_side_len: 0.05,
@@ -66,9 +63,12 @@ impl Default for LazyTowerExtension {
 }
 
 impl LazyTowerExtension {
+    pub fn num_of_cross_segments(&self) -> u32 {
+        (self.tower_length / 0.5).floor() as u32
+    }
     pub fn cross_segment_length(&self) -> f64 {
         (self.tower_length - self.cross_beam_l_sect_side_len * 2.)
-            / self.num_of_cross_segments as f64
+            / self.num_of_cross_segments() as f64
     }
 }
 
@@ -183,7 +183,7 @@ impl ParametricLazyCad for LazyTowerExtension {
             std::f32::consts::FRAC_PI_2,
             0.,
         ));
-        for idx in 0..2 {
+        for idx in 0..self.num_of_cross_segments() {
             let mut transform = org_transform;
             transform.rotate_y(std::f32::consts::FRAC_PI_2 * if idx % 2 == 0 { 0. } else { 1. });
             transform.rotate_z(cross_beam_angle_z as f32 * if idx % 2 == 0 { -1. } else { 1. });

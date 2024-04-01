@@ -38,7 +38,6 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
 /// Cross Beam Shell Builder.
 pub fn build_cross_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
     let LazyTowerExtension {
-        num_of_cross_segments,
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
         enclosure_profile_width,
