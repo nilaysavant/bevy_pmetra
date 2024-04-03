@@ -223,6 +223,8 @@ impl ParametricLazyCad for LazyTowerExtension {
             let num_of_cross_segments = self.num_of_cross_segments();
             let cross_segment_length = self.cross_segment_length();
             for jdx in 0..num_of_cross_segments {
+                //  Add idx: adjustment to flip cross beams pos so that they appear connected between sides....
+                let jdx = jdx + idx as u32;
                 let mut transform = org_transform;
                 transform
                     .rotate_y(std::f32::consts::FRAC_PI_2 * if jdx % 2 == 0 { 0. } else { 1. });
@@ -232,7 +234,9 @@ impl ParametricLazyCad for LazyTowerExtension {
                 } else {
                     self.enclosure_inner_width() as f32
                 };
-                transform.translation.y += jdx as f32 * (cross_segment_length as f32);
+                //  Sub idx: adjustment to flip cross beams pos so that they appear connected between sides....
+                transform.translation.y +=
+                    (jdx - idx as u32) as f32 * (cross_segment_length as f32);
 
                 cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                     CadShellName(CadShellIds::CrossBeam.to_string()),
