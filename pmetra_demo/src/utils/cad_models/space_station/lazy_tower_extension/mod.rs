@@ -195,10 +195,6 @@ impl ParametricLazyCad for LazyTowerExtension {
             )?;
         }
         // Create cross beams...
-        let cross_beams_proj_width = self.enclosure_profile_width
-            - self.straight_beam_l_sect_side_len
-            - self.straight_beam_l_sect_thickness * 2.
-            - 0.02;
         let cross_beam_angle_z = self.cross_beam_angle_z();
         let org_transform = Transform::from_translation(Vec3::new(
             -self.enclosure_profile_width as f32 / 2. + self.straight_beam_l_sect_thickness as f32,
