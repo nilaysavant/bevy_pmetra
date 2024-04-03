@@ -236,7 +236,11 @@ impl ParametricLazyCad for LazyTowerExtension {
 
                 cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                     CadShellName(CadShellIds::CrossBeam.to_string()),
-                    CadMeshIds::CrossBeam.to_string() + &idx.to_string() + &jdx.to_string(),
+                    CadMeshIds::CrossBeam.to_string()
+                        + "-"
+                        + &idx.to_string()
+                        + "-"
+                        + &jdx.to_string(),
                     cross_beam_mesh_builder(
                         self,
                         CadShellName(CadShellIds::CrossBeam.to_string()),
