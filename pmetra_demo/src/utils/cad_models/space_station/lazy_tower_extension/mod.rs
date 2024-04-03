@@ -70,6 +70,34 @@ impl LazyTowerExtension {
         (self.tower_length - self.cross_beam_l_sect_side_len * 2.)
             / self.num_of_cross_segments() as f64
     }
+
+    pub fn enclosure_inner_width(&self) -> f64 {
+        self.enclosure_profile_width - self.straight_beam_l_sect_thickness * 2.
+    }
+
+    pub fn cross_beam_hypotenuse(&self) -> f64 {
+        (self.cross_segment_length().powi(2) + self.enclosure_inner_width().powi(2)).sqrt()
+    }
+
+    pub fn cross_beam_length(&self) -> f64 {
+        (self.cross_beam_hypotenuse().powi(2) - self.cross_beam_l_sect_side_len.powi(2)).sqrt()
+    }
+
+    pub fn cross_beam_hyp_angle_z(&self) -> f64 {
+        std::f64::consts::FRAC_PI_2
+            - (self.cross_segment_length() / self.enclosure_inner_width()).atan()
+    }
+
+    pub fn cross_beam_angle_z(&self) -> f64 {
+        self.cross_beam_hyp_angle_z()
+            - (self.cross_beam_l_sect_side_len / self.cross_beam_length()).atan()
+    }
+
+    pub fn cross_beam_y_offset(&self) -> f64 {
+        let cross_beam_bot_angle =
+            std::f64::consts::PI - self.cross_beam_angle_z() - std::f64::consts::FRAC_PI_2;
+        self.cross_beam_l_sect_side_len * cross_beam_bot_angle.cos()
+    }
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
@@ -170,11 +198,10 @@ impl ParametricLazyCad for LazyTowerExtension {
             - self.straight_beam_l_sect_side_len
             - self.straight_beam_l_sect_thickness * 2.
             - 0.02;
-        let cross_beam_angle_z = std::f64::consts::FRAC_PI_2
-            - (self.cross_segment_length() / (cross_beams_proj_width)).atan();
+        let cross_beam_angle_z = self.cross_beam_angle_z();
         let org_transform = Transform::from_translation(Vec3::new(
             -self.enclosure_profile_width as f32 / 2. + self.straight_beam_l_sect_thickness as f32,
-            self.cross_beam_l_sect_side_len as f32 / 2. + 0.01,
+            self.cross_beam_y_offset() as f32,
             self.enclosure_profile_depth as f32 / 2. - self.straight_beam_l_sect_thickness as f32,
         ))
         .with_rotation(Quat::from_euler(
@@ -183,21 +210,18 @@ impl ParametricLazyCad for LazyTowerExtension {
             std::f32::consts::FRAC_PI_2,
             0.,
         ));
-        for idx in 0..self.num_of_cross_segments() {
+        dbg!(self.cross_beam_y_offset());
+        let num_of_cross_segments = self.num_of_cross_segments();
+        for idx in 0..num_of_cross_segments {
             let mut transform = org_transform;
             transform.rotate_y(std::f32::consts::FRAC_PI_2 * if idx % 2 == 0 { 0. } else { 1. });
             transform.rotate_z(cross_beam_angle_z as f32 * if idx % 2 == 0 { -1. } else { 1. });
             transform.translation.x += if idx % 2 == 0 {
                 0.
             } else {
-                cross_beams_proj_width as f32
-                    + self.straight_beam_l_sect_side_len as f32
-                    + self.straight_beam_l_sect_thickness as f32
-                    + 0.01
+                self.enclosure_inner_width() as f32
             };
-            transform.translation.y += idx as f32
-                * (self.cross_segment_length() as f32
-                    + self.straight_beam_l_sect_thickness as f32 * 2.);
+            transform.translation.y += idx as f32 * (self.cross_segment_length() as f32);
 
             cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                 CadShellName(CadShellIds::CrossBeam.to_string()),

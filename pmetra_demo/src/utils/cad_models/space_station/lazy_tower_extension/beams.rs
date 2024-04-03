@@ -44,15 +44,12 @@ pub fn build_cross_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
         ..
     } = params.clone();
 
-    let cross_beam_length =
-        (params.cross_segment_length().powi(2) + enclosure_profile_width.powi(2)).sqrt();
-
     let mut tagged_elements = CadTaggedElements::default();
 
     let shell = l_beam_shell(
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
-        cross_beam_length,
+        params.cross_beam_length(),
     )?;
 
     Ok(CadShell {
