@@ -1,4 +1,4 @@
-use bevy::{math::DVec3, pbr::wireframe::Wireframe, prelude::*};
+use bevy::{math::DVec3, pbr::wireframe::Wireframe, prelude::*, render::primitives::Frustum};
 use bevy_pmetra::{
     prelude::*,
     re_exports::{
@@ -16,21 +16,29 @@ use crate::utils::cad_models::space_station::common::{
 };
 
 pub fn scene_setup(mut commands: Commands) {
-    commands.spawn(Camera3dBundle::default()).insert((
-        OrbitCameraBundle::new(
-            OrbitCameraController {
-                mouse_rotate_sensitivity: Vec2::splat(0.25),
-                mouse_translate_sensitivity: Vec2::splat(0.5),
-                mouse_wheel_zoom_sensitivity: 0.06,
-                smoothing_weight: 0.,
-                ..default()
-            },
-            Vec3::new(-2.0, 5.0, 5.0),
-            Vec3::new(0., 0., 0.),
-            Vec3::Y,
-        ),
-        CadCamera, // Mark the camera to be used for CAD.
-    ));
+    commands
+        .spawn(Camera3dBundle {
+            projection: Projection::Perspective(PerspectiveProjection {
+                near: 0.001,
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .insert((
+            OrbitCameraBundle::new(
+                OrbitCameraController {
+                    mouse_rotate_sensitivity: Vec2::splat(0.25),
+                    mouse_translate_sensitivity: Vec2::splat(0.5),
+                    mouse_wheel_zoom_sensitivity: 0.06,
+                    smoothing_weight: 0.,
+                    ..default()
+                },
+                Vec3::new(-2.0, 5.0, 5.0),
+                Vec3::new(0., 0., 0.),
+                Vec3::Y,
+            ),
+            CadCamera, // Mark the camera to be used for CAD.
+        ));
 
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
