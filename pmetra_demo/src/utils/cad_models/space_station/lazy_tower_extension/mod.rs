@@ -64,8 +64,9 @@ impl Default for LazyTowerExtension {
 
 impl LazyTowerExtension {
     pub fn num_of_cross_segments(&self) -> u32 {
-        (self.tower_length / 0.5).floor() as u32
+        (self.tower_length / 0.2).floor() as u32
     }
+
     pub fn cross_segment_length(&self) -> f64 {
         (self.tower_length - self.cross_beam_l_sect_side_len * 2.)
             / self.num_of_cross_segments() as f64
