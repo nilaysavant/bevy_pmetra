@@ -195,7 +195,6 @@ impl ParametricLazyCad for LazyTowerExtension {
             )?;
         }
         // Create cross beams...
-        let cross_beam_angle_z = self.cross_beam_angle_z();
         let org_transform = Transform::from_translation(Vec3::new(
             -self.enclosure_profile_width as f32 / 2. + self.straight_beam_l_sect_thickness as f32,
             self.cross_beam_y_offset() as f32,
@@ -207,7 +206,9 @@ impl ParametricLazyCad for LazyTowerExtension {
             std::f32::consts::FRAC_PI_2,
             0.,
         ));
+        let cross_beam_angle_z = self.cross_beam_angle_z();
         let num_of_cross_segments = self.num_of_cross_segments();
+        let cross_segment_length = self.cross_segment_length();
         for idx in 0..num_of_cross_segments {
             let mut transform = org_transform;
             transform.rotate_y(std::f32::consts::FRAC_PI_2 * if idx % 2 == 0 { 0. } else { 1. });
@@ -217,7 +218,7 @@ impl ParametricLazyCad for LazyTowerExtension {
             } else {
                 self.enclosure_inner_width() as f32
             };
-            transform.translation.y += idx as f32 * (self.cross_segment_length() as f32);
+            transform.translation.y += idx as f32 * (cross_segment_length as f32);
 
             cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                 CadShellName(CadShellIds::CrossBeam.to_string()),
