@@ -211,7 +211,6 @@ impl ParametricLazyCad for LazyTowerExtension {
             std::f32::consts::FRAC_PI_2,
             0.,
         ));
-        dbg!(self.cross_beam_y_offset());
         let num_of_cross_segments = self.num_of_cross_segments();
         for idx in 0..num_of_cross_segments {
             let mut transform = org_transform;
