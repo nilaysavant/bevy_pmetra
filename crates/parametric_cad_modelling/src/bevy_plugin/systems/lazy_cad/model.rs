@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use bevy::{pbr::NotShadowCaster, prelude::*, utils::HashMap};
+use bevy::{pbr::NotShadowCaster, prelude::*, render::primitives::Aabb, utils::HashMap};
 use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
@@ -516,15 +516,19 @@ pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
 
         if cad_generated_mesh.is_some() {
             // If mesh already exists, update it...
-            ent_commands.insert((
-                MaterialMeshBundle {
-                    material: material_hdl.clone(),
-                    mesh: mesh_hdl,
-                    transform,
-                    ..Default::default()
-                },
-                CadGeneratedMeshOutlines(outlines.clone()),
-            ));
+            ent_commands
+                .insert((
+                    MaterialMeshBundle {
+                        material: material_hdl.clone(),
+                        mesh: mesh_hdl,
+                        transform,
+                        ..Default::default()
+                    },
+                    CadGeneratedMeshOutlines(outlines.clone()),
+                ))
+                // Remove AABB for Bevy to recompute as it wont recompute by itself...
+                // ref: https://github.com/bevyengine/bevy/issues/4294#issuecomment-1606056536)
+                .remove::<Aabb>();
         } else {
             // Insert a new mesh comp if does not exist...
             ent_commands
