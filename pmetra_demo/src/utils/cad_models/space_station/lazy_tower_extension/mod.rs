@@ -158,24 +158,28 @@ impl ParametricLazyCad for LazyTowerExtension {
                 )?;
         // Create straight beams...
         let straight_beam_transforms = [
+            // back-left
             Transform::from_translation(Vec3::new(
                 -self.enclosure_profile_width as f32 / 2.,
                 0.,
                 -self.enclosure_profile_depth as f32 / 2.,
             ))
             .with_rotation(Quat::from_rotation_y(0.)),
+            // back-right
             Transform::from_translation(Vec3::new(
                 self.enclosure_profile_width as f32 / 2.,
                 0.,
                 -self.enclosure_profile_depth as f32 / 2.,
             ))
             .with_rotation(Quat::from_rotation_y(-std::f32::consts::FRAC_PI_2)),
+            // front-right
             Transform::from_translation(Vec3::new(
                 self.enclosure_profile_width as f32 / 2.,
                 0.,
                 self.enclosure_profile_depth as f32 / 2.,
             ))
             .with_rotation(Quat::from_rotation_y(-std::f32::consts::PI)),
+            // front-left
             Transform::from_translation(Vec3::new(
                 -self.enclosure_profile_width as f32 / 2.,
                 0.,
@@ -195,40 +199,51 @@ impl ParametricLazyCad for LazyTowerExtension {
             )?;
         }
         // Create cross beams...
-        let org_transform = Transform::from_translation(Vec3::new(
-            -self.enclosure_profile_width as f32 / 2. + self.straight_beam_l_sect_thickness as f32,
-            self.cross_beam_y_offset() as f32,
-            self.enclosure_profile_depth as f32 / 2. - self.straight_beam_l_sect_thickness as f32,
-        ))
-        .with_rotation(Quat::from_euler(
-            EulerRot::XYZ,
-            0.,
-            std::f32::consts::FRAC_PI_2,
-            0.,
-        ));
-        let cross_beam_angle_z = self.cross_beam_angle_z();
-        let num_of_cross_segments = self.num_of_cross_segments();
-        let cross_segment_length = self.cross_segment_length();
-        for idx in 0..num_of_cross_segments {
-            let mut transform = org_transform;
-            transform.rotate_y(std::f32::consts::FRAC_PI_2 * if idx % 2 == 0 { 0. } else { 1. });
-            transform.rotate_z(cross_beam_angle_z as f32 * if idx % 2 == 0 { -1. } else { 1. });
-            transform.translation.x += if idx % 2 == 0 {
-                0.
-            } else {
-                self.enclosure_inner_width() as f32
-            };
-            transform.translation.y += idx as f32 * (cross_segment_length as f32);
+        let base_transforms = [
+            Transform::default(), // front
+            Transform::from_rotation(Quat::from_rotation_y(std::f32::consts::FRAC_PI_2)), // right
+            Transform::from_rotation(Quat::from_rotation_y(std::f32::consts::PI)), // back
+            Transform::from_rotation(Quat::from_rotation_y(-std::f32::consts::FRAC_PI_2)), // left
+        ];
+        for (idx, base_transform) in base_transforms.iter().enumerate() {
+            let org_transform = Transform::from_translation(Vec3::new(
+                -self.enclosure_profile_width as f32 / 2.
+                    + self.straight_beam_l_sect_thickness as f32,
+                self.cross_beam_y_offset() as f32,
+                self.enclosure_profile_depth as f32 / 2.
+                    - self.straight_beam_l_sect_thickness as f32,
+            ))
+            .with_rotation(Quat::from_euler(
+                EulerRot::XYZ,
+                0.,
+                std::f32::consts::FRAC_PI_2,
+                0.,
+            ));
+            let cross_beam_angle_z = self.cross_beam_angle_z();
+            let num_of_cross_segments = self.num_of_cross_segments();
+            let cross_segment_length = self.cross_segment_length();
+            for jdx in 0..num_of_cross_segments {
+                let mut transform = org_transform;
+                transform
+                    .rotate_y(std::f32::consts::FRAC_PI_2 * if jdx % 2 == 0 { 0. } else { 1. });
+                transform.rotate_z(cross_beam_angle_z as f32 * if jdx % 2 == 0 { -1. } else { 1. });
+                transform.translation.x += if jdx % 2 == 0 {
+                    0.
+                } else {
+                    self.enclosure_inner_width() as f32
+                };
+                transform.translation.y += jdx as f32 * (cross_segment_length as f32);
 
-            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
-                CadShellName(CadShellIds::CrossBeam.to_string()),
-                CadMeshIds::CrossBeam.to_string() + &idx.to_string(),
-                cross_beam_mesh_builder(
-                    self,
+                cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                     CadShellName(CadShellIds::CrossBeam.to_string()),
-                    transform,
-                )?,
-            )?;
+                    CadMeshIds::CrossBeam.to_string() + &idx.to_string() + &jdx.to_string(),
+                    cross_beam_mesh_builder(
+                        self,
+                        CadShellName(CadShellIds::CrossBeam.to_string()),
+                        *base_transform * transform,
+                    )?,
+                )?;
+            }
         }
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
