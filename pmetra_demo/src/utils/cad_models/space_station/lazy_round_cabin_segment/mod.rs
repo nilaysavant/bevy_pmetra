@@ -12,7 +12,9 @@ use bevy_pmetra::{
 };
 use strum::{Display, EnumString};
 
-use self::cabin::{build_cabin_mesh, build_cabin_shell, build_extrude_cursor};
+use self::cabin::{
+    build_cabin_mesh, build_cabin_shell, build_corner_radius_cursor, build_extrude_cursor,
+};
 
 use super::RoundRectCuboid;
 
@@ -118,11 +120,14 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
         let cursors = CadCursors::default() // builder
-        .add_cursor(
-            CadCursorIds::ExtrudeCursor.to_string().into(),
-            build_extrude_cursor(self, shells_by_name)?,
-        )? // todo
-        ;
+            .add_cursor(
+                CadCursorIds::ExtrudeCursor.to_string().into(),
+                build_extrude_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::CornerRadiusCursor.to_string().into(),
+                build_corner_radius_cursor(self, shells_by_name)?,
+            )?;
 
         Ok(cursors)
     }
@@ -142,6 +147,17 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
                     self.profile_extrude_length = new_value.clamp(0.001, std::f64::MAX);
                 }
             }
+            CadCursorIds::CornerRadiusCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.0;
+                    let new_value = self.profile_corner_radius + delta.x as f64 * sensitivity;
+                    self.profile_corner_radius = new_value.clamp(
+                        0.001,
+                        (self.profile_height / 2.).min(self.profile_width / 2.),
+                    );
+                }
+            }
             _ => {}
         }
     }
@@ -152,23 +168,24 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
                 "profile_extrude_length : {:.3}",
                 self.profile_extrude_length
             )),
-            // CadCursorIds::CornerRadiusCursor => {
-            //     format!("profile_corner_radius : {:.3}", self.profile_corner_radius)
-            // }
+            CadCursorIds::CornerRadiusCursor => Some(format!(
+                "profile_corner_radius : {:.3}",
+                self.profile_corner_radius
+            )),
             // CadCursorIds::ProfileThicknessCursor => {
-            //     format!("profile_thickness : {:.3}", self.profile_thickness)
+            //     Some(format!("profile_thickness : {:.3}", self.profile_thickness))
             // }
             // CadCursorIds::ProfileHeightCursor => {
-            //     format!("profile_height : {:.3}", self.profile_height)
+            //     Some(format!("profile_height : {:.3}", self.profile_height))
             // }
             // CadCursorIds::ProfileWidthCursor => {
-            //     format!("profile_width : {:.3}", self.profile_width)
+            //     Some(format!("profile_width : {:.3}", self.profile_width))
             // }
             // CadCursorIds::WindowTranslationCursor => {
-            //     format!(
+            //     Some(format!(
             //         "window_translation : [{:.3}, {:.3}, {:.3}]",
             //         self.window_translation.x, self.window_translation.y, self.window_translation.z
-            //     )
+            //     ))
             // }
             _ => None,
         };

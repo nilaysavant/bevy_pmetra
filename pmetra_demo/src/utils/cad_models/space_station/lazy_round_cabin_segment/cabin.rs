@@ -360,8 +360,8 @@ pub fn build_extrude_cursor(
 }
 
 pub fn build_corner_radius_cursor(
-    builder: &CadMeshBuilder<LazyRoundCabinSegment>,
-    cad_shell: &CadShell,
+    params: &LazyRoundCabinSegment,
+    shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
     let LazyRoundCabinSegment {
         profile_width,
@@ -372,7 +372,11 @@ pub fn build_corner_radius_cursor(
         window,
         window_translation,
         ..
-    } = &builder.params;
+    } = &params;
+
+    let cad_shell = shells_by_name
+        .get(&CadShellName(CadShellIds::CabinShell.to_string()))
+        .ok_or_else(|| anyhow!("Could not find shell!"))?;
 
     let Some(CadElement::Face(extruded_profile_face)) =
         cad_shell.get_element_by_tag(CadElementTag::new("ExtrudedProfileFace"))
@@ -392,7 +396,7 @@ pub fn build_corner_radius_cursor(
     };
     let (arc3_v1, arc3_v2) = arc3.ends();
     let cursor_translation = (arc3_v1.point().as_bevy_vec3() + arc3_v2.point().as_bevy_vec3()) / 2.
-        + Vec3::Z * builder.params.profile_extrude_length as f32;
+        + Vec3::Z * *profile_extrude_length as f32;
     let cursor_transform =
         Transform::from_translation(cursor_translation + extruded_profile_face_normal * 0.01)
             .with_rotation(get_rotation_from_normals(
