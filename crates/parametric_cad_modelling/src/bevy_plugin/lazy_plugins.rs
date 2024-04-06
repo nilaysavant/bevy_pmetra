@@ -171,9 +171,16 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
                     shells_to_mesh_builder_events::<Params>,
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
-                    // Cursors...
-                    update_params_from_cursors::<Params>,
-                    // Params UI...
+                )
+                    // chain seems to make the model update run more stable/smooth (less jittery).
+                    .chain(),
+            )
+            // Cursors...
+            .add_systems(Update, update_params_from_cursors::<Params>)
+            // Params UI...
+            .add_systems(
+                Update,
+                (
                     show_params_display_ui_on_hover_cursor::<Params>,
                     move_params_display_ui_on_transform_cursor::<Params>,
                 ),
