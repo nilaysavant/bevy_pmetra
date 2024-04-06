@@ -34,7 +34,9 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
         new_transform: Transform,
     );
     /// Handler called to get [`CadCursor`] tooltip UI text.
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String>;
+    ///
+    /// Return `None` if no tooltip should be displayed.
+    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>>;
 }
 
 mod test {
@@ -91,9 +93,8 @@ mod test {
                 // TODO
             }
 
-            fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String> {
-                // TODO
-                Ok("Test".into())
+            fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
+                Ok(None)
             }
         }
 

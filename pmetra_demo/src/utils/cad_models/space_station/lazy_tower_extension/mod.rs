@@ -284,10 +284,10 @@ impl ParametricLazyCad for LazyTowerExtension {
         }
     }
 
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String> {
+    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
         let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
             CadCursorIds::TowerLengthCursor => {
-                format!("tower_length : {:.3}", self.tower_length)
+                Some(format!("tower_length : {:.3}", self.tower_length))
             }
         };
 

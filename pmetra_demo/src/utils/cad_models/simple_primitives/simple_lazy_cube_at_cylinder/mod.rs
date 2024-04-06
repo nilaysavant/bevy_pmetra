@@ -149,13 +149,13 @@ impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
         }
     }
 
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<String> {
+    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
         let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
             CadCursorIds::CylinderRadius => {
-                format!("cylinder_radius : {:.3}", self.cylinder_radius)
+                Some(format!("cylinder_radius : {:.3}", self.cylinder_radius))
             }
             CadCursorIds::CubeSideLength => {
-                format!("cube_side_length : {:.3}", self.cube_side_length)
+                Some(format!("cube_side_length : {:.3}", self.cube_side_length))
             }
         };
 

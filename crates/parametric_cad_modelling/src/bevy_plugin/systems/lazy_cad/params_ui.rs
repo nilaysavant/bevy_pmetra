@@ -81,7 +81,7 @@ pub fn show_params_display_ui_on_hover_cursor<Params: ParametricLazyCad + Compon
         };
 
         // Update UI text...
-        let Ok(tooltip) = params.on_cursor_tooltip(cursor_name.clone()) else {
+        let Ok(Some(tooltip)) = params.on_cursor_tooltip(cursor_name.clone()) else {
             continue;
         };
         text.sections.first_mut().unwrap().value = tooltip;
@@ -146,7 +146,7 @@ pub fn move_params_display_ui_on_transform_cursor<Params: ParametricLazyCad + Co
             continue;
         };
         // Update UI text...
-        let Ok(tooltip) = params.on_cursor_tooltip(cursor_name.clone()) else {
+        let Ok(Some(tooltip)) = params.on_cursor_tooltip(cursor_name.clone()) else {
             continue;
         };
         text.sections.first_mut().unwrap().value = tooltip;
