@@ -36,8 +36,6 @@ pub struct LazyRoundCabinSegment {
     pub profile_thickness: f64,
     #[inspector(min = 0.1)]
     pub profile_extrude_length: f64,
-    #[inspector(min = 0.1)]
-    pub end_wall_thickness: f64,
     /// Params for windows.
     pub window: RoundRectCuboid,
     window_translation: DVec3,
@@ -51,7 +49,6 @@ impl Default for LazyRoundCabinSegment {
             profile_corner_radius: 0.1,
             profile_thickness: 0.03,
             profile_extrude_length: 1.2,
-            end_wall_thickness: 0.2,
             window: RoundRectCuboid {
                 profile_width: 0.5,
                 profile_height: 0.4,
