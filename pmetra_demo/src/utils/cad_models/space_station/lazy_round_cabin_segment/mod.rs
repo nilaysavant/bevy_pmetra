@@ -21,7 +21,6 @@ use self::cabin::{
 use super::RoundRectCuboid;
 
 pub mod cabin;
-pub mod end_walls;
 
 /// Basic Parametric Station Segment.
 #[derive(Debug, Reflect, Component, Clone, InspectorOptions)]
