@@ -14,7 +14,8 @@ use strum::{Display, EnumString};
 
 use self::cabin::{
     build_cabin_mesh, build_cabin_shell, build_corner_radius_cursor, build_extrude_cursor,
-    build_profile_width_cursor,
+    build_profile_height_cursor, build_profile_thickness_cursor, build_profile_width_cursor,
+    build_window_translation_cursor,
 };
 
 use super::RoundRectCuboid;
@@ -132,6 +133,18 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
             .add_cursor(
                 CadCursorIds::ProfileWidthCursor.to_string().into(),
                 build_profile_width_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::ProfileHeightCursor.to_string().into(),
+                build_profile_height_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::ProfileThicknessCursor.to_string().into(),
+                build_profile_thickness_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::WindowTranslationCursor.to_string().into(),
+                build_window_translation_cursor(self, shells_by_name)?,
             )?;
 
         Ok(cursors)
@@ -174,6 +187,35 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
                     );
                 }
             }
+            CadCursorIds::ProfileThicknessCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.0;
+                    let new_value = self.profile_thickness + delta.x as f64 * sensitivity;
+                    self.profile_thickness = new_value.clamp(
+                        0.02,
+                        ((self.profile_width / 2.).min(self.profile_height / 2.)
+                            - self.profile_corner_radius)
+                            .max(0.02),
+                    );
+                }
+            }
+            CadCursorIds::ProfileHeightCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.0;
+                    let new_value = self.profile_height + delta.y as f64 * sensitivity;
+                    self.profile_height =
+                        new_value.clamp(self.profile_corner_radius * 2. + 0.01, std::f64::MAX);
+                }
+            }
+            CadCursorIds::WindowTranslationCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.0;
+                    self.window_translation += delta.as_dvec3() * sensitivity;
+                }
+            }
             _ => {}
         }
     }
@@ -191,18 +233,16 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
             CadCursorIds::ProfileWidthCursor => {
                 Some(format!("profile_width : {:.3}", self.profile_width))
             }
-            // CadCursorIds::ProfileThicknessCursor => {
-            //     Some(format!("profile_thickness : {:.3}", self.profile_thickness))
-            // }
-            // CadCursorIds::ProfileHeightCursor => {
-            //     Some(format!("profile_height : {:.3}", self.profile_height))
-            // }
-            // CadCursorIds::WindowTranslationCursor => {
-            //     Some(format!(
-            //         "window_translation : [{:.3}, {:.3}, {:.3}]",
-            //         self.window_translation.x, self.window_translation.y, self.window_translation.z
-            //     ))
-            // }
+            CadCursorIds::ProfileThicknessCursor => {
+                Some(format!("profile_thickness : {:.3}", self.profile_thickness))
+            }
+            CadCursorIds::ProfileHeightCursor => {
+                Some(format!("profile_height : {:.3}", self.profile_height))
+            }
+            CadCursorIds::WindowTranslationCursor => Some(format!(
+                "window_translation : [{:.3}, {:.3}, {:.3}]",
+                self.window_translation.x, self.window_translation.y, self.window_translation.z
+            )),
             _ => None,
         };
 
