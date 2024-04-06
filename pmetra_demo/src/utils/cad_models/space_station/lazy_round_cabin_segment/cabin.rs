@@ -420,8 +420,8 @@ pub fn build_corner_radius_cursor(
 }
 
 pub fn build_profile_width_cursor(
-    builder: &CadMeshBuilder<LazyRoundCabinSegment>,
-    cad_shell: &CadShell,
+    params: &LazyRoundCabinSegment,
+    shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
     let LazyRoundCabinSegment {
         profile_width,
@@ -432,7 +432,11 @@ pub fn build_profile_width_cursor(
         window,
         window_translation,
         ..
-    } = &builder.params;
+    } = &params;
+
+    let cad_shell = shells_by_name
+        .get(&CadShellName(CadShellIds::CabinShell.to_string()))
+        .ok_or_else(|| anyhow!("Could not find shell!"))?;
 
     let Some(CadElement::Face(right_face)) =
         cad_shell.get_element_by_tag(CadElementTag::new("RightFace"))

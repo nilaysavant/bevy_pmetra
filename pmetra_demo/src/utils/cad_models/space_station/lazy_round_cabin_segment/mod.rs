@@ -14,6 +14,7 @@ use strum::{Display, EnumString};
 
 use self::cabin::{
     build_cabin_mesh, build_cabin_shell, build_corner_radius_cursor, build_extrude_cursor,
+    build_profile_width_cursor,
 };
 
 use super::RoundRectCuboid;
@@ -127,6 +128,10 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
             .add_cursor(
                 CadCursorIds::CornerRadiusCursor.to_string().into(),
                 build_corner_radius_cursor(self, shells_by_name)?,
+            )?
+            .add_cursor(
+                CadCursorIds::ProfileWidthCursor.to_string().into(),
+                build_profile_width_cursor(self, shells_by_name)?,
             )?;
 
         Ok(cursors)
@@ -158,6 +163,17 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
                     );
                 }
             }
+            CadCursorIds::ProfileWidthCursor => {
+                let delta = new_transform.translation - prev_transform.translation;
+                if delta.length() > 0. {
+                    let sensitivity = 1.0;
+                    let new_value = self.profile_width + delta.x as f64 * sensitivity;
+                    self.profile_width = new_value.clamp(
+                        (self.profile_corner_radius * 2.).max(self.profile_thickness * 2.) + 0.1,
+                        std::f64::MAX,
+                    );
+                }
+            }
             _ => {}
         }
     }
@@ -172,14 +188,14 @@ impl ParametricLazyCad for LazyRoundCabinSegment {
                 "profile_corner_radius : {:.3}",
                 self.profile_corner_radius
             )),
+            CadCursorIds::ProfileWidthCursor => {
+                Some(format!("profile_width : {:.3}", self.profile_width))
+            }
             // CadCursorIds::ProfileThicknessCursor => {
             //     Some(format!("profile_thickness : {:.3}", self.profile_thickness))
             // }
             // CadCursorIds::ProfileHeightCursor => {
             //     Some(format!("profile_height : {:.3}", self.profile_height))
-            // }
-            // CadCursorIds::ProfileWidthCursor => {
-            //     Some(format!("profile_width : {:.3}", self.profile_width))
             // }
             // CadCursorIds::WindowTranslationCursor => {
             //     Some(format!(
