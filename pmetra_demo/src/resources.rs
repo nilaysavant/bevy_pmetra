@@ -11,6 +11,7 @@ pub enum CadGeneratedModelParamsId {
     SimplLazyCubeAtCylinder,
     #[default]
     LazyTowerExtension,
+    LazyRoundCabinSegment,
     RoundCabinSegment,
     SimpleGear,
 }
