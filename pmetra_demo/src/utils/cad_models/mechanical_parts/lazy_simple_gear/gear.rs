@@ -31,7 +31,7 @@ use super::{
 
 /// Build Main Gear Solid.
 ///
-/// ## Nomenclature
+/// # Nomenclature
 ///
 /// Main dimensions:
 /// - `z`   : num of teeth.
@@ -84,23 +84,12 @@ pub fn build_main_gear_shell(params: &LazySimpleGear) -> Result<CadShell> {
     let tooth_thickness_bot_pt =
         tooth_half_thickness_quat.inverse() * (DVec3::X * pitch_circle_diameter / 2.);
 
-    // println!("tooth_thickness_angle: {:?}", tooth_thickness_angle);
-    // println!("tooth_thickness_bot_pt: {:?}", tooth_thickness_bot_pt);
-    // println!("tooth_thickness_top_pt: {:?}", tooth_thickness_top_pt);
-
     // Get pressure angle direction vec for getting intersection pts with outer and root circle/sphere.
     let pressure_angle_quat = DQuat::from_rotation_y(-pressure_angle); // neg because anticlockwise around y is -ve.
     let pressure_angle_bot_dir = (pressure_angle_quat * DVec3::X).normalize();
     let slant_line_bot = Line::from_point_direction(tooth_thickness_bot_pt, pressure_angle_bot_dir);
     let pressure_angle_top_dir = (pressure_angle_quat.inverse() * DVec3::X).normalize();
     let slant_line_top = Line::from_point_direction(tooth_thickness_top_pt, pressure_angle_top_dir);
-
-    // println!(
-    //     "pressure_angle_quat euler: {:?}",
-    //     pressure_angle_quat.to_euler(EulerRot::XYZ)
-    // );
-    // println!("pressure_angle_bot_dir: {:?}", pressure_angle_bot_dir);
-    // println!("pressure_angle_top_dir: {:?}", pressure_angle_top_dir);
 
     // Get intersection pts...
     // With bottom slant line...
@@ -142,11 +131,6 @@ pub fn build_main_gear_shell(params: &LazySimpleGear) -> Result<CadShell> {
     let slant_line_top_outside_pt =
         get_point_with_max_x_from_2_tuple(slant_line_top_intersects_outside_sphere);
 
-    // println!("slant_line_bot_root_pt: {:?}", slant_line_bot_root_pt);
-    // println!("slant_line_top_root_pt: {:?}", slant_line_top_root_pt);
-    // println!("slant_line_bot_outside_pt: {:?}", slant_line_bot_outside_pt);
-    // println!("slant_line_top_outside_pt: {:?}", slant_line_top_outside_pt);
-
     // Construct teeth (currently simple triangular)...
     // TODO - Impl proper teeth with arcs later.
     let v_bot_root = builder::vertex(slant_line_bot_root_pt.to_array().into());
@@ -168,19 +152,9 @@ pub fn build_main_gear_shell(params: &LazySimpleGear) -> Result<CadShell> {
     while angle < TAU {
         let rot_wire =
             builder::rotated(&tooth_wire, Point3::origin(), Vector3::unit_y(), Rad(angle));
-        // println!(
-        //     "rot_wire: {:#?}",
-        //     rot_wire.display(WireDisplayFormat::EdgesListTuple {
-        //         edge_format: EdgeDisplayFormat::VerticesTuple {
-        //             vertex_format: VertexDisplayFormat::AsPoint
-        //         }
-        //     })
-        // );
         all_teeth.push(rot_wire);
-
         angle += tooth_thickness_angle * 2.;
     }
-    // println!("all_teeth len: {:?}", all_teeth.len());
 
     // Connect teeth with intermediate arcs...
     let mut profile_wire = Wire::new();
@@ -208,9 +182,6 @@ pub fn build_main_gear_shell(params: &LazySimpleGear) -> Result<CadShell> {
         });
         profile_wire.push_back(arc);
     }
-
-    // println!("profile_wire.is_closed: {:?}", profile_wire.is_closed());
-    // println!("profile_wire.is_simple: {:?}", profile_wire.is_simple());
 
     let Ok(face) = builder::try_attach_plane(&[profile_wire.inverse()]) else {
         return Err(anyhow!("Could not attach plane to profile wire!"));
