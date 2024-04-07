@@ -30,7 +30,7 @@ use crate::{
         scene::{scene_setup, test_manual_mesh_gen},
     },
     utils::cad_models::{
-        mechanical_parts::simple_gear::SimpleGear,
+        mechanical_parts::{lazy_simple_gear::LazySimpleGear, simple_gear::SimpleGear},
         simple_primitives::{
             simple_cube_at_cylinder::SimpleCubeAtCylinder,
             simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
@@ -111,6 +111,7 @@ impl Plugin for PmetraDemoPlugin {
                 ParametricLazyCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
                 ParametricLazyCadParamsPlugin::<LazyTowerExtension>::default(),
                 ParametricLazyCadParamsPlugin::<LazyRoundCabinSegment>::default(),
+                ParametricLazyCadParamsPlugin::<LazySimpleGear>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()
@@ -134,6 +135,7 @@ impl Plugin for PmetraDemoPlugin {
             .register_type::<SimpleLazyCubeAtCylinder>()
             .register_type::<LazyTowerExtension>()
             .register_type::<LazyRoundCabinSegment>()
+            .register_type::<LazySimpleGear>()
             .register_type::<SimpleGear>()
             .register_type::<RoundRectCuboid>()
             .add_plugins(

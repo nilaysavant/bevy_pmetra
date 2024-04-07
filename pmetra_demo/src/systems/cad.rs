@@ -8,7 +8,7 @@ use bevy_rapier3d::prelude::*;
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
-        mechanical_parts::simple_gear::SimpleGear,
+        mechanical_parts::{lazy_simple_gear::LazySimpleGear, simple_gear::SimpleGear},
         simple_primitives::{
             simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder, SimpleCubeAtCylinder,
         },
@@ -32,6 +32,7 @@ pub fn spawn_cad_model(
     >,
     mut lazy_tower_extension: EventWriter<GenerateLazyCadModel<LazyTowerExtension>>,
     mut lazy_round_cabin_segment: EventWriter<GenerateLazyCadModel<LazyRoundCabinSegment>>,
+    mut lazy_simple_gear: EventWriter<GenerateLazyCadModel<LazySimpleGear>>,
     mut asset_server: ResMut<AssetServer>,
 ) {
     if !cad_model_spawner.is_changed() {
@@ -63,6 +64,9 @@ pub fn spawn_cad_model(
         }
         CadGeneratedModelParamsId::LazyRoundCabinSegment => {
             lazy_round_cabin_segment.send(GenerateLazyCadModel::default());
+        }
+        CadGeneratedModelParamsId::LazySimpleGear => {
+            lazy_simple_gear.send(GenerateLazyCadModel::default());
         }
     }
 }
