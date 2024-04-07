@@ -26,7 +26,7 @@ use strum::{Display, EnumString};
 
 use super::{
     math::{Line, Sphere},
-    CadCursorIds, CadSolidIds, LazySimpleGear,
+    CadCursorIds, CadShellIds, LazySimpleGear,
 };
 
 /// Build Main Gear Solid.
@@ -267,7 +267,7 @@ pub fn build_radius_cursor(
     } = &params;
 
     let cad_shell = shells_by_name
-        .get(&CadShellName(CadSolidIds::MainGear.to_string()))
+        .get(&CadShellName(CadShellIds::MainGear.to_string()))
         .ok_or_else(|| anyhow!("Could not get main gear shell!"))?;
 
     let Some(CadElement::Face(face)) = cad_shell.get_element_by_tag(CadElementTag::new("TopFace"))
@@ -306,7 +306,7 @@ pub fn build_face_width_cursor(
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
     let cad_shell = shells_by_name
-        .get(&CadShellName(CadSolidIds::MainGear.to_string()))
+        .get(&CadShellName(CadShellIds::MainGear.to_string()))
         .ok_or_else(|| anyhow!("Could not get main gear shell!"))?;
 
     let Some(CadElement::Face(face)) = cad_shell.get_element_by_tag(CadElementTag::new("TopFace"))
@@ -348,7 +348,7 @@ pub fn build_num_teeth_cursor(
     } = &params;
 
     let cad_shell = shells_by_name
-        .get(&CadShellName(CadSolidIds::MainGear.to_string()))
+        .get(&CadShellName(CadShellIds::MainGear.to_string()))
         .ok_or_else(|| anyhow!("Could not get main gear shell!"))?;
 
     let Some(CadElement::Face(top_face)) =

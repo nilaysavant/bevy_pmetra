@@ -42,7 +42,7 @@ impl Default for LazySimpleGear {
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CadSolidIds {
+pub enum CadShellIds {
     MainGear,
 }
 
@@ -61,7 +61,7 @@ pub enum CadCursorIds {
 impl ParametricLazyModelling for LazySimpleGear {
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let mut builders = CadShellsLazyBuilders::new(self.clone())?.add_shell_builder(
-            CadShellName(CadSolidIds::MainGear.to_string()),
+            CadShellName(CadShellIds::MainGear.to_string()),
             build_main_gear_shell,
         )?;
 
@@ -76,11 +76,11 @@ impl ParametricLazyCad for LazySimpleGear {
     ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
         CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
             .add_mesh_builder(
-                CadShellName(CadSolidIds::MainGear.to_string()),
+                CadShellName(CadShellIds::MainGear.to_string()),
                 CadMeshIds::MainGear.to_string(),
                 build_main_gear_mesh(
                     self,
-                    CadShellName(CadSolidIds::MainGear.to_string()),
+                    CadShellName(CadShellIds::MainGear.to_string()),
                     shells_by_name,
                 )?,
             )
