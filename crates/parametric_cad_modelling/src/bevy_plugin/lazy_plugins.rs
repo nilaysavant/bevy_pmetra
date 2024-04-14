@@ -22,7 +22,7 @@ use super::{
     },
     resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
-        lazy_cad::{
+        cad::{
             cursor::{
                 draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
                 update_cursor_visibility_based_on_root_selection, update_params_from_cursors,
