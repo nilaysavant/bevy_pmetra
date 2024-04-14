@@ -19,7 +19,7 @@ use crate::{
         },
         events::{
             cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
-            lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
+            cad::{GenerateCadModel, SpawnMeshesBuilder},
         },
         resources::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
@@ -41,10 +41,10 @@ use super::{
 
 pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
     mut commands: Commands,
-    mut events: EventReader<GenerateLazyCadModel<Params>>,
+    mut events: EventReader<GenerateCadModel<Params>>,
     cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>, Without<Cleanup>)>,
 ) {
-    for GenerateLazyCadModel {
+    for GenerateCadModel {
         params,
         remove_existing_models,
     } in events.read()

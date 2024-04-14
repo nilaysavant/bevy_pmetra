@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_pmetra::{bevy_plugin::events::lazy_cad::GenerateLazyCadModel, prelude::*};
+use bevy_pmetra::{bevy_plugin::events::cad::GenerateCadModel, prelude::*};
 use bevy_rapier3d::prelude::*;
 
 use crate::{
@@ -18,10 +18,10 @@ pub fn spawn_cad_model(
     cad_model_spawner: Res<CadGeneratedModelSpawner>,
     cad_models: Query<Entity, With<CadGeneratedRoot>>,
     mut spawn_lazy_simple_cube_at_cylinder: EventWriter<
-        GenerateLazyCadModel<SimpleLazyCubeAtCylinder>,
+        GenerateCadModel<SimpleLazyCubeAtCylinder>,
     >,
-    mut lazy_tower_extension: EventWriter<GenerateLazyCadModel<LazyTowerExtension>>,
-    mut lazy_round_cabin_segment: EventWriter<GenerateLazyCadModel<LazyRoundCabinSegment>>,
+    mut lazy_tower_extension: EventWriter<GenerateCadModel<LazyTowerExtension>>,
+    mut lazy_round_cabin_segment: EventWriter<GenerateCadModel<LazyRoundCabinSegment>>,
 ) {
     if !cad_model_spawner.is_changed() {
         return;
@@ -36,13 +36,13 @@ pub fn spawn_cad_model(
     // fire event to spawn new model...
     match cad_model_spawner.selected_params {
         CadGeneratedModelParamsId::SimplLazyCubeAtCylinder => {
-            spawn_lazy_simple_cube_at_cylinder.send(GenerateLazyCadModel::default());
+            spawn_lazy_simple_cube_at_cylinder.send(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::LazyTowerExtension => {
-            lazy_tower_extension.send(GenerateLazyCadModel::default());
+            lazy_tower_extension.send(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::LazyRoundCabinSegment => {
-            lazy_round_cabin_segment.send(GenerateLazyCadModel::default());
+            lazy_round_cabin_segment.send(GenerateCadModel::default());
         }
     }
 }

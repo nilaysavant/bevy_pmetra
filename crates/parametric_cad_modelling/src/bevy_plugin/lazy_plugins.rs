@@ -18,7 +18,7 @@ use super::{
     cleanup_manager::CleanupManagerPlugin,
     events::{
         cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
-        lazy_cad::{GenerateLazyCadModel, SpawnMeshesBuilder},
+        cad::{GenerateCadModel, SpawnMeshesBuilder},
     },
     resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
@@ -155,7 +155,7 @@ impl<Params: ParametricLazyCad + Component + Clone> Plugin
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App
-            .add_event::<GenerateLazyCadModel<Params>>()
+            .add_event::<GenerateCadModel<Params>>()
             .add_event::<SpawnMeshesBuilder<Params>>()
             .init_resource::<MeshesBuilderQueue<Params>>()
             .init_resource::<MeshesBuilderQueueInspector>()

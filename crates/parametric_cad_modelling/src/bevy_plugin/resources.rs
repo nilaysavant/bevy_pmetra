@@ -4,7 +4,7 @@ use bevy::{prelude::*, utils::HashMap};
 
 use crate::cad_core::lazy_builders::{CadShellName, ParametricLazyCad};
 
-use super::events::lazy_cad::SpawnMeshesBuilder;
+use super::events::cad::SpawnMeshesBuilder;
 
 #[derive(Debug, Default, Clone, Resource, Reflect, Deref, DerefMut)]
 pub struct MeshesBuilderQueue<Params: ParametricLazyCad + Component + Clone>(
