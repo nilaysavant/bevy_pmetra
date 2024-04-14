@@ -8,8 +8,8 @@ use crate::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot,
-                CadGeneratedCursor, CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
+                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot, CadGeneratedCursor,
+                CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
                 CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
                 CadGeneratedRoot,
             },
@@ -18,10 +18,7 @@ use crate::{
         },
         events::cursor::TransformCursorEvent,
     },
-    cad_core::{
-        builders::{CadCursorName, CadCursorType},
-        lazy_builders::ParametricLazyCad,
-    },
+    cad_core::builders::{CadCursorName, CadCursorType, ParametricLazyCad},
     math::get_rotation_from_normals,
     prelude::CadGeneratedRootSelectionState,
 };

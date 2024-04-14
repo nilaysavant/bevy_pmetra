@@ -25,12 +25,7 @@ use crate::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
-    cad_core::{
-        builders::{CadCursor, CadCursorName},
-        lazy_builders::{
-            CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricLazyCad
-        },
-    },
+    cad_core::builders::{CadCursor, CadCursorName, CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricLazyCad},
 };
 
 use super::{

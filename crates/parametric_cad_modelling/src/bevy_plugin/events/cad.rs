@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    cad_core::lazy_builders::{CadMeshesLazyBuilder, CadShellName, ParametricLazyCad},
+    cad_core::builders::{CadMeshesLazyBuilder, CadShellName, ParametricLazyCad},
     prelude::BelongsToCadGeneratedRoot,
 };
 

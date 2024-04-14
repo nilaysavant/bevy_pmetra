@@ -5,19 +5,15 @@ use crate::{
     bevy_plugin::{
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot,
-                CadGeneratedCursor, CadGeneratedCursorDragPlane,
-                CadGeneratedRoot,
+                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot, CadGeneratedCursor,
+                CadGeneratedCursorDragPlane, CadGeneratedRoot,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
         events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
-    cad_core::{
-        builders::CadCursorName,
-        lazy_builders::ParametricLazyCad,
-    },
+    cad_core::builders::{CadCursorName, ParametricLazyCad},
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,
 };
 

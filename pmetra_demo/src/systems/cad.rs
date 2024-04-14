@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_pmetra::{cad_core::lazy_builders::CadMeshName, prelude::*};
+use bevy_pmetra::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::{

@@ -10,8 +10,7 @@ use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlug
 use crate::{
     bevy_plugin::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
-    },
-    cad_core::lazy_builders::ParametricLazyCad,
+    }, cad_core::builders::ParametricLazyCad,
 };
 
 use super::{

@@ -1,4 +1,4 @@
-/// Wrapper structs/extension used by builders.
+/// Builders for CAD model generation.
 pub mod builders;
 /// Allows centroid calc for [`truck`] primitives.
 pub mod centroid;
@@ -6,8 +6,6 @@ pub mod centroid;
 pub mod dimensions;
 /// Extensions of truck primitives.
 pub mod extensions;
-/// Lazy Builders for Cad Generation.
-pub mod lazy_builders;
 /// Traits for meshing primitives into [`bevy::prelude::Mesh`] via [`PolygonMesh`].
 pub mod meshing;
 /// Custom Tessellation adapted from [`truck_meshalgo::tessellation`].
