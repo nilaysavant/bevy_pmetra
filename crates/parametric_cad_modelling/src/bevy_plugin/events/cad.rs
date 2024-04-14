@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    cad_core::builders::{CadMeshesLazyBuilder, CadShellName, ParametricLazyCad},
+    cad_core::builders::{CadMeshesLazyBuilder, CadShellName, ParametricCad},
     prelude::BelongsToCadGeneratedRoot,
 };
 
@@ -10,14 +10,14 @@ use crate::{
 /// Prerequisites:
 /// - Add plugin: [`ParametricCadModellingPlugin<Params>`].
 #[derive(Debug, Event, Reflect)]
-pub struct GenerateCadModel<Params: ParametricLazyCad + Component> {
+pub struct GenerateCadModel<Params: ParametricCad + Component> {
     /// Params used to generate cad model.
     pub params: Params,
     /// Remove any existing models generated with these [`Params`].
     pub remove_existing_models: bool,
 }
 
-impl<Params: ParametricLazyCad + Component + Default> Default for GenerateCadModel<Params> {
+impl<Params: ParametricCad + Component + Default> Default for GenerateCadModel<Params> {
     fn default() -> Self {
         Self {
             params: Default::default(),
@@ -28,7 +28,7 @@ impl<Params: ParametricLazyCad + Component + Default> Default for GenerateCadMod
 
 /// Event used to spawn individual mesh builders for parallel meshing.
 #[derive(Debug, Event, Reflect, Clone)]
-pub struct SpawnMeshesBuilder<Params: ParametricLazyCad + Component> {
+pub struct SpawnMeshesBuilder<Params: ParametricCad + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,
     pub meshes_builder: CadMeshesLazyBuilder<Params>,

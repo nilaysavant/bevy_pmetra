@@ -9,13 +9,13 @@ pub mod tags;
 pub use {cursors::*, meshes::*, shells::*, tags::*};
 
 /// Trait for parametrically generating [`CadShell`]s from struct.
-pub trait ParametricLazyModelling: Clone + Default {
+pub trait ParametricModelling: Clone + Default {
     /// Gets the [`CadShellsLazyBuilders`] for this params struct.
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>>;
 }
 
 /// Trait for parametrically generating models with cursors from struct.
-pub trait ParametricLazyCad: ParametricLazyModelling {
+pub trait ParametricCad: ParametricModelling {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
@@ -49,7 +49,7 @@ mod test {
             pub width: f64,
         }
 
-        impl ParametricLazyModelling for Cube {
+        impl ParametricModelling for Cube {
             fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
                 CadShellsLazyBuilders::default().add_shell_builder(
                     CadShellName("s1".into()),
@@ -58,7 +58,7 @@ mod test {
             }
         }
 
-        impl ParametricLazyCad for Cube {
+        impl ParametricCad for Cube {
             fn meshes_builders_by_shell(
                 &self,
                 shells_by_name: &CadShellsByName,

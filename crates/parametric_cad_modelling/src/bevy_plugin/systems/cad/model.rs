@@ -25,7 +25,7 @@ use crate::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
-    cad_core::builders::{CadCursor, CadCursorName, CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricLazyCad},
+    cad_core::builders::{CadCursor, CadCursorName, CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricCad},
 };
 
 use super::{
@@ -33,7 +33,7 @@ use super::{
     mesh::{mesh_pointer_move, mesh_pointer_out},
 };
 
-pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + Clone>(
+pub fn spawn_shells_by_name_on_generate<Params: ParametricCad + Component + Clone>(
     mut commands: Commands,
     mut events: EventReader<GenerateCadModel<Params>>,
     cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>, Without<Cleanup>)>,
@@ -95,7 +95,7 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricLazyCad + Component + 
     }
 }
 
-pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Component + Clone>(
+pub fn update_shells_by_name_on_params_change<Params: ParametricCad + Component + Clone>(
     cad_generated: Query<
         (Entity, &Params),
         (Changed<Params>, With<CadGeneratedRoot>, Without<Cleanup>),
@@ -137,7 +137,7 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricLazyCad + Compon
     }
 }
 
-pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
+pub fn shells_to_cursors<Params: ParametricCad + Component + Clone>(
     mut commands: Commands,
     cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
@@ -272,7 +272,7 @@ pub fn shells_to_cursors<Params: ParametricLazyCad + Component + Clone>(
     }
 }
 
-pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clone>(
+pub fn shells_to_mesh_builder_events<Params: ParametricCad + Component + Clone>(
     cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
         (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
@@ -311,7 +311,7 @@ pub fn shells_to_mesh_builder_events<Params: ParametricLazyCad + Component + Clo
     }
 }
 
-pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component + Clone>(
+pub fn handle_spawn_meshes_builder_events<Params: ParametricCad + Component + Clone>(
     mut commands: Commands,
     cad_generated: Query<Entity, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     mut mesh_builders: Query<
@@ -457,7 +457,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricLazyCad + Component 
     }
 }
 
-pub fn mesh_builder_to_bundle<Params: ParametricLazyCad + Component + Clone>(
+pub fn mesh_builder_to_bundle<Params: ParametricCad + Component + Clone>(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     cad_generated: Query<Entity, (With<CadGeneratedRoot>, Without<Cleanup>)>,

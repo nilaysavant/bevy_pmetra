@@ -10,7 +10,7 @@ use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlug
 use crate::{
     bevy_plugin::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
-    }, cad_core::builders::ParametricLazyCad,
+    }, cad_core::builders::ParametricCad,
 };
 
 use super::{
@@ -143,12 +143,12 @@ impl Plugin for ParametricCadModellingBasePlugin {
 ///
 /// The [`Plugin`] then allows generating CAD models using the passed [`Params`].
 #[derive(Default)]
-pub struct ParametricCadParamsPlugin<Params: ParametricLazyCad + Component> {
+pub struct ParametricCadParamsPlugin<Params: ParametricCad + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: ParametricLazyCad + Component + Clone> Plugin
+impl<Params: ParametricCad + Component + Clone> Plugin
     for ParametricCadParamsPlugin<Params>
 {
     fn build(&self, app: &mut App) {

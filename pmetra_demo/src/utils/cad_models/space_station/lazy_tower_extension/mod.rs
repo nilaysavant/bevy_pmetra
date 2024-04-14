@@ -114,7 +114,7 @@ pub enum CadCursorIds {
     TowerLengthCursor,
 }
 
-impl ParametricLazyModelling for LazyTowerExtension {
+impl ParametricModelling for LazyTowerExtension {
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -134,7 +134,7 @@ impl ParametricLazyModelling for LazyTowerExtension {
     }
 }
 
-impl ParametricLazyCad for LazyTowerExtension {
+impl ParametricCad for LazyTowerExtension {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

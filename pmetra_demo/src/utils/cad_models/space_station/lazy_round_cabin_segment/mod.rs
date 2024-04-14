@@ -82,7 +82,7 @@ pub enum CadMaterialIds {
     Roof,
 }
 
-impl ParametricLazyModelling for LazyRoundCabinSegment {
+impl ParametricModelling for LazyRoundCabinSegment {
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -94,7 +94,7 @@ impl ParametricLazyModelling for LazyRoundCabinSegment {
     }
 }
 
-impl ParametricLazyCad for LazyRoundCabinSegment {
+impl ParametricCad for LazyRoundCabinSegment {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

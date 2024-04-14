@@ -57,7 +57,7 @@ pub enum CadCursorIds {
     CubeSideLength,
 }
 
-impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
+impl ParametricModelling for SimpleLazyCubeAtCylinder {
     fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
         let builders = CadShellsLazyBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -72,7 +72,7 @@ impl ParametricLazyModelling for SimpleLazyCubeAtCylinder {
     }
 }
 
-impl ParametricLazyCad for SimpleLazyCubeAtCylinder {
+impl ParametricCad for SimpleLazyCubeAtCylinder {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

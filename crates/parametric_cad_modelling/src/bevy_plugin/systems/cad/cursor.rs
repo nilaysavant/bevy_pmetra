@@ -18,7 +18,7 @@ use crate::{
         },
         events::cursor::TransformCursorEvent,
     },
-    cad_core::builders::{CadCursorName, CadCursorType, ParametricLazyCad},
+    cad_core::builders::{CadCursorName, CadCursorType, ParametricCad},
     math::get_rotation_from_normals,
     prelude::CadGeneratedRootSelectionState,
 };
@@ -257,7 +257,7 @@ pub fn transform_cursor(
     }
 }
 
-pub fn update_params_from_cursors<Params: ParametricLazyCad + Component>(
+pub fn update_params_from_cursors<Params: ParametricCad + Component>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
     cursors: Query<
         (
