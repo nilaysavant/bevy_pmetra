@@ -40,7 +40,7 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
 }
 
 mod test {
-    use crate::cad_core::builders::{CadCursor, CadShell};
+    use crate::cad_core::builders::CadCursor;
 
     use super::*;
 

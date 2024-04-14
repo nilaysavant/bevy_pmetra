@@ -1,8 +1,19 @@
 use bevy::{prelude::*, utils::HashMap};
 
 use anyhow::{anyhow, Result};
+use truck_meshalgo::{
+    filters::OptimizingFilter, rexport_polymesh::PolygonMesh, tessellation::MeshedShape,
+};
+use truck_modeling::{Shell, Surface};
 
-use crate::cad_core::builders::CadShell;
+use crate::{
+    cad_core::{
+        builders::{CadElement, CadElementTag, CadTaggedElements},
+        meshing::{BuildCadMeshedShell, BuildPolygon},
+        tessellation::{CadMeshedShell, CustomMeshableShape},
+    },
+    constants::CUSTOM_TRUCK_TOLERANCE_1,
+};
 
 /// Holds multiple [`CadShellLazyBuilder`]s.
 #[derive(Clone, Default)]
@@ -44,12 +55,6 @@ impl<P: Default + Clone> CadShellsLazyBuilders<P> {
     }
 }
 
-/// Name of the [`CadShell`].
-///
-/// Used to identify the shell.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Deref, DerefMut, Reflect, Component)]
-pub struct CadShellName(pub String);
-
 /// Builder for building [`CadShell`]s.
 #[derive(Clone, Component)]
 pub struct CadShellLazyBuilder<P: Default + Clone> {
@@ -73,3 +78,52 @@ impl<P: Default + Clone> CadShellLazyBuilder<P> {
 /// Component to store all generated [`CadShell`]s by [`CadShellName`].
 #[derive(Debug, Clone, Component, Deref, DerefMut, Default)]
 pub struct CadShellsByName(pub HashMap<CadShellName, CadShell>);
+
+/// Name of the [`CadShell`].
+///
+/// Used to identify the shell.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Deref, DerefMut, Reflect, Component)]
+pub struct CadShellName(pub String);
+
+/// CAD generated [`Shell`].
+///
+/// Holds [`Shell`] with [`CadTaggedElements`].
+#[derive(Debug, Clone, Default, Component)]
+pub struct CadShell {
+    pub shell: Shell,
+    pub tagged_elements: CadTaggedElements,
+}
+
+impl CadShell {
+    pub fn get_element_by_tag(&self, tag: CadElementTag) -> Option<&CadElement> {
+        let element = self.tagged_elements.get(&tag);
+
+        element
+    }
+}
+
+impl BuildCadMeshedShell for CadShell {
+    fn build_cad_meshed_shell(&self) -> Result<CadMeshedShell<Surface>> {
+        self.build_cad_meshed_shell_with_tol(CUSTOM_TRUCK_TOLERANCE_1)
+    }
+
+    fn build_cad_meshed_shell_with_tol(&self, tol: f64) -> Result<CadMeshedShell<Surface>> {
+        let cad_meshed_shell = self.shell.triangulation(tol);
+
+        Ok(cad_meshed_shell)
+    }
+}
+
+impl BuildPolygon for CadShell {
+    fn build_polygon(&self) -> Result<PolygonMesh> {
+        self.build_polygon_with_tol(CUSTOM_TRUCK_TOLERANCE_1)
+    }
+
+    fn build_polygon_with_tol(&self, tol: f64) -> Result<PolygonMesh> {
+        let mut polygon_mesh = self.shell.triangulation(tol).meshed_shell.to_polygon();
+        // Also cleanup any degenerate stuff...
+        polygon_mesh.remove_degenerate_faces().remove_unused_attrs();
+
+        Ok(polygon_mesh)
+    }
+}

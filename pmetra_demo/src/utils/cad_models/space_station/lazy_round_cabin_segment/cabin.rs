@@ -5,7 +5,7 @@ use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
         extensions::face::FaceCadExtension,
-        lazy_builders::{CadMeshLazyBuilder, CadShellName, CadShellsByName},
+        lazy_builders::{CadMeshLazyBuilder, CadShell, CadShellName, CadShellsByName},
     },
     math::get_rotation_from_normals,
     prelude::*,

@@ -3,7 +3,7 @@ use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
         extensions::shell::ShellCadExtension,
-        lazy_builders::{CadMeshLazyBuilder, CadShellName},
+        lazy_builders::{CadMeshLazyBuilder, CadShell, CadShellName},
     },
     prelude::*,
     re_exports::truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire},
