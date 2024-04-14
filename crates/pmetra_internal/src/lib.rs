@@ -4,14 +4,14 @@
 
 /// [`bevy`] meshing utils.
 pub mod bevy_mesh;
-/// Plugin(s) for integrating with [`bevy`].
-pub mod pmetra_plugins;
-/// Core Data Structures/Traits/Extensions/Types.
-pub mod pmetra_core;
 /// Constants.
 pub mod constants;
 /// Math utilities.
 pub mod math;
+/// Core Data Structures/Traits/Extensions/Types.
+pub mod pmetra_core;
+/// Plugin(s) for integrating with [`bevy`].
+pub mod pmetra_plugins;
 
 /// Commonly imported/prelude modules.
 pub mod prelude {
@@ -19,12 +19,12 @@ pub mod prelude {
 
     pub use {
         bevy_mesh::BevyMeshBuilder,
+        constants::*,
+        pmetra_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
         pmetra_plugins::{
             components::cad::*, components::camera::*, components::wire_frame::*, events::cad::*,
             plugins::*,
         },
-        pmetra_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
-        constants::*,
     };
 }
 
