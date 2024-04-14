@@ -86,14 +86,6 @@ impl Plugin for PmetraDemoPlugin {
             ))
             .add_systems(Update, orbit_cam_custom_input_map_controller)
             // cad...
-            // .add_plugins((
-            //     ParametricCadModellingBasePlugin {
-            //         allow_wire_frames: true,
-            //     },
-            //     ParametricCadParamsPlugin::<SimpleCubeAtCylinder>::default(),
-            //     ParametricCadParamsPlugin::<RoundCabinSegment>::default(),
-            //     ParametricCadParamsPlugin::<SimpleGear>::default(),
-            // ))
             .add_plugins((
                 ParametricCadModellingBasePlugin {
                     allow_wire_frames: true,
@@ -108,14 +100,7 @@ impl Plugin for PmetraDemoPlugin {
             .add_systems(Update, (spawn_cad_model, fire_balls_at_look_point))
             .add_systems(PostUpdate, add_collider_to_generated_cad_model)
             // scene...
-            .add_systems(
-                Startup,
-                (
-                    //
-                    scene_setup,
-                    // test_manual_mesh_gen,
-                ),
-            )
+            .add_systems(Startup, scene_setup)
             // exporter
             .add_plugins(GltfExporterPlugin)
             // inspectors...
