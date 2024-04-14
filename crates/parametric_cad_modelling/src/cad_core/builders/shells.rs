@@ -1,5 +1,5 @@
 use anyhow::{Context, Ok, Result};
-use bevy::{prelude::*, utils::HashMap};
+use bevy::prelude::*;
 use truck_meshalgo::{
     filters::OptimizingFilter, rexport_polymesh::PolygonMesh, tessellation::MeshedShape,
 };
@@ -14,9 +14,6 @@ use crate::{
 };
 
 use super::{CadElement, CadElementTag, CadTaggedElements};
-
-#[derive(Debug, Clone, Default, Deref, DerefMut)]
-pub struct CadShells(pub HashMap<String, CadShell>);
 
 /// CAD generated [`Shell`].
 ///
