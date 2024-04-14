@@ -8,31 +8,31 @@ use crate::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot, CadGeneratedCursor,
-                CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
-                CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
+                BelongsToCadGeneratedSlider, BelongsToCadGeneratedRoot, CadGeneratedSlider,
+                CadGeneratedSliderConfig, CadGeneratedSliderDragPlane,
+                CadGeneratedSliderPreviousTransform, CadGeneratedSliderState, CadGeneratedMesh,
                 CadGeneratedRoot,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
-        events::cursor::TransformCursorEvent,
+        events::slider::TransformSliderEvent,
     },
-    pmetra_core::builders::{CadCursorName, CadCursorType, PmetraModelling},
+    pmetra_core::builders::{CadSliderName, CadSliderType, PmetraModelling},
     math::get_rotation_from_normals,
     prelude::CadGeneratedRootSelectionState,
 };
 
-pub fn update_cursor_visibility_based_on_root_selection(
+pub fn update_slider_visibility_based_on_root_selection(
     cad_generated: Query<(Entity, &CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    mut cad_cursors: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedCursor>>,
+    mut cad_sliders: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedSlider>>,
 ) {
     for (root_ent, root_selection) in cad_generated.iter() {
-        for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_cursors.iter_mut() {
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), mut visibility) in cad_sliders.iter_mut() {
             if cur_root_ent != root_ent {
                 continue;
             }
-            // if any mesh is selected show cursors else hide cursors...
+            // if any mesh is selected show sliders else hide sliders...
             if matches!(root_selection, CadGeneratedRootSelectionState::Selected) {
                 *visibility = Visibility::Visible;
             } else {
@@ -42,42 +42,42 @@ pub fn update_cursor_visibility_based_on_root_selection(
     }
 }
 
-pub fn cursor_drag_start(
+pub fn slider_drag_start(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     drag_event: Listener<Pointer<DragStart>>,
     cad_meshes: Query<(Entity, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
-    mut cad_cursors: Query<
+    mut cad_sliders: Query<
         (
-            &CadGeneratedCursorConfig,
-            &mut CadGeneratedCursorState,
+            &CadGeneratedSliderConfig,
+            &mut CadGeneratedSliderState,
             &Transform,
             &BelongsToCadGeneratedRoot,
         ),
-        With<CadGeneratedCursor>,
+        With<CadGeneratedSlider>,
     >,
 ) {
-    let cursor = drag_event.target();
+    let slider = drag_event.target();
     let Ok((
-        CadGeneratedCursorConfig {
-            cursor_radius,
+        CadGeneratedSliderConfig {
+            thumb_radius,
             drag_plane_normal,
-            cursor_type,
+            slider_type,
         },
-        mut cursor_state,
-        cursor_transform,
+        mut slider_state,
+        slider_transform,
         BelongsToCadGeneratedRoot(cad_root),
-    )) = cad_cursors.get_mut(cursor)
+    )) = cad_sliders.get_mut(slider)
     else {
         return;
     };
     // set state to dragging
-    *cursor_state = CadGeneratedCursorState::Dragging;
+    *slider_state = CadGeneratedSliderState::Dragging;
 
-    // Get transform from cursor normal...
+    // Get transform from slider normal...
     let rotation = get_rotation_from_normals(Vec3::Y, *drag_plane_normal);
-    let transform = Transform::from_translation(cursor_transform.translation)
+    let transform = Transform::from_translation(slider_transform.translation)
         // Get rotation by sub rotations...
         .with_rotation(rotation);
     let drag_plane = commands
@@ -94,8 +94,8 @@ pub fn cursor_drag_start(
                 transform,
                 ..default()
             },
-            CadGeneratedCursorDragPlane,
-            BelongsToCadGeneratedCursor(cursor),
+            CadGeneratedSliderDragPlane,
+            BelongsToCadGeneratedSlider(slider),
             BelongsToCadGeneratedRoot(*cad_root),
             // picking
             PickableBundle::default(), // <- Makes the mesh pickable.
@@ -112,13 +112,13 @@ pub fn cursor_drag_start(
                     ..mat.to_owned()
                 })),
             },
-            On::<Pointer<Move>>::send_event::<TransformCursorEvent>(),
+            On::<Pointer<Move>>::send_event::<TransformSliderEvent>(),
         ))
         .id();
     // Add drag plane as child of root for proper transform...
     commands.entity(*cad_root).add_child(drag_plane);
-    // Disable picking on cursor, etc...
-    commands.entity(cursor).insert(Pickable::IGNORE);
+    // Disable picking on slider, etc...
+    commands.entity(slider).insert(Pickable::IGNORE);
     // Disable picking on all meshes belonging to current root...
     for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
@@ -129,55 +129,55 @@ pub fn cursor_drag_start(
     commands.entity(*cad_root).insert(Pickable::IGNORE);
 }
 
-pub fn cursor_drag_end(
+pub fn slider_drag_end(
     mut commands: Commands,
     drag_event: Listener<Pointer<DragEnd>>,
-    cad_cursor_drag_planes: Query<
-        (Entity, &BelongsToCadGeneratedCursor),
-        With<CadGeneratedCursorDragPlane>,
+    cad_slider_drag_planes: Query<
+        (Entity, &BelongsToCadGeneratedSlider),
+        With<CadGeneratedSliderDragPlane>,
     >,
     cad_meshes: Query<(Entity, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
-    mut cursors: Query<
+    mut sliders: Query<
         (
             &mut Transform,
-            &CadGeneratedCursorPreviousTransform,
-            &CadGeneratedCursorConfig,
-            &mut CadGeneratedCursorState,
+            &CadGeneratedSliderPreviousTransform,
+            &CadGeneratedSliderConfig,
+            &mut CadGeneratedSliderState,
             &BelongsToCadGeneratedRoot,
         ),
-        With<CadGeneratedCursor>,
+        With<CadGeneratedSlider>,
     >,
     mut ui_nodes: Query<&mut Visibility, With<ParamDisplayUi>>,
 ) {
-    let cursor = drag_event.target();
+    let slider = drag_event.target();
     // Remove drag planes...
-    for (entity, BelongsToCadGeneratedCursor(curr_cad_cursor_entity)) in
-        cad_cursor_drag_planes.iter()
+    for (entity, BelongsToCadGeneratedSlider(cur_slider_entity)) in
+        cad_slider_drag_planes.iter()
     {
-        if *curr_cad_cursor_entity != cursor {
+        if *cur_slider_entity != slider {
             continue;
         }
         commands.entity(entity).despawn_recursive();
     }
     // Update prev transform with new transform...
     let Ok((
-        mut cursor_transform,
+        mut slider_transform,
         prev_transform,
         config,
-        mut cursor_state,
+        mut slider_state,
         BelongsToCadGeneratedRoot(cad_root),
-    )) = cursors.get_mut(cursor)
+    )) = sliders.get_mut(slider)
     else {
-        error!("Cursor not found!");
+        error!("Slider not found!");
         return;
     };
     // reset current transform to prev (as now prev would have been updated)
-    *cursor_transform = prev_transform.0;
+    *slider_transform = prev_transform.0;
     // reset state to default
-    *cursor_state = CadGeneratedCursorState::default();
+    *slider_state = CadGeneratedSliderState::default();
 
-    // Make cursor, etc pick-able again...
-    commands.entity(cursor).insert(Pickable::default());
+    // Make slider, etc pick-able again...
+    commands.entity(slider).insert(Pickable::default());
     // Enable picking on all meshes belonging to current root...
     for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
@@ -193,26 +193,26 @@ pub fn cursor_drag_end(
     *params_ui_visibility = Visibility::Hidden;
 }
 
-pub fn transform_cursor(
-    mut events: EventReader<TransformCursorEvent>,
+pub fn transform_slider(
+    mut events: EventReader<TransformSliderEvent>,
     cad_generated: Query<(Entity, &Transform), (With<CadGeneratedRoot>, Without<Cleanup>)>,
-    cursor_drag_planes: Query<
-        (&BelongsToCadGeneratedRoot, &BelongsToCadGeneratedCursor),
-        With<CadGeneratedCursorDragPlane>,
+    slider_drag_planes: Query<
+        (&BelongsToCadGeneratedRoot, &BelongsToCadGeneratedSlider),
+        With<CadGeneratedSliderDragPlane>,
     >,
-    mut cursors: Query<
-        (&mut Transform, &CadGeneratedCursorConfig),
-        (With<CadGeneratedCursor>, Without<CadGeneratedRoot>),
+    mut sliders: Query<
+        (&mut Transform, &CadGeneratedSliderConfig),
+        (With<CadGeneratedSlider>, Without<CadGeneratedRoot>),
     >,
 ) {
-    for TransformCursorEvent { target, hit } in events.read() {
+    for TransformSliderEvent { target, hit } in events.read() {
         let drag_plane = *target;
         let Some(hit_point) = hit.position else {
             error!("No hit point found!");
             return;
         };
-        let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedCursor(cursor))) =
-            cursor_drag_planes.get(drag_plane)
+        let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedSlider(slider))) =
+            slider_drag_planes.get(drag_plane)
         else {
             error!("drag plane not found!");
             return;
@@ -224,21 +224,21 @@ pub fn transform_cursor(
         let hit_point_local_space = root_transform_inverse_affine.transform_point3(hit_point);
         let Ok((
             mut transform,
-            CadGeneratedCursorConfig {
-                cursor_radius,
+            CadGeneratedSliderConfig {
+                thumb_radius,
                 drag_plane_normal,
-                cursor_type,
+                slider_type,
             },
-        )) = cursors.get_mut(*cursor)
+        )) = sliders.get_mut(*slider)
         else {
-            error!("cursor not found!");
+            error!("Slider not found!");
             return;
         };
-        match cursor_type {
-            CadCursorType::Planer => {
+        match slider_type {
+            CadSliderType::Planer => {
                 transform.translation = hit_point_local_space;
             }
-            CadCursorType::Linear {
+            CadSliderType::Linear {
                 direction,
                 limit_min,
                 limit_max,
@@ -257,28 +257,28 @@ pub fn transform_cursor(
     }
 }
 
-pub fn update_params_from_cursors<Params: PmetraModelling + Component>(
+pub fn update_params_from_sliders<Params: PmetraModelling + Component>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
-    cursors: Query<
+    sliders: Query<
         (
-            &CadCursorName,
+            &CadSliderName,
             &BelongsToCadGeneratedRoot,
             &Transform,
-            &CadGeneratedCursorPreviousTransform,
-            &CadGeneratedCursorConfig,
-            &CadGeneratedCursorState,
+            &CadGeneratedSliderPreviousTransform,
+            &CadGeneratedSliderConfig,
+            &CadGeneratedSliderState,
         ),
-        With<CadGeneratedCursor>,
+        With<CadGeneratedSlider>,
     >,
 ) {
     for (
-        cursor_name,
+        slider_name,
         BelongsToCadGeneratedRoot(cad_generated_root),
         transform,
         mut previous_transform,
         config,
         state,
-    ) in cursors.iter()
+    ) in sliders.iter()
     {
         let Ok((cad_generated_ent, mut params)) = generated_roots.get_mut(*cad_generated_root)
         else {
@@ -287,27 +287,27 @@ pub fn update_params_from_cursors<Params: PmetraModelling + Component>(
         let is_transforms_equal = transform
             .translation
             .abs_diff_eq(previous_transform.0.translation, 0.01);
-        if !is_transforms_equal && matches!(state, CadGeneratedCursorState::Dragging) {
+        if !is_transforms_equal && matches!(state, CadGeneratedSliderState::Dragging) {
             // run event handler on params...
-            params.on_cursor_transform(cursor_name.clone(), previous_transform.0, *transform);
+            params.on_slider_transform(slider_name.clone(), previous_transform.0, *transform);
         }
     }
 }
 
-pub fn draw_cursor_gizmo(
+pub fn draw_slider_gizmo(
     cad_generated: Query<(Entity, &CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    cursors: Query<
+    sliders: Query<
         (
             &BelongsToCadGeneratedRoot,
-            &CadGeneratedCursorConfig,
+            &CadGeneratedSliderConfig,
             &GlobalTransform,
         ),
-        (With<CadGeneratedCursor>, Without<CadGeneratedMesh>),
+        (With<CadGeneratedSlider>, Without<CadGeneratedMesh>),
     >,
     mut gizmos: Gizmos,
 ) {
     for (root_ent, selection_state) in cad_generated.iter() {
-        for (&BelongsToCadGeneratedRoot(cur_root_ent), config, glob_transform) in cursors.iter() {
+        for (&BelongsToCadGeneratedRoot(cur_root_ent), config, glob_transform) in sliders.iter() {
             if cur_root_ent != root_ent {
                 continue;
             }
@@ -320,20 +320,20 @@ pub fn draw_cursor_gizmo(
             gizmos.circle(
                 transform.translation,
                 transform.local_z(),
-                config.cursor_radius * transform.scale.x,
+                config.thumb_radius * transform.scale.x,
                 Color::WHITE,
             );
         }
     }
 }
 
-pub fn scale_cursors_based_on_zoom_level(
+pub fn scale_sliders_based_on_zoom_level(
     cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
     cad_meshes: Query<(Entity, &PickSelection), (With<CadGeneratedMesh>, Without<CadCamera>)>,
-    mut cursors: Query<
+    mut sliders: Query<
         &mut Transform,
         (
-            With<CadGeneratedCursor>,
+            With<CadGeneratedSlider>,
             Without<CadCamera>,
             Without<CadGeneratedMesh>,
         ),
@@ -348,8 +348,8 @@ pub fn scale_cursors_based_on_zoom_level(
     else {
         return;
     };
-    for mut transform in cursors.iter_mut() {
-        let camera_to_cursor_dist = camera_transform.translation.distance(transform.translation);
-        transform.scale = Vec3::ONE * camera_to_cursor_dist.clamp(0., 5.) / 5.;
+    for mut transform in sliders.iter_mut() {
+        let camera_to_slider_dist = camera_transform.translation.distance(transform.translation);
+        transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
     }
 }

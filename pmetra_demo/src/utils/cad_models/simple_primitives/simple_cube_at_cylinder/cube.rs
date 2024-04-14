@@ -95,10 +95,10 @@ pub fn cube_mesh_builder(
     Ok(mesh_builder)
 }
 
-pub fn build_side_length_cursor(
+pub fn build_side_length_slider(
     params: &SimpleCubeAtCylinder,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
@@ -140,17 +140,17 @@ pub fn build_side_length_cursor(
     )?;
     let mesh_transform = cube_builder.transform;
 
-    let local_cursor_pos =
+    let local_slider_pos =
         face_centroid.as_vec3() - Vec3::X * (*cube_side_length as f32 / 2. + 0.1);
-    let cursor_pos = mesh_transform.transform_point(local_cursor_pos);
-    let mut cursor_transform =
-        Transform::from_translation(cursor_pos).with_rotation(mesh_transform.rotation);
-    cursor_transform.rotate_y(std::f32::consts::FRAC_PI_2);
+    let slider_pos = mesh_transform.transform_point(local_slider_pos);
+    let mut slider_transform =
+        Transform::from_translation(slider_pos).with_rotation(mesh_transform.rotation);
+    slider_transform.rotate_y(std::f32::consts::FRAC_PI_2);
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: *mesh_transform.up(),
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: *mesh_transform.local_x(),
             limit_min: None,
             limit_max: None,

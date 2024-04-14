@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::pmetra_core::builders::{CadCursorType, CadMeshOutlines};
+use crate::pmetra_core::builders::{CadSliderType, CadMeshOutlines};
 
 /// Marker for CAD generated entities root.
 #[derive(Debug, Component, Reflect)]
@@ -42,27 +42,27 @@ pub enum CadGeneratedMeshOutlinesState {
 }
 
 #[derive(Debug, Component)]
-pub struct CadGeneratedCursor;
+pub struct CadGeneratedSlider;
 
 #[derive(Debug, Component)]
-pub struct CadGeneratedCursorConfig {
-    pub cursor_radius: f32,
+pub struct CadGeneratedSliderConfig {
+    pub thumb_radius: f32,
     pub drag_plane_normal: Vec3,
-    pub cursor_type: CadCursorType,
+    pub slider_type: CadSliderType,
 }
 
 #[derive(Debug, Component, Default)]
-pub enum CadGeneratedCursorState {
+pub enum CadGeneratedSliderState {
     #[default]
     Normal,
     Dragging,
 }
 
 #[derive(Debug, Component)]
-pub struct CadGeneratedCursorPreviousTransform(pub Transform);
+pub struct CadGeneratedSliderPreviousTransform(pub Transform);
 
 #[derive(Debug, Component)]
-pub struct BelongsToCadGeneratedCursor(pub Entity);
+pub struct BelongsToCadGeneratedSlider(pub Entity);
 
 #[derive(Debug, Component)]
-pub struct CadGeneratedCursorDragPlane;
+pub struct CadGeneratedSliderDragPlane;

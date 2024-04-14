@@ -67,10 +67,10 @@ pub fn cylinder_mesh_builder(
     Ok(mesh_builder)
 }
 
-pub fn build_radius_cursor(
+pub fn build_radius_slider(
     params: &SimpleCubeAtCylinder,
     cad_shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
@@ -98,17 +98,17 @@ pub fn build_radius_cursor(
     let face_centroid = face_wire.get_centroid();
     let right_direction = (vertex_v0.point().as_bevy_vec3() - face_centroid.as_vec3()).normalize();
     let mesh_transform = Transform::default();
-    let cursor_transform = Transform::from_translation(
+    let slider_transform = Transform::from_translation(
         mesh_transform.translation
             + face_centroid.as_vec3()
             + right_direction * (*cylinder_radius as f32 + 0.1),
     )
     .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: face_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: right_direction,
             limit_min: None,
             limit_max: None,

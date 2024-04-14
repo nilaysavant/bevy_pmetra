@@ -117,7 +117,7 @@ pub fn build_cabin_shell(params: &RoundCabinSegment) -> Result<CadShell> {
     let window_shell = builder::translated(&window_shell, window_translation.to_array().into());
     let window_left_face =
         get_shell_face_from_normal_dir(&window_shell, -Vector3::unit_x(), (0.5, 0.5))?;
-    // Tag left window left face for window transform cursor later...
+    // Tag left window left face for window transform slider later...
     tagged_elements.insert(
         CadElementTag::new("LeftWindowLeftFace"),
         CadElement::Face(window_left_face.clone()),
@@ -299,12 +299,12 @@ pub fn build_cabin_mesh(
     Ok(mesh_builder)
 }
 
-// Cursors...
+// Sliders...
 
-pub fn build_extrude_cursor(
+pub fn build_extrude_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let cad_shell = shells_by_name
         .get(&CadShellName(CadShellIds::CabinShell.to_string()))
         .ok_or_else(|| anyhow!("Could not find shell!"))?;
@@ -324,13 +324,13 @@ pub fn build_extrude_cursor(
         .expect("No wire found!");
     let extruded_profile_face_centroid = extruded_profile_face_wire.get_centroid();
     let ref_edge_direction = ref_edge_direction_for_wire(extruded_profile_face_wire.clone())?;
-    let cursor_normal = extruded_profile_face_normal
+    let slider_normal = extruded_profile_face_normal
         .cross(ref_edge_direction)
         .normalize();
-    let cursor_transform = Transform::from_translation(
+    let slider_transform = Transform::from_translation(
         extruded_profile_face_centroid.as_vec3() + extruded_profile_face_normal * 0.1,
     )
-    .with_rotation(get_rotation_from_normals(Vec3::Z, cursor_normal));
+    .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
     let Some(CadElement::Face(profile_face)) =
         cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
@@ -343,10 +343,10 @@ pub fn build_extrude_cursor(
         .expect("No wire found!")
         .get_centroid();
 
-    Ok(CadCursor {
-        normal: cursor_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+    Ok(CadSlider {
+        normal: slider_normal,
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: extruded_profile_face_normal,
             limit_min: None,
             limit_max: None,
@@ -355,10 +355,10 @@ pub fn build_extrude_cursor(
     })
 }
 
-pub fn build_corner_radius_cursor(
+pub fn build_corner_radius_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let RoundCabinSegment {
         profile_width,
         profile_height,
@@ -391,10 +391,10 @@ pub fn build_corner_radius_cursor(
         return Err(anyhow!("Could not find arc3!"));
     };
     let (arc3_v1, arc3_v2) = arc3.ends();
-    let cursor_translation = (arc3_v1.point().as_bevy_vec3() + arc3_v2.point().as_bevy_vec3()) / 2.
+    let slider_translation = (arc3_v1.point().as_bevy_vec3() + arc3_v2.point().as_bevy_vec3()) / 2.
         + Vec3::Z * *profile_extrude_length as f32;
-    let cursor_transform =
-        Transform::from_translation(cursor_translation + extruded_profile_face_normal * 0.01)
+    let slider_transform =
+        Transform::from_translation(slider_translation + extruded_profile_face_normal * 0.01)
             .with_rotation(get_rotation_from_normals(
                 Vec3::Z,
                 extruded_profile_face_normal,
@@ -403,10 +403,10 @@ pub fn build_corner_radius_cursor(
     let min_corner_radius = std::f64::MIN_POSITIVE;
     let max_corner_radius = (profile_width / 2.).min(profile_height / 2.);
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: extruded_profile_face_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: ref_edge_direction,
             limit_min: None,
             limit_max: None,
@@ -415,10 +415,10 @@ pub fn build_corner_radius_cursor(
     })
 }
 
-pub fn build_profile_width_cursor(
+pub fn build_profile_width_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let RoundCabinSegment {
         profile_width,
         profile_height,
@@ -448,17 +448,17 @@ pub fn build_profile_width_cursor(
     let right_face_centroid = right_face_wire.get_centroid();
 
     let ref_edge_direction = ref_edge_direction_for_wire(right_face_wire.clone())?;
-    let cursor_translation = right_face_centroid.as_vec3();
+    let slider_translation = right_face_centroid.as_vec3();
     let top_direction = right_face_normal.cross(ref_edge_direction).normalize();
-    let cursor_normal = right_face_normal.cross(top_direction).normalize();
-    let cursor_transform =
-        Transform::from_translation(cursor_translation + right_face_normal * 0.1)
-            .with_rotation(get_rotation_from_normals(Vec3::Z, cursor_normal));
+    let slider_normal = right_face_normal.cross(top_direction).normalize();
+    let slider_transform =
+        Transform::from_translation(slider_translation + right_face_normal * 0.1)
+            .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
-    Ok(CadCursor {
-        normal: cursor_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+    Ok(CadSlider {
+        normal: slider_normal,
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: right_face_normal,
             limit_min: None,
             limit_max: None,
@@ -467,10 +467,10 @@ pub fn build_profile_width_cursor(
     })
 }
 
-pub fn build_profile_height_cursor(
+pub fn build_profile_height_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let RoundCabinSegment {
         profile_width,
         profile_height,
@@ -506,16 +506,16 @@ pub fn build_profile_height_cursor(
     let top_face_normal = top_face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
 
     let ref_edge_direction = ref_edge_direction_for_wire(profile_face_wire.clone())?;
-    let cursor_translation = top_face_wire.get_centroid();
-    let cursor_normal = ref_edge_direction.cross(top_face_normal).normalize();
-    let cursor_transform =
-        Transform::from_translation(cursor_translation.as_vec3() + top_face_normal * 0.1)
-            .with_rotation(get_rotation_from_normals(Vec3::Z, cursor_normal));
+    let slider_translation = top_face_wire.get_centroid();
+    let slider_normal = ref_edge_direction.cross(top_face_normal).normalize();
+    let slider_transform =
+        Transform::from_translation(slider_translation.as_vec3() + top_face_normal * 0.1)
+            .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
-    Ok(CadCursor {
-        normal: cursor_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+    Ok(CadSlider {
+        normal: slider_normal,
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: top_face_normal,
             limit_min: None,
             limit_max: None,
@@ -524,10 +524,10 @@ pub fn build_profile_height_cursor(
     })
 }
 
-pub fn build_profile_thickness_cursor(
+pub fn build_profile_thickness_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let RoundCabinSegment {
         profile_width,
         profile_height,
@@ -572,18 +572,18 @@ pub fn build_profile_thickness_cursor(
         .ok_or_else(|| anyhow!("Could not find right edge with same x"))?;
 
     let ref_edge_direction = ref_edge_direction_for_wire(profile_face_wire.clone())?;
-    let cursor_translation = left_edge_center;
-    let cursor_transform =
-        Transform::from_translation(cursor_translation + extruded_profile_face_normal * 0.01)
+    let slider_translation = left_edge_center;
+    let slider_transform =
+        Transform::from_translation(slider_translation + extruded_profile_face_normal * 0.01)
             .with_rotation(get_rotation_from_normals(
                 Vec3::Z,
                 extruded_profile_face_normal,
             ));
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: extruded_profile_face_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: ref_edge_direction,
             limit_min: None,
             limit_max: None,
@@ -592,10 +592,10 @@ pub fn build_profile_thickness_cursor(
     })
 }
 
-pub fn build_window_translation_cursor(
+pub fn build_window_translation_slider(
     params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let RoundCabinSegment {
         profile_width,
         profile_height,
@@ -626,15 +626,15 @@ pub fn build_window_translation_cursor(
     let wire_centroid = face_wire.get_centroid();
 
     let ref_edge_direction = ref_edge_direction_for_wire(face_wire.clone())?;
-    let cursor_translation = wire_centroid;
-    let cursor_transform =
-        Transform::from_translation(cursor_translation.as_vec3() + face_normal * 0.01)
+    let slider_translation = wire_centroid;
+    let slider_transform =
+        Transform::from_translation(slider_translation.as_vec3() + face_normal * 0.01)
             .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: face_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Planer,
+        transform: slider_transform,
+        slider_type: CadSliderType::Planer,
         ..default()
     })
 }

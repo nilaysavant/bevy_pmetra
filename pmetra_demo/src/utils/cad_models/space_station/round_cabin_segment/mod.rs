@@ -7,9 +7,9 @@ use bevy_pmetra::prelude::*;
 use strum::{Display, EnumString};
 
 use self::cabin::{
-    build_cabin_mesh, build_cabin_shell, build_corner_radius_cursor, build_extrude_cursor,
-    build_profile_height_cursor, build_profile_thickness_cursor, build_profile_width_cursor,
-    build_window_translation_cursor,
+    build_cabin_mesh, build_cabin_shell, build_corner_radius_slider, build_extrude_slider,
+    build_profile_height_slider, build_profile_thickness_slider, build_profile_width_slider,
+    build_window_translation_slider,
 };
 
 use super::RoundRectCuboid;
@@ -67,13 +67,13 @@ pub enum CadMeshIds {
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CadCursorIds {
-    ExtrudeCursor,
-    CornerRadiusCursor,
-    ProfileThicknessCursor,
-    ProfileHeightCursor,
-    ProfileWidthCursor,
-    WindowTranslationCursor,
+pub enum CadSliderIds {
+    ExtrudeSlider,
+    CornerRadiusSlider,
+    ProfileThicknessSlider,
+    ProfileHeightSlider,
+    ProfileWidthSlider,
+    WindowTranslationSlider,
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
@@ -110,44 +110,44 @@ impl PmetraModelling for RoundCabinSegment {
         Ok(cad_meshes_builders_by_cad_shell)
     }
 
-    fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let cursors = CadCursors::default() // builder
-            .add_cursor(
-                CadCursorIds::ExtrudeCursor.to_string().into(),
-                build_extrude_cursor(self, shells_by_name)?,
+    fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+        let sliders = CadSliders::default() // builder
+            .add_slider(
+                CadSliderIds::ExtrudeSlider.to_string().into(),
+                build_extrude_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::CornerRadiusCursor.to_string().into(),
-                build_corner_radius_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::CornerRadiusSlider.to_string().into(),
+                build_corner_radius_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::ProfileWidthCursor.to_string().into(),
-                build_profile_width_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::ProfileWidthSlider.to_string().into(),
+                build_profile_width_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::ProfileHeightCursor.to_string().into(),
-                build_profile_height_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::ProfileHeightSlider.to_string().into(),
+                build_profile_height_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::ProfileThicknessCursor.to_string().into(),
-                build_profile_thickness_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::ProfileThicknessSlider.to_string().into(),
+                build_profile_thickness_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::WindowTranslationCursor.to_string().into(),
-                build_window_translation_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::WindowTranslationSlider.to_string().into(),
+                build_window_translation_slider(self, shells_by_name)?,
             )?;
 
-        Ok(cursors)
+        Ok(sliders)
     }
 
-    fn on_cursor_transform(
+    fn on_slider_transform(
         &mut self,
-        cursor_name: CadCursorName,
+        name: CadSliderName,
         prev_transform: Transform,
         new_transform: Transform,
     ) {
-        match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-            CadCursorIds::ExtrudeCursor => {
+        match CadSliderIds::from_str(&name.0).unwrap() {
+            CadSliderIds::ExtrudeSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -155,7 +155,7 @@ impl PmetraModelling for RoundCabinSegment {
                     self.profile_extrude_length = new_value.clamp(0.001, std::f64::MAX);
                 }
             }
-            CadCursorIds::CornerRadiusCursor => {
+            CadSliderIds::CornerRadiusSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -166,7 +166,7 @@ impl PmetraModelling for RoundCabinSegment {
                     );
                 }
             }
-            CadCursorIds::ProfileWidthCursor => {
+            CadSliderIds::ProfileWidthSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -177,7 +177,7 @@ impl PmetraModelling for RoundCabinSegment {
                     );
                 }
             }
-            CadCursorIds::ProfileThicknessCursor => {
+            CadSliderIds::ProfileThicknessSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -190,7 +190,7 @@ impl PmetraModelling for RoundCabinSegment {
                     );
                 }
             }
-            CadCursorIds::ProfileHeightCursor => {
+            CadSliderIds::ProfileHeightSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -199,7 +199,7 @@ impl PmetraModelling for RoundCabinSegment {
                         new_value.clamp(self.profile_corner_radius * 2. + 0.01, std::f64::MAX);
                 }
             }
-            CadCursorIds::WindowTranslationCursor => {
+            CadSliderIds::WindowTranslationSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
@@ -210,26 +210,26 @@ impl PmetraModelling for RoundCabinSegment {
         }
     }
 
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
-        let tooltip = match CadCursorIds::from_str(&cursor_name).unwrap() {
-            CadCursorIds::ExtrudeCursor => Some(format!(
+    fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
+        let tooltip = match CadSliderIds::from_str(&name).unwrap() {
+            CadSliderIds::ExtrudeSlider => Some(format!(
                 "profile_extrude_length : {:.3}",
                 self.profile_extrude_length
             )),
-            CadCursorIds::CornerRadiusCursor => Some(format!(
+            CadSliderIds::CornerRadiusSlider => Some(format!(
                 "profile_corner_radius : {:.3}",
                 self.profile_corner_radius
             )),
-            CadCursorIds::ProfileWidthCursor => {
+            CadSliderIds::ProfileWidthSlider => {
                 Some(format!("profile_width : {:.3}", self.profile_width))
             }
-            CadCursorIds::ProfileThicknessCursor => {
+            CadSliderIds::ProfileThicknessSlider => {
                 Some(format!("profile_thickness : {:.3}", self.profile_thickness))
             }
-            CadCursorIds::ProfileHeightCursor => {
+            CadSliderIds::ProfileHeightSlider => {
                 Some(format!("profile_height : {:.3}", self.profile_height))
             }
-            CadCursorIds::WindowTranslationCursor => Some(format!(
+            CadSliderIds::WindowTranslationSlider => Some(format!(
                 "window_translation : [{:.3}, {:.3}, {:.3}]",
                 self.window_translation.x, self.window_translation.y, self.window_translation.z
             )),

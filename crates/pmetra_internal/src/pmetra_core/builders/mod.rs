@@ -1,12 +1,12 @@
 use anyhow::Result;
 use bevy::prelude::*;
 
-pub mod cursors;
 pub mod meshes;
 pub mod shells;
+pub mod sliders;
 pub mod tags;
 
-pub use {cursors::*, meshes::*, shells::*, tags::*};
+pub use {meshes::*, shells::*, sliders::*, tags::*};
 
 /// Used for generating [`CadShell`]s using this struct via `truck`'s modelling APIs.
 pub trait PmetraCad: Clone + Default {
@@ -14,7 +14,7 @@ pub trait PmetraCad: Clone + Default {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>>;
 }
 
-/// Trait for parametrically generating models with cursors from struct.
+/// Trait for parametrically generating models with [`CadSlider`]s from struct.
 pub trait PmetraModelling: PmetraCad {
     /// Configure the [`CadMesh`]s to be generated for each of the [`CadShell`]s.
     fn meshes_builders_by_shell(
@@ -22,24 +22,24 @@ pub trait PmetraModelling: PmetraCad {
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesBuildersByCadShell<Self>>;
 
-    /// Configure Cursors.
-    fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors>;
+    /// Configure sliders.
+    fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders>;
 
-    /// Handler called whenever a cursor is Transformed.
-    fn on_cursor_transform(
+    /// Handler called whenever a [`CadSlider`] is Transformed.
+    fn on_slider_transform(
         &mut self,
-        cursor_name: CadCursorName,
+        name: CadSliderName,
         prev_transform: Transform,
         new_transform: Transform,
     );
-    /// Handler called to get [`CadCursor`] tooltip UI text.
+    /// Handler called to get [`CadSlider`] tooltip UI text.
     ///
     /// Return `None` if no tooltip should be displayed.
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>>;
+    fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>>;
 }
 
 mod test {
-    use crate::pmetra_core::builders::CadCursor;
+    use crate::pmetra_core::builders::CadSlider;
 
     use super::*;
 
@@ -74,32 +74,32 @@ mod test {
                     )
             }
 
-            fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-                let mut cursors = CadCursors::default();
-                cursors.insert(CadCursorName("c1".into()), CadCursor::default());
+            fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+                let mut sliders = CadSliders::default();
+                sliders.insert(CadSliderName("c1".into()), CadSlider::default());
 
-                Ok(cursors)
+                Ok(sliders)
             }
 
-            fn on_cursor_transform(
+            fn on_slider_transform(
                 &mut self,
-                cursor_name: CadCursorName,
+                name: CadSliderName,
                 prev_transform: Transform,
                 new_transform: Transform,
             ) {
                 // TODO
             }
 
-            fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
+            fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
                 Ok(None)
             }
         }
 
-        pub fn build_cursor_c1(
+        pub fn build_slider_c1(
             builder: &CadMeshBuilder<Cube>,
             shell: &CadShell,
-        ) -> Result<CadCursor> {
-            Ok(CadCursor::default())
+        ) -> Result<CadSlider> {
+            Ok(CadSlider::default())
         }
 
         let cube = Cube { width: 1. };

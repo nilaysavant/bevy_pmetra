@@ -12,7 +12,7 @@ use self::{
         straight_beam_mesh_builder,
     },
     cuboid_enclosure::{
-        build_cuboid_enclosure_shell, build_tower_length_cursor, cuboid_enclosure_mesh_builder,
+        build_cuboid_enclosure_shell, build_tower_length_slider, cuboid_enclosure_mesh_builder,
     },
 };
 
@@ -110,8 +110,8 @@ pub enum CadMeshIds {
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CadCursorIds {
-    TowerLengthCursor,
+pub enum CadSliderIds {
+    TowerLengthSlider,
 }
 
 impl PmetraCad for TowerExtension {
@@ -251,23 +251,23 @@ impl PmetraModelling for TowerExtension {
         Ok(cad_meshes_builders_by_cad_shell)
     }
 
-    fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let cursors = CadCursors::default().add_cursor(
-            CadCursorIds::TowerLengthCursor.to_string().into(),
-            build_tower_length_cursor(self, shells_by_name)?,
+    fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+        let sliders = CadSliders::default().add_slider(
+            CadSliderIds::TowerLengthSlider.to_string().into(),
+            build_tower_length_slider(self, shells_by_name)?,
         )?;
 
-        Ok(cursors)
+        Ok(sliders)
     }
 
-    fn on_cursor_transform(
+    fn on_slider_transform(
         &mut self,
-        cursor_name: CadCursorName,
+        name: CadSliderName,
         prev_transform: Transform,
         new_transform: Transform,
     ) {
-        match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-            CadCursorIds::TowerLengthCursor => {
+        match CadSliderIds::from_str(&name.0).unwrap() {
+            CadSliderIds::TowerLengthSlider => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.;
@@ -278,9 +278,9 @@ impl PmetraModelling for TowerExtension {
         }
     }
 
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
-        let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-            CadCursorIds::TowerLengthCursor => {
+    fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
+        let tooltip = match CadSliderIds::from_str(&name.0).unwrap() {
+            CadSliderIds::TowerLengthSlider => {
                 Some(format!("tower_length : {:.3}", self.tower_length))
             }
         };

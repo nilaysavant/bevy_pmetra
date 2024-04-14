@@ -4,11 +4,11 @@ use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
 use truck_modeling::{builder, Shell};
 
 use crate::{
+    constants::CUSTOM_TRUCK_TOLERANCE_1,
     pmetra_core::{
         dimensions::AsBevyVec3,
         meshing::{BuildBevyMesh, BuildPolygon},
     },
-    constants::CUSTOM_TRUCK_TOLERANCE_1,
 };
 
 use super::{CadShellName, CadShellsByName};
@@ -123,7 +123,6 @@ pub struct CadMeshBuilder<P: Default + Clone> {
     pub base_material: StandardMaterial,
     pub outlines: CadMeshOutlines,
     pub transform: Transform,
-    // pub cursors: HashMap<CadCursorName, CadCursor>,
 }
 
 impl<P: Default + Clone> CadMeshBuilder<P> {
@@ -165,7 +164,6 @@ impl<P: Default + Clone> CadMeshBuilder<P> {
             base_material: self.base_material.clone(),
             transform: self.transform,
             outlines: self.outlines.clone(),
-            // cursors: self.cursors.clone(),
         })
     }
 }

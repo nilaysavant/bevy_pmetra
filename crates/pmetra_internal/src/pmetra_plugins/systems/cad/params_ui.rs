@@ -5,15 +5,15 @@ use crate::{
     pmetra_plugins::{
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot, CadGeneratedCursor,
-                CadGeneratedCursorDragPlane, CadGeneratedRoot,
+                BelongsToCadGeneratedSlider, BelongsToCadGeneratedRoot, CadGeneratedSlider,
+                CadGeneratedSliderDragPlane, CadGeneratedRoot,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
-        events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
+        events::slider::{SliderPointerMoveEvent, SliderPointerOutEvent, TransformSliderEvent},
     },
-    pmetra_core::builders::{CadCursorName, PmetraModelling},
+    pmetra_core::builders::{CadSliderName, PmetraModelling},
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,
 };
 
@@ -37,7 +37,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
             .with_no_wrap(),
             // Set the style of the TextBundle itself.
             style: Style {
-                // Abs pos allows for ui that can be tracking a world pos, ie. of cursor.
+                // Abs pos allows for ui that can be tracking a world pos, ie. of slider.
                 position_type: PositionType::Absolute,
                 ..default()
             },
@@ -50,12 +50,12 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
     ));
 }
 
-pub fn show_params_display_ui_on_hover_cursor<Params: PmetraModelling + Component>(
-    mut events: EventReader<CursorPointerMoveEvent>,
+pub fn show_params_display_ui_on_hover_slider<Params: PmetraModelling + Component>(
+    mut events: EventReader<SliderPointerMoveEvent>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
-    cursors: Query<(&CadCursorName, &BelongsToCadGeneratedRoot), With<CadGeneratedCursor>>,
+    sliders: Query<(&CadSliderName, &BelongsToCadGeneratedRoot), With<CadGeneratedSlider>>,
 ) {
     if events.is_empty() {
         return;
@@ -67,8 +67,8 @@ pub fn show_params_display_ui_on_hover_cursor<Params: PmetraModelling + Componen
         warn!("NO UI!");
         return;
     };
-    for CursorPointerMoveEvent { target, hit } in events.read() {
-        let Ok((cursor_name, BelongsToCadGeneratedRoot(cad_root_ent))) = cursors.get(*target)
+    for SliderPointerMoveEvent { target, hit } in events.read() {
+        let Ok((slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) = sliders.get(*target)
         else {
             continue;
         };
@@ -77,16 +77,16 @@ pub fn show_params_display_ui_on_hover_cursor<Params: PmetraModelling + Componen
         };
 
         // Update UI text...
-        let Ok(Some(tooltip)) = params.on_cursor_tooltip(cursor_name.clone()) else {
+        let Ok(Some(tooltip)) = params.on_slider_tooltip(slider_name.clone()) else {
             continue;
         };
         text.sections.first_mut().unwrap().value = tooltip;
         // Update UI position...
-        let Some(cursor_pos) = hit.position else {
+        let Some(slider_pos) = hit.position else {
             continue;
         };
-        // Get view translation to set the UI pos from world cursor pos.
-        let Some(viewport_pos) = camera.world_to_viewport(cam_glob_transform, cursor_pos) else {
+        // Get view translation to set the UI pos from world slider pos.
+        let Some(viewport_pos) = camera.world_to_viewport(cam_glob_transform, slider_pos) else {
             error!("Could not find world_to_viewport pos!");
             return;
         };
@@ -96,8 +96,8 @@ pub fn show_params_display_ui_on_hover_cursor<Params: PmetraModelling + Componen
     }
 }
 
-pub fn hide_params_display_ui_on_out_cursor(
-    mut events: EventReader<CursorPointerOutEvent>,
+pub fn hide_params_display_ui_on_out_slider(
+    mut events: EventReader<SliderPointerOutEvent>,
     mut ui_nodes: Query<&mut Visibility, With<ParamDisplayUi>>,
 ) {
     if events.is_empty() {
@@ -106,18 +106,18 @@ pub fn hide_params_display_ui_on_out_cursor(
     let Ok(mut visibility) = ui_nodes.get_single_mut() else {
         return;
     };
-    for CursorPointerOutEvent { target, hit } in events.read() {
+    for SliderPointerOutEvent { target, hit } in events.read() {
         *visibility = Visibility::Hidden;
     }
 }
 
-pub fn move_params_display_ui_on_transform_cursor<Params: PmetraModelling + Component>(
-    mut events: EventReader<TransformCursorEvent>,
-    cursor_drag_planes: Query<&BelongsToCadGeneratedCursor, With<CadGeneratedCursorDragPlane>>,
+pub fn move_params_display_ui_on_transform_slider<Params: PmetraModelling + Component>(
+    mut events: EventReader<TransformSliderEvent>,
+    slider_drag_planes: Query<&BelongsToCadGeneratedSlider, With<CadGeneratedSliderDragPlane>>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
-    cursors: Query<(&CadCursorName, &BelongsToCadGeneratedRoot), With<CadGeneratedCursor>>,
+    sliders: Query<(&CadSliderName, &BelongsToCadGeneratedRoot), With<CadGeneratedSlider>>,
 ) {
     if events.is_empty() {
         return;
@@ -128,13 +128,13 @@ pub fn move_params_display_ui_on_transform_cursor<Params: PmetraModelling + Comp
     let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.get_single_mut() else {
         return;
     };
-    for TransformCursorEvent { target, hit } in events.read() {
+    for TransformSliderEvent { target, hit } in events.read() {
         let drag_plane = *target;
-        let Ok(BelongsToCadGeneratedCursor(cursor)) = cursor_drag_planes.get(drag_plane) else {
+        let Ok(BelongsToCadGeneratedSlider(slider)) = slider_drag_planes.get(drag_plane) else {
             error!("drag plane not found!");
             return;
         };
-        let Ok((cursor_name, BelongsToCadGeneratedRoot(cad_root_ent))) = cursors.get(*cursor)
+        let Ok((slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) = sliders.get(*slider)
         else {
             continue;
         };
@@ -142,16 +142,16 @@ pub fn move_params_display_ui_on_transform_cursor<Params: PmetraModelling + Comp
             continue;
         };
         // Update UI text...
-        let Ok(Some(tooltip)) = params.on_cursor_tooltip(cursor_name.clone()) else {
+        let Ok(Some(tooltip)) = params.on_slider_tooltip(slider_name.clone()) else {
             continue;
         };
         text.sections.first_mut().unwrap().value = tooltip;
         // Update UI position...
-        let Some(cursor_pos) = hit.position else {
+        let Some(slider_pos) = hit.position else {
             continue;
         };
-        // Get view translation to set the UI pos from world cursor pos.
-        let Some(viewport_pos) = camera.world_to_viewport(cam_glob_transform, cursor_pos) else {
+        // Get view translation to set the UI pos from world slider pos.
+        let Some(viewport_pos) = camera.world_to_viewport(cam_glob_transform, slider_pos) else {
             error!("Could not find world_to_viewport pos!");
             return;
         };

@@ -5,48 +5,48 @@ use bevy_mod_picking::{
     prelude::*,
 };
 
-/// Used to Move cursor on **drag plane** [`Pointer<Move>`].
+/// Used to Move slider on **drag plane** [`Pointer<Move>`].
 #[derive(Event)]
-pub struct TransformCursorEvent {
+pub struct TransformSliderEvent {
     pub target: Entity,
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Move>>> for TransformCursorEvent {
+impl From<ListenerInput<Pointer<Move>>> for TransformSliderEvent {
     fn from(event: ListenerInput<Pointer<Move>>) -> Self {
-        TransformCursorEvent {
+        TransformSliderEvent {
             target: event.target(),
             hit: event.hit.clone(),
         }
     }
 }
 
-/// Dispatched on **Cursor** : [`Pointer<Move>`].
+/// Dispatched on **Slider** : [`Pointer<Move>`].
 #[derive(Event)]
-pub struct CursorPointerMoveEvent {
+pub struct SliderPointerMoveEvent {
     pub target: Entity,
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Move>>> for CursorPointerMoveEvent {
+impl From<ListenerInput<Pointer<Move>>> for SliderPointerMoveEvent {
     fn from(event: ListenerInput<Pointer<Move>>) -> Self {
-        CursorPointerMoveEvent {
+        SliderPointerMoveEvent {
             target: event.target(),
             hit: event.hit.clone(),
         }
     }
 }
 
-/// Dispatched on **Cursor** : [`Pointer<Out>`].
+/// Dispatched on **Slider** : [`Pointer<Out>`].
 #[derive(Event)]
-pub struct CursorPointerOutEvent {
+pub struct SliderPointerOutEvent {
     pub target: Entity,
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Out>>> for CursorPointerOutEvent {
+impl From<ListenerInput<Pointer<Out>>> for SliderPointerOutEvent {
     fn from(event: ListenerInput<Pointer<Out>>) -> Self {
-        CursorPointerOutEvent {
+        SliderPointerOutEvent {
             target: event.target(),
             hit: event.hit.clone(),
         }

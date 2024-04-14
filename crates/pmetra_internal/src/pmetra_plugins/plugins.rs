@@ -18,28 +18,28 @@ use super::{
     cleanup_manager::CleanupManagerPlugin,
     events::{
         cad::{GenerateCadModel, SpawnMeshesBuilder},
-        cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
+        slider::{SliderPointerMoveEvent, SliderPointerOutEvent, TransformSliderEvent},
     },
     resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
         cad::{
-            cursor::{
-                draw_cursor_gizmo, scale_cursors_based_on_zoom_level, transform_cursor,
-                update_cursor_visibility_based_on_root_selection, update_params_from_cursors,
+            slider::{
+                draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,
+                update_slider_visibility_based_on_root_selection, update_params_from_sliders,
             },
             mesh::{
                 handle_mesh_selection, show_mesh_local_debug_axis,
                 update_root_selection_based_on_mesh_selection,
             },
             model::{
-                handle_spawn_meshes_builder_events, mesh_builder_to_bundle, shells_to_cursors,
+                handle_spawn_meshes_builder_events, mesh_builder_to_bundle, shells_to_sliders,
                 shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
                 update_shells_by_name_on_params_change,
             },
             outlines::generate_mesh_outlines,
             params_ui::{
-                hide_params_display_ui_on_out_cursor, move_params_display_ui_on_transform_cursor,
-                setup_param_display_ui, show_params_display_ui_on_hover_cursor,
+                hide_params_display_ui_on_out_slider, move_params_display_ui_on_transform_slider,
+                setup_param_display_ui, show_params_display_ui_on_hover_slider,
             },
         },
         wire_frame::control_wire_frame_display,
@@ -94,13 +94,13 @@ impl Plugin for PmetraBasePlugin {
         // Add all the plugins/systems/resources/events that are not specific to params...
         app // app
             // picking events...
-            .add_event::<TransformCursorEvent>()
-            .add_event::<CursorPointerMoveEvent>()
-            .add_event::<CursorPointerOutEvent>()
+            .add_event::<TransformSliderEvent>()
+            .add_event::<SliderPointerMoveEvent>()
+            .add_event::<SliderPointerOutEvent>()
             // UI for params and dimensions...
             .add_systems(
                 Update,
-                (setup_param_display_ui, hide_params_display_ui_on_out_cursor),
+                (setup_param_display_ui, hide_params_display_ui_on_out_slider),
             )
             // mesh systems...
             .add_systems(
@@ -112,17 +112,17 @@ impl Plugin for PmetraBasePlugin {
                     show_mesh_local_debug_axis,
                 ),
             )
-            // cursor systems...
+            // slider systems...
             .add_systems(
                 Update,
                 (
                     (
-                        update_cursor_visibility_based_on_root_selection,
-                        transform_cursor,
-                        scale_cursors_based_on_zoom_level,
+                        update_slider_visibility_based_on_root_selection,
+                        transform_slider,
+                        scale_sliders_based_on_zoom_level,
                     )
                         .chain(),
-                    draw_cursor_gizmo,
+                    draw_slider_gizmo,
                 ),
             )
             // cleanup...
@@ -170,7 +170,7 @@ impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlug
                     // Model...
                     spawn_shells_by_name_on_generate::<Params>,
                     update_shells_by_name_on_params_change::<Params>,
-                    shells_to_cursors::<Params>,
+                    shells_to_sliders::<Params>,
                     shells_to_mesh_builder_events::<Params>,
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
@@ -178,14 +178,14 @@ impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlug
                     // chain seems to make the model update run more stable/smooth (less jittery).
                     .chain(),
             )
-            // Cursors...
-            .add_systems(Update, update_params_from_cursors::<Params>)
+            // Sliders...
+            .add_systems(Update, update_params_from_sliders::<Params>)
             // Params UI...
             .add_systems(
                 Update,
                 (
-                    show_params_display_ui_on_hover_cursor::<Params>,
-                    move_params_display_ui_on_transform_cursor::<Params>,
+                    show_params_display_ui_on_hover_slider::<Params>,
+                    move_params_display_ui_on_transform_slider::<Params>,
                 ),
             )
             // rest...

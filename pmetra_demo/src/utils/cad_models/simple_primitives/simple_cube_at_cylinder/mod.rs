@@ -7,8 +7,8 @@ use bevy_pmetra::prelude::*;
 use strum::{Display, EnumString};
 
 use self::{
-    cube::{build_cube_shell, build_side_length_cursor, cube_mesh_builder},
-    cylinder::{build_cylinder_shell, build_radius_cursor, cylinder_mesh_builder},
+    cube::{build_cube_shell, build_side_length_slider, cube_mesh_builder},
+    cylinder::{build_cylinder_shell, build_radius_slider, cylinder_mesh_builder},
 };
 
 pub mod cube;
@@ -52,7 +52,7 @@ pub enum CadMeshIds {
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
-pub enum CadCursorIds {
+pub enum CadSliderIds {
     CylinderRadius,
     CubeSideLength,
 }
@@ -103,28 +103,28 @@ impl PmetraModelling for SimpleCubeAtCylinder {
         Ok(cad_meshes_lazy_builders_by_cad_shell)
     }
 
-    fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {
-        let cursors = CadCursors::default()
-            .add_cursor(
-                CadCursorIds::CylinderRadius.to_string().into(),
-                build_radius_cursor(self, shells_by_name)?,
+    fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+        let sliders = CadSliders::default()
+            .add_slider(
+                CadSliderIds::CylinderRadius.to_string().into(),
+                build_radius_slider(self, shells_by_name)?,
             )?
-            .add_cursor(
-                CadCursorIds::CubeSideLength.to_string().into(),
-                build_side_length_cursor(self, shells_by_name)?,
+            .add_slider(
+                CadSliderIds::CubeSideLength.to_string().into(),
+                build_side_length_slider(self, shells_by_name)?,
             )?;
 
-        Ok(cursors)
+        Ok(sliders)
     }
 
-    fn on_cursor_transform(
+    fn on_slider_transform(
         &mut self,
-        cursor_name: CadCursorName,
+        name: CadSliderName,
         prev_transform: Transform,
         new_transform: Transform,
     ) {
-        match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-            CadCursorIds::CylinderRadius => {
+        match CadSliderIds::from_str(&name.0).unwrap() {
+            CadSliderIds::CylinderRadius => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.;
@@ -132,7 +132,7 @@ impl PmetraModelling for SimpleCubeAtCylinder {
                     self.cylinder_radius = new_value.clamp(0.01, std::f64::MAX);
                 }
             }
-            CadCursorIds::CubeSideLength => {
+            CadSliderIds::CubeSideLength => {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.;
@@ -143,12 +143,12 @@ impl PmetraModelling for SimpleCubeAtCylinder {
         }
     }
 
-    fn on_cursor_tooltip(&self, cursor_name: CadCursorName) -> Result<Option<String>> {
-        let tooltip = match CadCursorIds::from_str(&cursor_name.0).unwrap() {
-            CadCursorIds::CylinderRadius => {
+    fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
+        let tooltip = match CadSliderIds::from_str(&name.0).unwrap() {
+            CadSliderIds::CylinderRadius => {
                 Some(format!("cylinder_radius : {:.3}", self.cylinder_radius))
             }
-            CadCursorIds::CubeSideLength => {
+            CadSliderIds::CubeSideLength => {
                 Some(format!("cube_side_length : {:.3}", self.cube_side_length))
             }
         };

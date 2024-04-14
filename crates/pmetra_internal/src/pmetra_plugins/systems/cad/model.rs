@@ -6,12 +6,16 @@ use bevy_mod_picking::{
 };
 
 use crate::{
+    pmetra_core::builders::{
+        CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, CadSlider,
+        CadSliderName, PmetraModelling,
+    },
     pmetra_plugins::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedRoot, CadGeneratedCursor, CadGeneratedCursorConfig,
-                CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
+                BelongsToCadGeneratedRoot, CadGeneratedSlider, CadGeneratedSliderConfig,
+                CadGeneratedSliderPreviousTransform, CadGeneratedSliderState, CadGeneratedMesh,
                 CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState, CadGeneratedRoot,
                 CadGeneratedRootSelectionState,
             },
@@ -19,17 +23,16 @@ use crate::{
         },
         events::{
             cad::{GenerateCadModel, SpawnMeshesBuilder},
-            cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
+            slider::{SliderPointerMoveEvent, SliderPointerOutEvent},
         },
         resources::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
-    pmetra_core::builders::{CadCursor, CadCursorName, CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, PmetraModelling},
 };
 
 use super::{
-    cursor::{cursor_drag_end, cursor_drag_start},
+    slider::{slider_drag_end, slider_drag_start},
     mesh::{mesh_pointer_move, mesh_pointer_out},
 };
 
@@ -137,23 +140,23 @@ pub fn update_shells_by_name_on_params_change<Params: PmetraModelling + Componen
     }
 }
 
-pub fn shells_to_cursors<Params: PmetraModelling + Component + Clone>(
+pub fn shells_to_sliders<Params: PmetraModelling + Component + Clone>(
     mut commands: Commands,
     cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
         (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
     >,
-    mut cad_cursors: Query<
+    mut slider_comps: Query<
         (
             Entity,
-            &CadCursorName,
+            &CadSliderName,
             &BelongsToCadGeneratedRoot,
             &mut Transform,
-            &mut CadGeneratedCursorPreviousTransform,
-            &CadGeneratedCursorState,
+            &mut CadGeneratedSliderPreviousTransform,
+            &CadGeneratedSliderState,
         ),
-        (With<CadGeneratedCursor>, Without<CadGeneratedRoot>),
+        (With<CadGeneratedSlider>, Without<CadGeneratedRoot>),
     >,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -166,50 +169,50 @@ pub fn shells_to_cursors<Params: PmetraModelling + Component + Clone>(
             // warn!("Could not get `CadGeneratedRoot` with associated params!");
             continue;
         };
-        // Cursors...
-        let Ok(cursors) = params.cursors(shells_by_name) else {
-            warn!("Could not get cursors!");
+        // Sliders...
+        let Ok(sliders) = params.sliders(shells_by_name) else {
+            warn!("Could not get sliders!");
             continue;
         };
-        for (cursor_name, cursor) in cursors.iter() {
-            let CadCursor {
+        for (slider_name, slider) in sliders.iter() {
+            let CadSlider {
                 normal,
                 transform,
-                cursor_radius,
-                cursor_type,
-            } = cursor;
+                thumb_radius,
+                slider_type,
+            } = slider;
 
-            if let Some((_, _, _, mut cursor_transform, mut prev_transform, cursor_state)) =
-                cad_cursors.iter_mut().find(|(_, name, bel_root, _, _, _)| {
-                    *name == cursor_name && bel_root.0 == root_ent
+            if let Some((_, _, _, mut slider_transform, mut prev_transform, slider_state)) =
+                slider_comps.iter_mut().find(|(_, name, bel_root, _, _, _)| {
+                    *name == slider_name && bel_root.0 == root_ent
                 })
             {
-                // If cursor already exists, update it...
+                // If slider already exists, update it...
                 // Update transform only in normal state...
-                match cursor_state {
-                    CadGeneratedCursorState::Normal => {
+                match slider_state {
+                    CadGeneratedSliderState::Normal => {
                         // Update transform using new translation/rotation but use original scale...
-                        // Since we're setting scale for adaptive cursors, changing it causes flickering.
-                        *cursor_transform = Transform {
+                        // Since we're setting scale for adaptive sliders, changing it causes flickering.
+                        *slider_transform = Transform {
                             translation: transform.translation,
                             rotation: transform.rotation,
-                            scale: cursor_transform.scale,
+                            scale: slider_transform.scale,
                         };
-                        *prev_transform = CadGeneratedCursorPreviousTransform(*cursor_transform);
+                        *prev_transform = CadGeneratedSliderPreviousTransform(*slider_transform);
                     }
-                    CadGeneratedCursorState::Dragging => {
+                    CadGeneratedSliderState::Dragging => {
                         // Update prev transform using new translation/rotation but use original scale...
-                        // Since we're setting scale for adaptive cursors, changing it causes flickering.
-                        *prev_transform = CadGeneratedCursorPreviousTransform(Transform {
+                        // Since we're setting scale for adaptive sliders, changing it causes flickering.
+                        *prev_transform = CadGeneratedSliderPreviousTransform(Transform {
                             translation: transform.translation,
                             rotation: transform.rotation,
-                            scale: cursor_transform.scale,
+                            scale: slider_transform.scale,
                         });
                     }
                 }
             } else {
-                // Spawn new cursor...
-                let cursor = commands
+                // Spawn new slider...
+                let slider = commands
                     .spawn((
                         PbrBundle {
                             material: materials.add(StandardMaterial {
@@ -220,26 +223,26 @@ pub fn shells_to_cursors<Params: PmetraModelling + Component + Clone>(
                                 cull_mode: None,
                                 ..default()
                             }),
-                            mesh: meshes.add(shape::Circle::new(*cursor_radius)),
+                            mesh: meshes.add(shape::Circle::new(*thumb_radius)),
                             transform: *transform,
                             // visibility: Visibility::Hidden,
                             ..default()
                         },
-                        cursor_name.clone(),
-                        CadGeneratedCursor,
-                        CadGeneratedCursorConfig {
-                            cursor_radius: *cursor_radius,
+                        slider_name.clone(),
+                        CadGeneratedSlider,
+                        CadGeneratedSliderConfig {
+                            thumb_radius: *thumb_radius,
                             drag_plane_normal: *normal,
-                            cursor_type: cursor_type.clone(),
+                            slider_type: slider_type.clone(),
                         },
-                        CadGeneratedCursorState::default(),
-                        CadGeneratedCursorPreviousTransform(*transform),
+                        CadGeneratedSliderState::default(),
+                        CadGeneratedSliderPreviousTransform(*transform),
                         BelongsToCadGeneratedRoot(root_ent),
                         NotShadowCaster,
                         // picking...
                         PickableBundle::default(), // <- Makes the mesh pickable.
                         NoBackfaceCulling,
-                        // Disable highlight cursor...
+                        // Disable highlight slider...
                         Highlight::<StandardMaterial> {
                             hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
                                 base_color: mat.base_color.with_a(0.6),
@@ -256,17 +259,17 @@ pub fn shells_to_cursors<Params: PmetraModelling + Component + Clone>(
                     ))
                     .insert((
                         // events...
-                        On::<Pointer<Move>>::send_event::<CursorPointerMoveEvent>(),
-                        On::<Pointer<Out>>::send_event::<CursorPointerOutEvent>(),
+                        On::<Pointer<Move>>::send_event::<SliderPointerMoveEvent>(),
+                        On::<Pointer<Out>>::send_event::<SliderPointerOutEvent>(),
                         // Add drag plane on drag start...
-                        On::<Pointer<DragStart>>::run(cursor_drag_start),
-                        On::<Pointer<DragEnd>>::run(cursor_drag_end),
+                        On::<Pointer<DragStart>>::run(slider_drag_start),
+                        On::<Pointer<DragEnd>>::run(slider_drag_end),
                     ))
-                    // Prevent de-select other ent when cursor is interacted with.
+                    // Prevent de-select other ent when slider is interacted with.
                     .insert(NoDeselect)
                     .id();
-                // Add cursor to root...
-                commands.entity(root_ent).add_child(cursor);
+                // Add slider to root...
+                commands.entity(root_ent).add_child(slider);
             }
         }
     }
@@ -504,7 +507,6 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
             base_material,
             transform,
             outlines,
-            // cursors,
         } = cad_mesh;
         let material_hdl = materials.add(base_material);
 

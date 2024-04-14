@@ -130,10 +130,10 @@ pub fn cuboid_enclosure_mesh_builder(
     Ok(mesh_builder)
 }
 
-pub fn build_tower_length_cursor(
+pub fn build_tower_length_slider(
     params: &TowerExtension,
     cad_shells_by_name: &CadShellsByName,
-) -> Result<CadCursor> {
+) -> Result<CadSlider> {
     let &TowerExtension { tower_length, .. } = params;
 
     let cad_shell = cad_shells_by_name
@@ -160,14 +160,14 @@ pub fn build_tower_length_cursor(
         .normal(0.5, 0.5)
         .as_bevy_vec3();
 
-    let cursor_transform =
+    let slider_transform =
         Transform::from_translation(top_face_centroid.as_vec3() + top_face_normal * 0.1)
             .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
 
-    Ok(CadCursor {
+    Ok(CadSlider {
         normal: front_face_normal,
-        transform: cursor_transform,
-        cursor_type: CadCursorType::Linear {
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
             direction: top_face_normal,
             limit_min: None,
             limit_max: None,
