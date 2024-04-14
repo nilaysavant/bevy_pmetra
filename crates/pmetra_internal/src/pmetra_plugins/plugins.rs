@@ -49,7 +49,7 @@ use super::{
 /// Base [`bevy`] [`Plugin`] for Interactive/Parametric/CAD modelling.
 /// 
 /// Add this plugin just **once** to your Bevy app.
-/// Before the other plugins of pmetra.
+/// Before the other plugins of Pmetra.
 #[derive(Default)]
 pub struct PmetraBasePlugin {
     /// Allows setting the wire-frame display on meshes via [`WireFramePlugin`].
