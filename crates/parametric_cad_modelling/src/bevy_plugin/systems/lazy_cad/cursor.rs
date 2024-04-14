@@ -19,7 +19,7 @@ use crate::{
         events::cursor::TransformCursorEvent,
     },
     cad_core::{
-        builders::{CadCursorName, CadCursorType, CadMeshName, ParametricCad},
+        builders::{CadCursorName, CadCursorType, CadMeshName},
         lazy_builders::ParametricLazyCad,
     },
     math::get_rotation_from_normals,

@@ -19,10 +19,7 @@ pub mod prelude {
 
     pub use {
         bevy_mesh::BevyMeshBuilder,
-        bevy_plugin::{
-            components::cad::*, components::camera::*, components::wire_frame::*, events::cad::*,
-            plugins::*,
-        },
+        bevy_plugin::{components::cad::*, components::camera::*, components::wire_frame::*},
         cad_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
         constants::*,
     };

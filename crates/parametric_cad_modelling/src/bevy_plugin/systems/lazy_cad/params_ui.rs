@@ -15,7 +15,7 @@ use crate::{
         events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
     cad_core::{
-        builders::{CadCursorName, CadMeshName, ParametricCad},
+        builders::{CadCursorName, CadMeshName},
         lazy_builders::ParametricLazyCad,
     },
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,

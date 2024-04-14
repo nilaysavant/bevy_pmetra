@@ -30,14 +30,10 @@ use crate::{
         scene::{scene_setup, test_manual_mesh_gen},
     },
     utils::cad_models::{
-        mechanical_parts::simple_gear::SimpleGear,
-        simple_primitives::{
-            simple_cube_at_cylinder::SimpleCubeAtCylinder,
-            simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
-        },
+        simple_primitives::simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
         space_station::{
             lazy_round_cabin_segment::LazyRoundCabinSegment,
-            lazy_tower_extension::LazyTowerExtension, RoundCabinSegment, RoundRectCuboid,
+            lazy_tower_extension::LazyTowerExtension, RoundRectCuboid,
         },
     },
 };
@@ -129,12 +125,9 @@ impl Plugin for PmetraDemoPlugin {
             // exporter
             .add_plugins(GltfExporterPlugin)
             // inspectors...
-            .register_type::<RoundCabinSegment>()
-            .register_type::<SimpleCubeAtCylinder>()
             .register_type::<SimpleLazyCubeAtCylinder>()
             .register_type::<LazyTowerExtension>()
             .register_type::<LazyRoundCabinSegment>()
-            .register_type::<SimpleGear>()
             .register_type::<RoundRectCuboid>()
             .add_plugins(
                 FilterQueryInspectorPlugin::<With<CadGeneratedRoot>>::default()

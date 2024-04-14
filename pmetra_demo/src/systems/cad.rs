@@ -8,14 +8,10 @@ use bevy_rapier3d::prelude::*;
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
-        mechanical_parts::simple_gear::SimpleGear,
-        simple_primitives::{
-            simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder, SimpleCubeAtCylinder,
-        },
+        simple_primitives::simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
         space_station::{
             lazy_round_cabin_segment::LazyRoundCabinSegment,
-            lazy_tower_extension::LazyTowerExtension, round_cabin_segment::CadMaterialIds,
-            RoundCabinSegment,
+            lazy_tower_extension::LazyTowerExtension,
         },
     },
 };
