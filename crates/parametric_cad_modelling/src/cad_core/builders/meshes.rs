@@ -14,13 +14,13 @@ use crate::{
 use super::{CadShellName, CadShellsByName};
 
 #[derive(Debug, Clone, Default)]
-pub struct CadMeshesLazyBuildersByCadShell<P: Default + Clone> {
+pub struct CadMeshesBuildersByCadShell<P: Default + Clone> {
     pub params: P,
     pub shells_by_name: CadShellsByName,
-    pub meshes_builders: HashMap<CadShellName, CadMeshesLazyBuilder<P>>,
+    pub meshes_builders: HashMap<CadShellName, CadMeshesBuilder<P>>,
 }
 
-impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
+impl<P: Default + Clone> CadMeshesBuildersByCadShell<P> {
     pub fn new(params: P, shells_by_name: CadShellsByName) -> Result<Self> {
         let builder = Self {
             params,
@@ -30,12 +30,12 @@ impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
         Ok(builder)
     }
 
-    /// Add a new [`CadMeshLazyBuilder`] to the builders.
+    /// Add a new [`CadMeshBuilder`] to the builders.
     pub fn add_mesh_builder(
         &mut self,
         shell_name: CadShellName,
         mesh_name: String,
-        mesh_builder: CadMeshLazyBuilder<P>,
+        mesh_builder: CadMeshBuilder<P>,
     ) -> Result<Self> {
         // Get the shell and set outlines on mesh builder...
         let shell = self
@@ -49,7 +49,7 @@ impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
             meshes_builder.add_mesh_builder(mesh_name, mesh_builder)?;
         } else {
             // create new and add the mesh builder to the meshes builders...
-            let mut meshes_builder = CadMeshesLazyBuilder::new(
+            let mut meshes_builder = CadMeshesBuilder::new(
                 self.params.clone(),
                 self.shells_by_name.clone(),
                 shell_name.clone(),
@@ -63,15 +63,15 @@ impl<P: Default + Clone> CadMeshesLazyBuildersByCadShell<P> {
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct CadMeshesLazyBuilder<P: Default + Clone> {
+pub struct CadMeshesBuilder<P: Default + Clone> {
     pub params: P,
     pub shells_by_name: CadShellsByName,
     /// Name of the singular shell used to build the meshes.
     pub shell_name: CadShellName,
-    pub mesh_builders: HashMap<CadMeshName, CadMeshLazyBuilder<P>>,
+    pub mesh_builders: HashMap<CadMeshName, CadMeshBuilder<P>>,
 }
 
-impl<P: Default + Clone> CadMeshesLazyBuilder<P> {
+impl<P: Default + Clone> CadMeshesBuilder<P> {
     pub fn new(
         params: P,
         shells_by_name: CadShellsByName,
@@ -98,7 +98,7 @@ impl<P: Default + Clone> CadMeshesLazyBuilder<P> {
     pub fn add_mesh_builder(
         &mut self,
         mesh_name: String,
-        mesh_builder: CadMeshLazyBuilder<P>,
+        mesh_builder: CadMeshBuilder<P>,
     ) -> Result<Self> {
         self.mesh_builders.insert(mesh_name.into(), mesh_builder);
         Ok(self.clone())
@@ -116,7 +116,7 @@ impl From<String> for CadMeshName {
 
 /// Builder for building a [`CadMesh`].
 #[derive(Debug, Clone, Default, Component)]
-pub struct CadMeshLazyBuilder<P: Default + Clone> {
+pub struct CadMeshBuilder<P: Default + Clone> {
     pub params: P,
     pub shell_name: CadShellName,
     pub mesh_hdl: Option<Handle<Mesh>>,
@@ -126,7 +126,7 @@ pub struct CadMeshLazyBuilder<P: Default + Clone> {
     // pub cursors: HashMap<CadCursorName, CadCursor>,
 }
 
-impl<P: Default + Clone> CadMeshLazyBuilder<P> {
+impl<P: Default + Clone> CadMeshBuilder<P> {
     pub fn new(params: P, shell_name: CadShellName) -> Result<Self> {
         let builder = Self {
             params,
@@ -156,8 +156,8 @@ impl<P: Default + Clone> CadMeshLazyBuilder<P> {
         Ok(self.clone())
     }
 
-    pub fn build(&self) -> Result<CadLazyMesh> {
-        Ok(CadLazyMesh {
+    pub fn build(&self) -> Result<CadMesh> {
+        Ok(CadMesh {
             mesh_hdl: self
                 .mesh_hdl
                 .clone()
@@ -171,12 +171,11 @@ impl<P: Default + Clone> CadMeshLazyBuilder<P> {
 }
 
 #[derive(Debug, Clone)]
-pub struct CadLazyMesh {
+pub struct CadMesh {
     pub mesh_hdl: Handle<Mesh>,
     pub base_material: StandardMaterial,
     pub transform: Transform,
     pub outlines: CadMeshOutlines,
-    // pub cursors: HashMap<CadCursorName, CadCursor>,
 }
 
 /// Outlines for [`InteractiveCadMesh`]

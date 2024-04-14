@@ -115,8 +115,8 @@ pub enum CadCursorIds {
 }
 
 impl ParametricModelling for LazyTowerExtension {
-    fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
-        let builders = CadShellsLazyBuilders::new(self.clone())? // builder
+    fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
+        let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
                 CadShellName(CadShellIds::CuboidEnclosure.to_string()),
                 build_cuboid_enclosure_shell,
@@ -138,10 +138,10 @@ impl ParametricCad for LazyTowerExtension {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
-    ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
+    ) -> Result<CadMeshesBuildersByCadShell<Self>> {
         // Create enclosure...
         let mut cad_meshes_lazy_builders_by_cad_shell =
-            CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
+            CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::CuboidEnclosure.to_string()),
                     CadMeshIds::CuboidEnclosure.to_string(),

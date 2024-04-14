@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    cad_core::builders::{CadMeshesLazyBuilder, CadShellName, ParametricCad},
+    cad_core::builders::{CadMeshesBuilder, CadShellName, ParametricCad},
     prelude::BelongsToCadGeneratedRoot,
 };
 
@@ -31,7 +31,7 @@ impl<Params: ParametricCad + Component + Default> Default for GenerateCadModel<P
 pub struct SpawnMeshesBuilder<Params: ParametricCad + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,
-    pub meshes_builder: CadMeshesLazyBuilder<Params>,
+    pub meshes_builder: CadMeshesBuilder<Params>,
     /// Index count at the time of creation. Used to check for the latest mesh build.
     pub created_at_idx: usize,
 }

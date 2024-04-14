@@ -15,14 +15,14 @@ use crate::{
     constants::CUSTOM_TRUCK_TOLERANCE_1,
 };
 
-/// Holds multiple [`CadShellLazyBuilder`]s.
+/// Holds multiple [`CadShellBuilder`]s.
 #[derive(Clone, Default)]
-pub struct CadShellsLazyBuilders<P: Default + Clone> {
+pub struct CadShellsBuilders<P: Default + Clone> {
     pub params: P,
-    pub builders: HashMap<CadShellName, CadShellLazyBuilder<P>>,
+    pub builders: HashMap<CadShellName, CadShellBuilder<P>>,
 }
 
-impl<P: Default + Clone> CadShellsLazyBuilders<P> {
+impl<P: Default + Clone> CadShellsBuilders<P> {
     pub fn new(params: P) -> Result<Self> {
         let builder = Self {
             params,
@@ -31,13 +31,13 @@ impl<P: Default + Clone> CadShellsLazyBuilders<P> {
         Ok(builder)
     }
 
-    /// Add new [`CadShellLazyBuilder`] to builders.
+    /// Add new [`CadShellBuilder`] to builders.
     pub fn add_shell_builder(
         &mut self,
         shell_name: CadShellName,
         build_fn: fn(&P) -> Result<CadShell>,
     ) -> Result<Self> {
-        let shell_builder = CadShellLazyBuilder {
+        let shell_builder = CadShellBuilder {
             params: self.params.clone(),
             build_cad_shell: build_fn,
         };
@@ -45,7 +45,7 @@ impl<P: Default + Clone> CadShellsLazyBuilders<P> {
         Ok(self.clone())
     }
 
-    /// Build [`CadShell`] using the stored [`CadShellLazyBuilder`] with `shell_name`.
+    /// Build [`CadShell`] using the stored [`CadShellBuilder`] with [`CadShellName`].
     pub fn build_shell(&self, shell_name: CadShellName) -> Result<CadShell> {
         (self
             .builders
@@ -57,12 +57,12 @@ impl<P: Default + Clone> CadShellsLazyBuilders<P> {
 
 /// Builder for building [`CadShell`]s.
 #[derive(Clone, Component)]
-pub struct CadShellLazyBuilder<P: Default + Clone> {
+pub struct CadShellBuilder<P: Default + Clone> {
     pub params: P,
     pub build_cad_shell: fn(&P) -> Result<CadShell>,
 }
 
-impl<P: Default + Clone> CadShellLazyBuilder<P> {
+impl<P: Default + Clone> CadShellBuilder<P> {
     pub fn new(params: P, build_fn: fn(&P) -> Result<CadShell>) -> Self {
         Self {
             params,

@@ -25,7 +25,7 @@ use crate::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
-    cad_core::builders::{CadCursor, CadCursorName, CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricCad},
+    cad_core::builders::{CadCursor, CadCursorName, CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricCad},
 };
 
 use super::{
@@ -64,7 +64,7 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricCad + Component + Clon
             .id();
 
         // Get the shell builders from params...
-        let shells_lazy_builders = match params.shells_builders() {
+        let shells_builders = match params.shells_builders() {
             Ok(result) => result,
             Err(e) => {
                 error!("shells_builders failed with error: {:?}", e);
@@ -74,7 +74,7 @@ pub fn spawn_shells_by_name_on_generate<Params: ParametricCad + Component + Clon
 
         let mut shells_by_name = CadShellsByName::default();
         // Build Shells from Builders and add to common resource for later use.
-        for (shell_name, shell_builder) in shells_lazy_builders.builders.iter() {
+        for (shell_name, shell_builder) in shells_builders.builders.iter() {
             let cad_shell = match shell_builder.build_cad_shell() {
                 Ok(shell) => shell,
                 Err(e) => {
@@ -110,7 +110,7 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricCad + Component 
                 continue;
             }
             // Get the shell builders from params...
-            let shells_lazy_builders = match params.shells_builders() {
+            let shells_builders = match params.shells_builders() {
                 Ok(result) => result,
                 Err(e) => {
                     error!("shells_builders failed with error: {:?}", e);
@@ -120,7 +120,7 @@ pub fn update_shells_by_name_on_params_change<Params: ParametricCad + Component 
             // Clear existing shells...
             shells_by_name.clear();
             // Build Shells from Builders and add to shells_by_name...
-            for (shell_name, shell_builder) in shells_lazy_builders.builders.iter() {
+            for (shell_name, shell_builder) in shells_builders.builders.iter() {
                 let cad_shell = match shell_builder.build_cad_shell() {
                     Ok(shell) => shell,
                     Err(e) => {
@@ -319,7 +319,7 @@ pub fn handle_spawn_meshes_builder_events<Params: ParametricCad + Component + Cl
             Entity,
             &CadShellName,
             &CadMeshName,
-            &mut CadMeshLazyBuilder<Params>,
+            &mut CadMeshBuilder<Params>,
             &BelongsToCadGeneratedRoot,
         ),
         Without<Cleanup>,
@@ -467,10 +467,10 @@ pub fn mesh_builder_to_bundle<Params: ParametricCad + Component + Clone>(
             Option<&CadGeneratedMesh>,
             &CadShellName,
             &CadMeshName,
-            &CadMeshLazyBuilder<Params>,
+            &CadMeshBuilder<Params>,
             &BelongsToCadGeneratedRoot,
         ),
-        (Changed<CadMeshLazyBuilder<Params>>, Without<Cleanup>),
+        (Changed<CadMeshBuilder<Params>>, Without<Cleanup>),
     >,
 ) {
     for (
@@ -499,7 +499,7 @@ pub fn mesh_builder_to_bundle<Params: ParametricCad + Component + Clone>(
                 continue;
             }
         };
-        let CadLazyMesh {
+        let CadMesh {
             mesh_hdl,
             base_material,
             transform,

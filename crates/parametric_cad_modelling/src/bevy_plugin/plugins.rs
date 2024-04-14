@@ -132,7 +132,7 @@ impl Plugin for ParametricCadModellingBasePlugin {
                 control_wire_frame_display.run_if(move || allow_wire_frames),
             )
             .add_systems(Startup, || {
-                info!("ParametricLazyCadModellingBasePlugin started!")
+                info!("ParametricCadModellingBasePlugin started!")
             });
     }
 }
@@ -185,6 +185,6 @@ impl<Params: ParametricCad + Component + Clone> Plugin
                 ),
             )
             // rest...
-            .add_systems(Startup, || info!("ParametricLazyCadParamsPlugin started!"));
+            .add_systems(Startup, || info!("ParametricCadParamsPlugin started!"));
     }
 }

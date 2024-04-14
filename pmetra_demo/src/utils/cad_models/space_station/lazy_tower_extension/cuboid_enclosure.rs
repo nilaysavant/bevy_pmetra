@@ -113,7 +113,7 @@ pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadSh
 pub fn cuboid_enclosure_mesh_builder(
     params: &LazyTowerExtension,
     shell_name: CadShellName,
-) -> Result<CadMeshLazyBuilder<LazyTowerExtension>> {
+) -> Result<CadMeshBuilder<LazyTowerExtension>> {
     let LazyTowerExtension {
         tower_length,
         enclosure_profile_depth,
@@ -123,7 +123,7 @@ pub fn cuboid_enclosure_mesh_builder(
     // spawn entity with generated mesh...
     let transform = Transform::default();
 
-    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+    let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::WHITE.with_a(0.0).into())?;
 

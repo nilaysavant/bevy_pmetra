@@ -50,7 +50,7 @@ pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShel
 pub fn cylinder_mesh_builder(
     params: &SimpleLazyCubeAtCylinder,
     shell_name: CadShellName,
-) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
+) -> Result<CadMeshBuilder<SimpleLazyCubeAtCylinder>> {
     let SimpleLazyCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
@@ -60,7 +60,7 @@ pub fn cylinder_mesh_builder(
     // spawn entity with generated mesh...
     let transform = Transform::default();
 
-    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+    let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::RED.into())?;
 

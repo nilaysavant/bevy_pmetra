@@ -10,8 +10,8 @@ pub use {cursors::*, meshes::*, shells::*, tags::*};
 
 /// Trait for parametrically generating [`CadShell`]s from struct.
 pub trait ParametricModelling: Clone + Default {
-    /// Gets the [`CadShellsLazyBuilders`] for this params struct.
-    fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>>;
+    /// Gets the [`CadShellsBuilders`] for this params struct.
+    fn shells_builders(&self) -> Result<CadShellsBuilders<Self>>;
 }
 
 /// Trait for parametrically generating models with cursors from struct.
@@ -19,7 +19,7 @@ pub trait ParametricCad: ParametricModelling {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
-    ) -> Result<CadMeshesLazyBuildersByCadShell<Self>>;
+    ) -> Result<CadMeshesBuildersByCadShell<Self>>;
 
     /// Configure Cursors.
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors>;
@@ -50,8 +50,8 @@ mod test {
         }
 
         impl ParametricModelling for Cube {
-            fn shells_builders(&self) -> Result<CadShellsLazyBuilders<Self>> {
-                CadShellsLazyBuilders::default().add_shell_builder(
+            fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
+                CadShellsBuilders::default().add_shell_builder(
                     CadShellName("s1".into()),
                     |p: &Self| Ok(CadShell::default()),
                 )
@@ -62,12 +62,12 @@ mod test {
             fn meshes_builders_by_shell(
                 &self,
                 shells_by_name: &CadShellsByName,
-            ) -> Result<CadMeshesLazyBuildersByCadShell<Self>> {
-                CadMeshesLazyBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
+            ) -> Result<CadMeshesBuildersByCadShell<Self>> {
+                CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                     .add_mesh_builder(
                         CadShellName("s1".into()),
                         "m1".into(),
-                        CadMeshLazyBuilder::new(self.clone(), CadShellName("s1".into()))?
+                        CadMeshBuilder::new(self.clone(), CadShellName("s1".into()))?
                             .set_transform(Transform::default())?
                             .set_base_material(StandardMaterial::default())?,
                     )
@@ -95,7 +95,7 @@ mod test {
         }
 
         pub fn build_cursor_c1(
-            builder: &CadMeshLazyBuilder<Cube>,
+            builder: &CadMeshBuilder<Cube>,
             shell: &CadShell,
         ) -> Result<CadCursor> {
             Ok(CadCursor::default())

@@ -286,13 +286,13 @@ fn get_shell_face_mut_from_normal_dir(
 pub fn build_cabin_mesh(
     params: &LazyRoundCabinSegment,
     shell_name: CadShellName,
-) -> Result<CadMeshLazyBuilder<LazyRoundCabinSegment>> {
+) -> Result<CadMeshBuilder<LazyRoundCabinSegment>> {
     let LazyRoundCabinSegment { profile_width, .. } = params;
 
     // spawn entity with generated mesh...
     let main_mesh_transform: Transform = Transform::from_translation(Vec3::ZERO);
     // Init cad mesh from mesh stuff...
-    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name)? // builder
+    let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name)? // builder
         .set_base_material(Color::RED.into())?
         .set_transform(main_mesh_transform)?;
 

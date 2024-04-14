@@ -61,7 +61,7 @@ pub fn cube_mesh_builder(
     shell_name: CadShellName,
     shells_by_name: &CadShellsByName,
     rot_y: f32,
-) -> Result<CadMeshLazyBuilder<SimpleLazyCubeAtCylinder>> {
+) -> Result<CadMeshBuilder<SimpleLazyCubeAtCylinder>> {
     let SimpleLazyCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
@@ -88,7 +88,7 @@ pub fn cube_mesh_builder(
     );
     transform.rotate_around(Vec3::ZERO, Quat::from_rotation_y(rot_y));
 
-    let mesh_builder = CadMeshLazyBuilder::new(params.clone(), shell_name.clone())? // builder
+    let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::BLUE.into())?;
 
