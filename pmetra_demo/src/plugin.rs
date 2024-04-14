@@ -90,9 +90,9 @@ impl Plugin for PmetraDemoPlugin {
                 PmetraBasePlugin {
                     allow_wire_frames: true,
                 },
-                ParametricCadParamsPlugin::<SimpleCubeAtCylinder>::default(),
-                ParametricCadParamsPlugin::<TowerExtension>::default(),
-                ParametricCadParamsPlugin::<RoundCabinSegment>::default(),
+                PmetraModellingPlugin::<SimpleCubeAtCylinder>::default(),
+                PmetraModellingPlugin::<TowerExtension>::default(),
+                PmetraModellingPlugin::<RoundCabinSegment>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()

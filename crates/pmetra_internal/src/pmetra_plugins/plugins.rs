@@ -46,7 +46,7 @@ use super::{
     },
 };
 
-/// Base [`bevy`] [`Plugin`] for Interactive/Parametric/CAD modelling.
+/// Base [`Plugin`] for *Interactive/Parametric/CAD* modelling.
 /// 
 /// Add this plugin just **once** to your Bevy app.
 /// Before the other plugins of Pmetra.
@@ -141,18 +141,20 @@ impl Plugin for PmetraBasePlugin {
     }
 }
 
-/// Parametric CAD Modelling [`bevy`] [`Plugin`].
-///
-/// Accepts [`Params`] (generic parameter) that should implement: [`ParametricCad`] + [`Component`].
-///
-/// The [`Plugin`] then allows generating CAD models using the passed [`Params`].
+/// Modelling [`Plugin`] for Pmetra.
+/// 
+/// This [`Plugin`] allows generating models for the passed [`Params`].
+/// 
+/// Each [`Params`] struct will allow generating its own composition of model(s).
+/// 
+/// You will have to add multiple instances of this plugin with different [`Params`] type for each kind of composition.
 #[derive(Default)]
-pub struct ParametricCadParamsPlugin<Params: ParametricCad + Component> {
+pub struct PmetraModellingPlugin<Params: ParametricCad + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: ParametricCad + Component + Clone> Plugin for ParametricCadParamsPlugin<Params> {
+impl<Params: ParametricCad + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App
@@ -187,6 +189,6 @@ impl<Params: ParametricCad + Component + Clone> Plugin for ParametricCadParamsPl
                 ),
             )
             // rest...
-            .add_systems(Startup, || info!("ParametricCadParamsPlugin started!"));
+            .add_systems(Startup, || info!("PmetraModellingPlugin started!"));
     }
 }
