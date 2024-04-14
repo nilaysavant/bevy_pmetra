@@ -201,6 +201,7 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraInteractio
                 Update,
                 (
                     shells_to_sliders::<Params>
+                        // Need the below for smooth/less jittery behavior...
                         .after(update_shells_by_name_on_params_change::<Params>)
                         .before(shells_to_mesh_builder_events::<Params>),
                     update_params_from_sliders::<Params>,
