@@ -46,16 +46,16 @@ use super::{
     },
 };
 
-/// Base [`bevy`] [`Plugin`] for Parametric CAD Modelling.
+/// Base [`bevy`] [`Plugin`] for Interactive/Parametric/CAD modelling.
 #[derive(Default)]
-pub struct ParametricCadModellingBasePlugin {
+pub struct PmetraBasePlugin {
     /// Allows setting the wire-frame display on meshes via [`WireFramePlugin`].
     ///
     /// PS: **Only available in native environments.**
     pub allow_wire_frames: bool,
 }
 
-impl Plugin for ParametricCadModellingBasePlugin {
+impl Plugin for PmetraBasePlugin {
     fn build(&self, app: &mut App) {
         let Self {
             allow_wire_frames, ..
@@ -133,7 +133,7 @@ impl Plugin for ParametricCadModellingBasePlugin {
                 control_wire_frame_display.run_if(move || allow_wire_frames),
             )
             .add_systems(Startup, || {
-                info!("ParametricCadModellingBasePlugin started!")
+                info!("PmetraBasePlugin started!")
             });
     }
 }

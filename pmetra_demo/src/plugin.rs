@@ -87,7 +87,7 @@ impl Plugin for PmetraDemoPlugin {
             .add_systems(Update, orbit_cam_custom_input_map_controller)
             // cad...
             .add_plugins((
-                ParametricCadModellingBasePlugin {
+                PmetraBasePlugin {
                     allow_wire_frames: true,
                 },
                 ParametricCadParamsPlugin::<SimpleCubeAtCylinder>::default(),
