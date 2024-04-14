@@ -1,11 +1,11 @@
 use std::{f64::consts::PI, str::FromStr};
 
-use anyhow::{anyhow, Context, Error, Ok, Result};
-use bevy::{math::DVec3, prelude::*, utils::HashMap};
+use anyhow::{Ok, Result};
+use bevy::prelude::*;
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{
     cad_core::lazy_builders::{
-        CadMeshLazyBuilder, CadMeshesLazyBuilder, CadMeshesLazyBuildersByCadShell, CadShellName,
+        CadMeshesLazyBuildersByCadShell, CadShellName,
         CadShellsByName, CadShellsLazyBuilders, ParametricLazyCad, ParametricLazyModelling,
     },
     prelude::*,

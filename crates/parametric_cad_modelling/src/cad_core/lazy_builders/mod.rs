@@ -1,7 +1,7 @@
 use anyhow::Result;
-use bevy::{prelude::*, utils::HashMap};
+use bevy::prelude::*;
 
-use super::builders::{CadCursor, CadCursorName, CadCursors, CadMeshName, CadShell};
+use super::builders::{CadCursorName, CadCursors};
 
 /// Meshes builders.
 pub mod meshes;
@@ -40,9 +40,7 @@ pub trait ParametricLazyCad: ParametricLazyModelling {
 }
 
 mod test {
-    use anyhow::anyhow;
-
-    use crate::cad_core::builders::{BuildCadMeshOutlines, CadCursor, CadMeshOutlines, CadShell};
+    use crate::cad_core::builders::{CadCursor, CadShell};
 
     use super::*;
 

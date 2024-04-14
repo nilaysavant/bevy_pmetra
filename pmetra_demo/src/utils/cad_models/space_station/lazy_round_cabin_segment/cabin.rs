@@ -1,10 +1,10 @@
 use std::f64::consts::FRAC_PI_2;
 
 use anyhow::{anyhow, Context, Result};
-use bevy::{math::DVec3, prelude::*, utils::HashSet};
+use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
-        extensions::{face::FaceCadExtension, transform::UvFaceTransform},
+        extensions::face::FaceCadExtension,
         lazy_builders::{CadMeshLazyBuilder, CadShellName, CadShellsByName},
     },
     math::get_rotation_from_normals,
@@ -14,13 +14,12 @@ use bevy_pmetra::{
         Vector3,
     },
 };
-use strum::{Display, EnumString};
 
 use crate::utils::cad_models::space_station::common::{
     get_corner_arcs_for_corner_vertices, get_profile_from_corner_arcs, ref_edge_direction_for_wire,
 };
 
-use super::{CadMaterialIds, CadShellIds, LazyRoundCabinSegment};
+use super::{CadShellIds, LazyRoundCabinSegment};
 
 pub fn build_cabin_shell(params: &LazyRoundCabinSegment) -> Result<CadShell> {
     let LazyRoundCabinSegment {

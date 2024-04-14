@@ -1,22 +1,14 @@
-use std::hash::Hash;
+use anyhow::{anyhow, Result};
+use bevy::{prelude::*, utils::HashMap};
 
-use anyhow::{anyhow, Context, Result};
-use bevy::{prelude::*, render::mesh, utils::HashMap};
-use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
-use truck_modeling::{builder, Shell, Solid};
-use truck_topology::shell;
-
-use crate::{
+use crate::
     cad_core::{
         builders::{
-            BuildCadMeshOutlines, CadCursor, CadCursorName, CadMeshName, CadMeshOutlines,
-            CadMeshes, CadShell,
+            BuildCadMeshOutlines, CadMeshName, CadMeshOutlines,
         },
-        dimensions::AsBevyVec3,
         meshing::{BuildBevyMesh, BuildPolygon},
-    },
-    constants::CUSTOM_TRUCK_TOLERANCE_1,
-};
+    }
+;
 
 use super::{CadShellName, CadShellsByName};
 

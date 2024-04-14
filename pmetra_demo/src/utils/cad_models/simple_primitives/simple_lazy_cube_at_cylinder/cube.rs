@@ -1,6 +1,4 @@
-use std::f64::consts::{FRAC_PI_2, PI, TAU};
-
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{anyhow, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
@@ -10,11 +8,9 @@ use bevy_pmetra::{
     math::get_rotation_from_normals,
     prelude::*,
     re_exports::truck_modeling::{
-        builder, cgmath::AbsDiffEq, control_point::ControlPoint, Homogeneous, ParametricSurface3D,
-        Point3, Rad, Shell, Vector3, Vertex, Wire,
+        builder, control_point::ControlPoint, ParametricSurface3D, Shell, Vector3, Vertex,
     },
 };
-use strum::{Display, EnumString};
 
 use super::{CadShellIds, SimpleLazyCubeAtCylinder};
 

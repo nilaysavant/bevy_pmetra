@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use anyhow::{Ok, Result};
-use bevy::{prelude::*, transform};
+use bevy::prelude::*;
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{
     cad_core::lazy_builders::{

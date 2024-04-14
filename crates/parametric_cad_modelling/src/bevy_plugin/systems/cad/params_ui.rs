@@ -5,9 +5,9 @@ use crate::{
     bevy_plugin::{
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot,
-                CadGeneratedCursor, CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
-                CadGeneratedMesh, CadGeneratedRoot,
+                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot,
+                CadGeneratedCursor, CadGeneratedCursorDragPlane,
+                CadGeneratedRoot,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
@@ -15,7 +15,7 @@ use crate::{
         events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
     cad_core::{
-        builders::{CadCursorName, CadMeshName},
+        builders::CadCursorName,
         lazy_builders::ParametricLazyCad,
     },
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,

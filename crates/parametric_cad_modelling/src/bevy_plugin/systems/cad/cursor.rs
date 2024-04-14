@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_mod_picking::{
-    backend::HitData, backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*,
+    backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*,
 };
 
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedCursor, BelongsToCadGeneratedMesh, BelongsToCadGeneratedRoot,
+                BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot,
                 CadGeneratedCursor, CadGeneratedCursorConfig, CadGeneratedCursorDragPlane,
                 CadGeneratedCursorPreviousTransform, CadGeneratedCursorState, CadGeneratedMesh,
                 CadGeneratedRoot,
@@ -19,7 +19,7 @@ use crate::{
         events::cursor::TransformCursorEvent,
     },
     cad_core::{
-        builders::{CadCursorName, CadCursorType, CadMeshName},
+        builders::{CadCursorName, CadCursorType},
         lazy_builders::ParametricLazyCad,
     },
     math::get_rotation_from_normals,

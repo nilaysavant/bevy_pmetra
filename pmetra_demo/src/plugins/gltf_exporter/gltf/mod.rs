@@ -1,10 +1,10 @@
 use std::io::Cursor;
 
 use anyhow::{anyhow, Result};
-use base64::{engine::general_purpose::STANDARD, write::EncoderWriter, Engine};
+use base64::{engine::general_purpose::STANDARD, Engine};
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 use gltf::json;
-use image::{ImageOutputFormat, RgbaImage};
+use image::RgbaImage;
 use itertools::Itertools;
 use json::validation::Checked::Valid;
 

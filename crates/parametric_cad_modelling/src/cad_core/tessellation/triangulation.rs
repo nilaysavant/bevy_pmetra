@@ -2,18 +2,16 @@ use bevy::utils::HashMap;
 use rustc_hash::FxHashMap;
 #[cfg(not(target_arch = "wasm32"))]
 use truck_meshalgo::tessellation::triangulation::rayon::iter::{
-    IntoParallelIterator, IntoParallelRefIterator, ParallelIterator,
+    IntoParallelIterator, ParallelIterator,
 };
 use truck_meshalgo::tessellation::{
     triangulation::shell_create_polygon, Parallelizable, PolylineableCurve, PreMeshableSurface,
 };
 
-use truck_modeling::{Point2, Point3};
+use truck_modeling::Point3;
 use truck_topology::{Edge, Face, FaceID, Shell, Wire};
 
 use crate::cad_core::tessellation::{CadMeshedShell, PolylineCurve};
-
-use super::MeshedShell;
 
 /// Tessellates faces
 #[cfg(not(target_arch = "wasm32"))]

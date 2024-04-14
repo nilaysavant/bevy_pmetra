@@ -3,7 +3,7 @@ use bevy_mod_picking::prelude::*;
 
 use crate::{
     bevy_plugin::components::cad::{
-        BelongsToCadGeneratedMesh, CadGeneratedCursor, CadGeneratedMesh,
+        CadGeneratedMesh,
         CadGeneratedMeshOutlinesState,
     },
     prelude::{BelongsToCadGeneratedRoot, CadGeneratedRoot, CadGeneratedRootSelectionState},

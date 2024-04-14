@@ -2,7 +2,7 @@ use anyhow::Result;
 use bevy::{
     asset::{Assets, Handle},
     prelude::StandardMaterial,
-    render::{color::Color, render_resource::Face, texture::Image},
+    render::{color::Color, texture::Image},
 };
 use gltf::{
     json::{

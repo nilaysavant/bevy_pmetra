@@ -4,10 +4,9 @@ use truck_meshalgo::{
     rexport_polymesh::PolygonMesh,
     tessellation::{
         triangulation::by_search_parameter, MeshableSurface, MeshedShape, PolylineableCurve,
-        PreMeshableSurface,
     },
 };
-use truck_modeling::{Point3, Surface};
+use truck_modeling::Point3;
 use truck_topology::{Face, FaceID, Shell};
 
 pub mod triangulation;

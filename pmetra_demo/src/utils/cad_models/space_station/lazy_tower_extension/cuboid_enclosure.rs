@@ -1,24 +1,17 @@
-use std::f64::consts::{FRAC_PI_2, PI, TAU};
-
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{anyhow, Context, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     cad_core::{
         extensions::shell::ShellCadExtension,
-        lazy_builders::{CadMeshLazyBuilder, CadMeshesLazyBuilder, CadShellName, CadShellsByName},
+        lazy_builders::{CadMeshLazyBuilder, CadShellName, CadShellsByName},
     },
     math::get_rotation_from_normals,
     prelude::*,
-    re_exports::{
-        truck_modeling::{
-            builder, cgmath::AbsDiffEq, control_point::ControlPoint, Curve, Edge,
-            ParametricSurface3D, Point3, Rad, Shell, Vector3, Vertex, Wire,
-        },
-        truck_topology::{VertexDisplayFormat, WireDisplayFormat},
+    re_exports::truck_modeling::{
+        builder, cgmath::AbsDiffEq, ParametricSurface3D, Point3, Shell, Vector3, Vertex, Wire,
     },
 };
 use itertools::Itertools;
-use strum::{Display, EnumString};
 
 use super::{CadShellIds, LazyTowerExtension};
 

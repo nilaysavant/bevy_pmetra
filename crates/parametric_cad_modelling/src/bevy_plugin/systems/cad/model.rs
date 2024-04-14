@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use bevy::{pbr::NotShadowCaster, prelude::*, render::primitives::Aabb, utils::HashMap};
+use bevy::{pbr::NotShadowCaster, prelude::*, render::primitives::Aabb};
 use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
@@ -26,9 +26,9 @@ use crate::{
         },
     },
     cad_core::{
-        builders::{CadCursor, CadCursorName, CadMeshName, CadShell},
+        builders::{CadCursor, CadCursorName, CadMeshName},
         lazy_builders::{
-            CadLazyMesh, CadMeshLazyBuilder, CadShellLazyBuilder, CadShellName, CadShellsByName,
+            CadLazyMesh, CadMeshLazyBuilder, CadShellName, CadShellsByName,
             ParametricLazyCad,
         },
     },

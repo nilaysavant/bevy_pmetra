@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context, Ok, Result};
 use bevy::{prelude::*, utils::HashMap};
 use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
-use truck_modeling::{builder, Shell, Solid};
+use truck_modeling::{builder, Shell};
 
 use crate::{cad_core::dimensions::AsBevyVec3, constants::CUSTOM_TRUCK_TOLERANCE_1};
 

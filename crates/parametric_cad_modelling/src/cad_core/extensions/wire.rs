@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use truck_modeling::{builder, Edge, Wire};
+use truck_modeling::{builder, Wire};
 
 /// Extensions to [`Wire`] primitive.
 pub trait WireCadExtension: Sized {
