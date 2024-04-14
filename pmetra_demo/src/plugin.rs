@@ -51,7 +51,7 @@ impl Plugin for PmetraDemoPlugin {
                 log_filter_debug: vec![
                     (env!("CARGO_PKG_NAME"), "debug"),
                     ("bevy_pmetra", "debug"),
-                    ("parametric_cad_modelling", "debug"),
+                    ("pmetra_internal", "debug"),
                 ],
                 log_filter_release: vec![(env!("CARGO_PKG_NAME"), "info")],
             });
@@ -90,9 +90,15 @@ impl Plugin for PmetraDemoPlugin {
                 PmetraBasePlugin {
                     allow_wire_frames: true,
                 },
+                // SimpleCubeAtCylinder
                 PmetraModellingPlugin::<SimpleCubeAtCylinder>::default(),
+                PmetraInteractionsPlugin::<SimpleCubeAtCylinder>::default(),
+                // TowerExtension
                 PmetraModellingPlugin::<TowerExtension>::default(),
+                PmetraInteractionsPlugin::<TowerExtension>::default(),
+                // RoundCabinSegment
                 PmetraModellingPlugin::<RoundCabinSegment>::default(),
+                PmetraInteractionsPlugin::<RoundCabinSegment>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()

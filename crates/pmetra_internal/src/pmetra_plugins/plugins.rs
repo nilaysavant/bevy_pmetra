@@ -147,12 +147,12 @@ impl Plugin for PmetraBasePlugin {
 ///
 /// You will have to add multiple instances of this plugin with different [`Params`] type for each kind of composition.
 #[derive(Default)]
-pub struct PmetraModellingPlugin<Params: PmetraInteractions + Component> {
+pub struct PmetraModellingPlugin<Params: PmetraModelling + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
+impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App
@@ -168,7 +168,6 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraModellingP
                     // Model...
                     spawn_shells_by_name_on_generate::<Params>,
                     update_shells_by_name_on_params_change::<Params>,
-                    shells_to_sliders::<Params>,
                     shells_to_mesh_builder_events::<Params>,
                     handle_spawn_meshes_builder_events::<Params>,
                     mesh_builder_to_bundle::<Params>,
@@ -176,8 +175,37 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraModellingP
                     // chain seems to make the model update run more stable/smooth (less jittery).
                     .chain(),
             )
+            // rest...
+            .add_systems(Startup, || info!("PmetraModellingPlugin started!"));
+    }
+}
+
+/// Interactions [`Plugin`] for Pmetra.
+///
+/// This [`Plugin`] allows generating **slider/grip** handles for the passed [`Params`].
+///
+/// Sliders can be used to manipulate the models via manipulating the [`Params`] struct.
+///
+/// This plugin will need to be added on each [`Params`] type that needs interactions.
+#[derive(Default)]
+pub struct PmetraInteractionsPlugin<Params: PmetraInteractions + Component> {
+    /// Owns the params type to prevent compiler complains.
+    _params_type: PhantomData<Params>,
+}
+
+impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraInteractionsPlugin<Params> {
+    fn build(&self, app: &mut App) {
+        app // App
             // Sliders...
-            .add_systems(Update, update_params_from_sliders::<Params>)
+            .add_systems(
+                Update,
+                (
+                    shells_to_sliders::<Params>
+                        .after(update_shells_by_name_on_params_change::<Params>)
+                        .before(shells_to_mesh_builder_events::<Params>),
+                    update_params_from_sliders::<Params>,
+                ),
+            )
             // Params UI...
             .add_systems(
                 Update,
@@ -186,7 +214,6 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraModellingP
                     move_params_display_ui_on_transform_slider::<Params>,
                 ),
             )
-            // rest...
-            .add_systems(Startup, || info!("PmetraModellingPlugin started!"));
+            .add_systems(Startup, || info!("PmetraInteractionsPlugin started!"));
     }
 }
