@@ -4,23 +4,22 @@ use bevy_mod_picking::{
 };
 
 use crate::{
+    math::get_rotation_from_normals,
+    pmetra_core::builders::{CadSliderName, CadSliderType, PmetraInteractions, PmetraModelling},
     pmetra_plugins::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedSlider, BelongsToCadGeneratedRoot, CadGeneratedSlider,
+                BelongsToCadGeneratedRoot, BelongsToCadGeneratedSlider, CadGeneratedMesh,
+                CadGeneratedRoot, CadGeneratedRootSelectionState, CadGeneratedSlider,
                 CadGeneratedSliderConfig, CadGeneratedSliderDragPlane,
-                CadGeneratedSliderPreviousTransform, CadGeneratedSliderState, CadGeneratedMesh,
-                CadGeneratedRoot,
+                CadGeneratedSliderPreviousTransform, CadGeneratedSliderState,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
         events::slider::TransformSliderEvent,
     },
-    pmetra_core::builders::{CadSliderName, CadSliderType, PmetraModelling},
-    math::get_rotation_from_normals,
-    prelude::CadGeneratedRootSelectionState,
 };
 
 pub fn update_slider_visibility_based_on_root_selection(
@@ -151,9 +150,7 @@ pub fn slider_drag_end(
 ) {
     let slider = drag_event.target();
     // Remove drag planes...
-    for (entity, BelongsToCadGeneratedSlider(cur_slider_entity)) in
-        cad_slider_drag_planes.iter()
-    {
+    for (entity, BelongsToCadGeneratedSlider(cur_slider_entity)) in cad_slider_drag_planes.iter() {
         if *cur_slider_entity != slider {
             continue;
         }
@@ -257,7 +254,7 @@ pub fn transform_slider(
     }
 }
 
-pub fn update_params_from_sliders<Params: PmetraModelling + Component>(
+pub fn update_params_from_sliders<Params: PmetraInteractions + Component>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
     sliders: Query<
         (

@@ -8,16 +8,16 @@ use bevy_mod_picking::{
 use crate::{
     pmetra_core::builders::{
         CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, CadSlider,
-        CadSliderName, PmetraModelling,
+        CadSliderName, PmetraInteractions, PmetraModelling,
     },
     pmetra_plugins::{
         cleanup_manager::Cleanup,
         components::{
             cad::{
-                BelongsToCadGeneratedRoot, CadGeneratedSlider, CadGeneratedSliderConfig,
-                CadGeneratedSliderPreviousTransform, CadGeneratedSliderState, CadGeneratedMesh,
-                CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState, CadGeneratedRoot,
-                CadGeneratedRootSelectionState,
+                BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedMeshOutlines,
+                CadGeneratedMeshOutlinesState, CadGeneratedRoot, CadGeneratedRootSelectionState,
+                CadGeneratedSlider, CadGeneratedSliderConfig, CadGeneratedSliderPreviousTransform,
+                CadGeneratedSliderState,
             },
             wire_frame::WireFrameDisplaySettings,
         },
@@ -32,8 +32,8 @@ use crate::{
 };
 
 use super::{
-    slider::{slider_drag_end, slider_drag_start},
     mesh::{mesh_pointer_move, mesh_pointer_out},
+    slider::{slider_drag_end, slider_drag_start},
 };
 
 pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Clone>(
@@ -140,7 +140,7 @@ pub fn update_shells_by_name_on_params_change<Params: PmetraModelling + Componen
     }
 }
 
-pub fn shells_to_sliders<Params: PmetraModelling + Component + Clone>(
+pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
     mut commands: Commands,
     cad_generated: Query<&Params, (With<CadGeneratedRoot>, Without<Cleanup>)>,
     shells_by_name_entities: Query<
@@ -183,9 +183,11 @@ pub fn shells_to_sliders<Params: PmetraModelling + Component + Clone>(
             } = slider;
 
             if let Some((_, _, _, mut slider_transform, mut prev_transform, slider_state)) =
-                slider_comps.iter_mut().find(|(_, name, bel_root, _, _, _)| {
-                    *name == slider_name && bel_root.0 == root_ent
-                })
+                slider_comps
+                    .iter_mut()
+                    .find(|(_, name, bel_root, _, _, _)| {
+                        *name == slider_name && bel_root.0 == root_ent
+                    })
             {
                 // If slider already exists, update it...
                 // Update transform only in normal state...

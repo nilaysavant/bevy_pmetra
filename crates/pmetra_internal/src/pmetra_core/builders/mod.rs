@@ -21,7 +21,10 @@ pub trait PmetraModelling: PmetraCad {
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesBuildersByCadShell<Self>>;
+}
 
+/// Setup interactions for live manipulations on models using [`CadSlider`]s.
+pub trait PmetraInteractions: PmetraModelling {
     /// Configure sliders.
     fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders>;
 
@@ -73,7 +76,9 @@ mod test {
                             .set_base_material(StandardMaterial::default())?,
                     )
             }
+        }
 
+        impl PmetraInteractions for Cube {
             fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
                 let mut sliders = CadSliders::default();
                 sliders.insert(CadSliderName("c1".into()), CadSlider::default());

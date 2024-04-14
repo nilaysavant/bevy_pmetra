@@ -8,10 +8,10 @@ use bevy::{
 use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlugins};
 
 use crate::{
+    pmetra_core::builders::{PmetraInteractions, PmetraModelling},
     pmetra_plugins::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
     },
-    pmetra_core::builders::PmetraModelling,
 };
 
 use super::{
@@ -23,17 +23,13 @@ use super::{
     resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
         cad::{
-            slider::{
-                draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,
-                update_slider_visibility_based_on_root_selection, update_params_from_sliders,
-            },
             mesh::{
                 handle_mesh_selection, show_mesh_local_debug_axis,
                 update_root_selection_based_on_mesh_selection,
             },
             model::{
-                handle_spawn_meshes_builder_events, mesh_builder_to_bundle, shells_to_sliders,
-                shells_to_mesh_builder_events, spawn_shells_by_name_on_generate,
+                handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
+                shells_to_mesh_builder_events, shells_to_sliders, spawn_shells_by_name_on_generate,
                 update_shells_by_name_on_params_change,
             },
             outlines::generate_mesh_outlines,
@@ -41,13 +37,17 @@ use super::{
                 hide_params_display_ui_on_out_slider, move_params_display_ui_on_transform_slider,
                 setup_param_display_ui, show_params_display_ui_on_hover_slider,
             },
+            slider::{
+                draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,
+                update_params_from_sliders, update_slider_visibility_based_on_root_selection,
+            },
         },
         wire_frame::control_wire_frame_display,
     },
 };
 
 /// Base [`Plugin`] for *Interactive/Parametric/CAD* modelling.
-/// 
+///
 /// Add this plugin just **once** to your Bevy app.
 /// Before the other plugins of Pmetra.
 #[derive(Default)]
@@ -135,26 +135,24 @@ impl Plugin for PmetraBasePlugin {
                 Update,
                 control_wire_frame_display.run_if(move || allow_wire_frames),
             )
-            .add_systems(Startup, || {
-                info!("PmetraBasePlugin started!")
-            });
+            .add_systems(Startup, || info!("PmetraBasePlugin started!"));
     }
 }
 
 /// Modelling [`Plugin`] for Pmetra.
-/// 
+///
 /// This [`Plugin`] allows generating models for the passed [`Params`].
-/// 
+///
 /// Each [`Params`] struct will allow generating its own composition of model(s).
-/// 
+///
 /// You will have to add multiple instances of this plugin with different [`Params`] type for each kind of composition.
 #[derive(Default)]
-pub struct PmetraModellingPlugin<Params: PmetraModelling + Component> {
+pub struct PmetraModellingPlugin<Params: PmetraInteractions + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
+impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App

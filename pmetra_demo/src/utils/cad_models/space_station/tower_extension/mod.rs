@@ -250,7 +250,9 @@ impl PmetraModelling for TowerExtension {
 
         Ok(cad_meshes_builders_by_cad_shell)
     }
+}
 
+impl PmetraInteractions for TowerExtension {
     fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
         let sliders = CadSliders::default().add_slider(
             CadSliderIds::TowerLengthSlider.to_string().into(),

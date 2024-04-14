@@ -109,7 +109,9 @@ impl PmetraModelling for RoundCabinSegment {
 
         Ok(cad_meshes_builders_by_cad_shell)
     }
+}
 
+impl PmetraInteractions for RoundCabinSegment {
     fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
         let sliders = CadSliders::default() // builder
             .add_slider(

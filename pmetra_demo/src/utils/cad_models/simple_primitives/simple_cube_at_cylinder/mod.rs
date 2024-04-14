@@ -102,7 +102,9 @@ impl PmetraModelling for SimpleCubeAtCylinder {
 
         Ok(cad_meshes_lazy_builders_by_cad_shell)
     }
+}
 
+impl PmetraInteractions for SimpleCubeAtCylinder {
     fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
         let sliders = CadSliders::default()
             .add_slider(

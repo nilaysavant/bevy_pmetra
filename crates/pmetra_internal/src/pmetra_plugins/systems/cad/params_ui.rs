@@ -2,19 +2,19 @@ use bevy::prelude::*;
 use bevy_mod_picking::picking_core::Pickable;
 
 use crate::{
+    constants::PARAMS_UI_BOTTOM_SHIFT_PX,
+    pmetra_core::builders::{CadSliderName, PmetraInteractions, PmetraModelling},
     pmetra_plugins::{
         components::{
             cad::{
-                BelongsToCadGeneratedSlider, BelongsToCadGeneratedRoot, CadGeneratedSlider,
-                CadGeneratedSliderDragPlane, CadGeneratedRoot,
+                BelongsToCadGeneratedRoot, BelongsToCadGeneratedSlider, CadGeneratedRoot,
+                CadGeneratedSlider, CadGeneratedSliderDragPlane,
             },
             camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
         events::slider::{SliderPointerMoveEvent, SliderPointerOutEvent, TransformSliderEvent},
     },
-    pmetra_core::builders::{CadSliderName, PmetraModelling},
-    constants::PARAMS_UI_BOTTOM_SHIFT_PX,
 };
 
 pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCamera>>) {
@@ -50,7 +50,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
     ));
 }
 
-pub fn show_params_display_ui_on_hover_slider<Params: PmetraModelling + Component>(
+pub fn show_params_display_ui_on_hover_slider<Params: PmetraInteractions + Component>(
     mut events: EventReader<SliderPointerMoveEvent>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
@@ -111,7 +111,7 @@ pub fn hide_params_display_ui_on_out_slider(
     }
 }
 
-pub fn move_params_display_ui_on_transform_slider<Params: PmetraModelling + Component>(
+pub fn move_params_display_ui_on_transform_slider<Params: PmetraInteractions + Component>(
     mut events: EventReader<TransformSliderEvent>,
     slider_drag_planes: Query<&BelongsToCadGeneratedSlider, With<CadGeneratedSliderDragPlane>>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
