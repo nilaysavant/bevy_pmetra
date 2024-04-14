@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
-    cad_core::extensions::shell::ShellCadExtension,
+    pmetra_core::extensions::shell::ShellCadExtension,
     math::get_rotation_from_normals,
     prelude::*,
     re_exports::truck_modeling::{

@@ -7,7 +7,7 @@ use truck_meshalgo::{
 use truck_modeling::{Shell, Surface};
 
 use crate::{
-    cad_core::{
+    pmetra_core::{
         builders::{CadElement, CadElementTag, CadTaggedElements},
         meshing::{BuildCadMeshedShell, BuildPolygon},
         tessellation::{CadMeshedShell, CustomMeshableShape},

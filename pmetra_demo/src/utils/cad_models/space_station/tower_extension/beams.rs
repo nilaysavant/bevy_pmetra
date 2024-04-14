@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context, Error, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
-    cad_core::extensions::shell::ShellCadExtension,
+    pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
     re_exports::truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire},
 };

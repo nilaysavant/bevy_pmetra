@@ -3,7 +3,7 @@ use std::f64::consts::FRAC_PI_2;
 use anyhow::{anyhow, Context, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
-    cad_core::extensions::face::FaceCadExtension,
+    pmetra_core::extensions::face::FaceCadExtension,
     math::get_rotation_from_normals,
     prelude::*,
     re_exports::truck_modeling::{

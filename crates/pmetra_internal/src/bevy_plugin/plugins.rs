@@ -10,14 +10,15 @@ use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlug
 use crate::{
     bevy_plugin::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
-    }, cad_core::builders::ParametricCad,
+    },
+    pmetra_core::builders::ParametricCad,
 };
 
 use super::{
     cleanup_manager::CleanupManagerPlugin,
     events::{
-        cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
         cad::{GenerateCadModel, SpawnMeshesBuilder},
+        cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
     resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
     systems::{
@@ -148,9 +149,7 @@ pub struct ParametricCadParamsPlugin<Params: ParametricCad + Component> {
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: ParametricCad + Component + Clone> Plugin
-    for ParametricCadParamsPlugin<Params>
-{
+impl<Params: ParametricCad + Component + Clone> Plugin for ParametricCadParamsPlugin<Params> {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App

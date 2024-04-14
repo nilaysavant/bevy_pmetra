@@ -18,7 +18,7 @@ use crate::{
         },
         events::cursor::TransformCursorEvent,
     },
-    cad_core::builders::{CadCursorName, CadCursorType, ParametricCad},
+    pmetra_core::builders::{CadCursorName, CadCursorType, ParametricCad},
     math::get_rotation_from_normals,
     prelude::CadGeneratedRootSelectionState,
 };

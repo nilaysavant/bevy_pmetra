@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use bevy::{prelude::*, utils::HashMap};
 
-use crate::cad_core::builders::{CadShellName, ParametricCad};
+use crate::pmetra_core::builders::{CadShellName, ParametricCad};
 
 use super::events::cad::SpawnMeshesBuilder;
 

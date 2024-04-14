@@ -25,7 +25,7 @@ use crate::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
-    cad_core::builders::{CadCursor, CadCursorName, CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricCad},
+    pmetra_core::builders::{CadCursor, CadCursorName, CadMesh, CadMeshBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricCad},
 };
 
 use super::{

@@ -11,7 +11,7 @@ use truck_meshalgo::tessellation::{
 use truck_modeling::Point3;
 use truck_topology::{Edge, Face, FaceID, Shell, Wire};
 
-use crate::cad_core::tessellation::{CadMeshedShell, PolylineCurve};
+use crate::pmetra_core::tessellation::{CadMeshedShell, PolylineCurve};
 
 /// Tessellates faces
 #[cfg(not(target_arch = "wasm32"))]

@@ -38,7 +38,7 @@ pub trait ParametricCad: ParametricModelling {
 }
 
 mod test {
-    use crate::cad_core::builders::CadCursor;
+    use crate::pmetra_core::builders::CadCursor;
 
     use super::*;
 

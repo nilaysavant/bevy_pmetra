@@ -6,9 +6,9 @@
 pub mod bevy_mesh;
 /// Plugin for integrating with [`bevy`].
 pub mod bevy_plugin;
-/// Core Data Structures/Traits/Extensions/Types for CAD Modelling.
-pub mod cad_core;
-/// Constants used in CAD generations.
+/// Core Data Structures/Traits/Extensions/Types.
+pub mod pmetra_core;
+/// Constants.
 pub mod constants;
 /// Math utilities.
 pub mod math;
@@ -23,7 +23,7 @@ pub mod prelude {
             components::cad::*, components::camera::*, components::wire_frame::*, events::cad::*,
             plugins::*,
         },
-        cad_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
+        pmetra_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
         constants::*,
     };
 }

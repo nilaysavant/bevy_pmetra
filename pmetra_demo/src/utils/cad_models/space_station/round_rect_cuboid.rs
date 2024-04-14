@@ -4,7 +4,7 @@ use anyhow::{Context, Error, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{
-    cad_core::extensions::shell::ShellCadExtension,
+    pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
     re_exports::truck_modeling::{builder, Shell, Vector3},
 };

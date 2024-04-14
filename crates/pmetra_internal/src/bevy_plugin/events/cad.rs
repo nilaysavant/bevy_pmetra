@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    cad_core::builders::{CadMeshesBuilder, CadShellName, ParametricCad},
+    pmetra_core::builders::{CadMeshesBuilder, CadShellName, ParametricCad},
     prelude::BelongsToCadGeneratedRoot,
 };
 

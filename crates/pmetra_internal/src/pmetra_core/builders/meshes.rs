@@ -4,7 +4,7 @@ use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
 use truck_modeling::{builder, Shell};
 
 use crate::{
-    cad_core::{
+    pmetra_core::{
         dimensions::AsBevyVec3,
         meshing::{BuildBevyMesh, BuildPolygon},
     },

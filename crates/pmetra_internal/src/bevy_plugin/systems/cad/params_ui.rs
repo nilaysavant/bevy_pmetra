@@ -13,7 +13,7 @@ use crate::{
         },
         events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
-    cad_core::builders::{CadCursorName, ParametricCad},
+    pmetra_core::builders::{CadCursorName, ParametricCad},
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,
 };
 
