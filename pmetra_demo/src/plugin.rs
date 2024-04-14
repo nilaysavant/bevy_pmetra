@@ -24,10 +24,10 @@ use crate::{
         scene::{scene_setup, test_manual_mesh_gen},
     },
     utils::cad_models::{
-        simple_primitives::simple_lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
+        simple_primitives::lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
         space_station::{
-            lazy_round_cabin_segment::LazyRoundCabinSegment,
-            lazy_tower_extension::LazyTowerExtension, RoundRectCuboid,
+            round_cabin_segment::LazyRoundCabinSegment,
+            tower_extension::LazyTowerExtension, RoundRectCuboid,
         },
     },
 };
