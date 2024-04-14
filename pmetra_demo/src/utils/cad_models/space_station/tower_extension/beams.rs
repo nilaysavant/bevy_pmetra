@@ -7,11 +7,11 @@ use bevy_pmetra::{
 };
 use itertools::Itertools;
 
-use super::LazyTowerExtension;
+use super::TowerExtension;
 
 /// Straight Beam Shell Builder.
-pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
-    let LazyTowerExtension {
+pub fn build_straight_beam_shell(params: &TowerExtension) -> Result<CadShell> {
+    let TowerExtension {
         tower_length,
         straight_beam_l_sect_side_len,
         straight_beam_l_sect_thickness,
@@ -33,8 +33,8 @@ pub fn build_straight_beam_shell(params: &LazyTowerExtension) -> Result<CadShell
 }
 
 /// Cross Beam Shell Builder.
-pub fn build_cross_beam_shell(params: &LazyTowerExtension) -> Result<CadShell> {
-    let LazyTowerExtension {
+pub fn build_cross_beam_shell(params: &TowerExtension) -> Result<CadShell> {
+    let TowerExtension {
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
         enclosure_profile_width,
@@ -111,11 +111,11 @@ pub fn l_beam_shell(l_side_length: f64, thickness: f64, length: f64) -> Result<S
 }
 
 pub fn straight_beam_mesh_builder(
-    params: &LazyTowerExtension,
+    params: &TowerExtension,
     shell_name: CadShellName,
     transform: Transform,
-) -> Result<CadMeshBuilder<LazyTowerExtension>> {
-    let LazyTowerExtension {
+) -> Result<CadMeshBuilder<TowerExtension>> {
+    let TowerExtension {
         tower_length,
         straight_beam_l_sect_side_len,
         straight_beam_l_sect_thickness,
@@ -131,11 +131,11 @@ pub fn straight_beam_mesh_builder(
 }
 
 pub fn cross_beam_mesh_builder(
-    params: &LazyTowerExtension,
+    params: &TowerExtension,
     shell_name: CadShellName,
     transform: Transform,
-) -> Result<CadMeshBuilder<LazyTowerExtension>> {
-    let LazyTowerExtension {
+) -> Result<CadMeshBuilder<TowerExtension>> {
+    let TowerExtension {
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
         ..
@@ -154,7 +154,7 @@ mod tests {
 
     #[test]
     pub fn test_shell_builder() {
-        let params = LazyTowerExtension {
+        let params = TowerExtension {
             tower_length: 1.0,
             straight_beam_l_sect_side_len: 0.25,
             straight_beam_l_sect_thickness: 0.05,

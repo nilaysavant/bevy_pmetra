@@ -7,8 +7,8 @@ pub struct CadGeneratedModelSpawner {
 
 #[derive(Debug, Reflect, Default)]
 pub enum CadGeneratedModelParamsId {
-    SimplLazyCubeAtCylinder,
-    LazyTowerExtension,
+    SimplCubeAtCylinder,
+    TowerExtension,
     #[default]
-    LazyRoundCabinSegment,
+    RoundCabinSegment,
 }

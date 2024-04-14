@@ -12,10 +12,10 @@ use bevy_pmetra::{
     },
 };
 
-use super::{CadShellIds, SimpleLazyCubeAtCylinder};
+use super::{CadShellIds, SimpleCubeAtCylinder};
 
-pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShell> {
-    let SimpleLazyCubeAtCylinder {
+pub fn build_cylinder_shell(params: &SimpleCubeAtCylinder) -> Result<CadShell> {
+    let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
         cube_attach_angle,
@@ -48,10 +48,10 @@ pub fn build_cylinder_shell(params: &SimpleLazyCubeAtCylinder) -> Result<CadShel
 }
 
 pub fn cylinder_mesh_builder(
-    params: &SimpleLazyCubeAtCylinder,
+    params: &SimpleCubeAtCylinder,
     shell_name: CadShellName,
-) -> Result<CadMeshBuilder<SimpleLazyCubeAtCylinder>> {
-    let SimpleLazyCubeAtCylinder {
+) -> Result<CadMeshBuilder<SimpleCubeAtCylinder>> {
+    let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
         cube_attach_angle,
@@ -68,10 +68,10 @@ pub fn cylinder_mesh_builder(
 }
 
 pub fn build_radius_cursor(
-    params: &SimpleLazyCubeAtCylinder,
+    params: &SimpleCubeAtCylinder,
     cad_shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let SimpleLazyCubeAtCylinder {
+    let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
         cube_attach_angle,

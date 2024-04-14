@@ -1,1 +1,1 @@
-pub mod lazy_cube_at_cylinder;
+pub mod simple_cube_at_cylinder;

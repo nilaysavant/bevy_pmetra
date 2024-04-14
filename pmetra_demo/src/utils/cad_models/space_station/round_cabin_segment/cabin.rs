@@ -16,10 +16,10 @@ use crate::utils::cad_models::space_station::common::{
     get_corner_arcs_for_corner_vertices, get_profile_from_corner_arcs, ref_edge_direction_for_wire,
 };
 
-use super::{CadShellIds, LazyRoundCabinSegment};
+use super::{CadShellIds, RoundCabinSegment};
 
-pub fn build_cabin_shell(params: &LazyRoundCabinSegment) -> Result<CadShell> {
-    let LazyRoundCabinSegment {
+pub fn build_cabin_shell(params: &RoundCabinSegment) -> Result<CadShell> {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,
@@ -284,10 +284,10 @@ fn get_shell_face_mut_from_normal_dir(
 }
 
 pub fn build_cabin_mesh(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shell_name: CadShellName,
-) -> Result<CadMeshBuilder<LazyRoundCabinSegment>> {
-    let LazyRoundCabinSegment { profile_width, .. } = params;
+) -> Result<CadMeshBuilder<RoundCabinSegment>> {
+    let RoundCabinSegment { profile_width, .. } = params;
 
     // spawn entity with generated mesh...
     let main_mesh_transform: Transform = Transform::from_translation(Vec3::ZERO);
@@ -302,7 +302,7 @@ pub fn build_cabin_mesh(
 // Cursors...
 
 pub fn build_extrude_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
     let cad_shell = shells_by_name
@@ -356,10 +356,10 @@ pub fn build_extrude_cursor(
 }
 
 pub fn build_corner_radius_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let LazyRoundCabinSegment {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,
@@ -416,10 +416,10 @@ pub fn build_corner_radius_cursor(
 }
 
 pub fn build_profile_width_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let LazyRoundCabinSegment {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,
@@ -468,10 +468,10 @@ pub fn build_profile_width_cursor(
 }
 
 pub fn build_profile_height_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let LazyRoundCabinSegment {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,
@@ -525,10 +525,10 @@ pub fn build_profile_height_cursor(
 }
 
 pub fn build_profile_thickness_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let LazyRoundCabinSegment {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,
@@ -593,10 +593,10 @@ pub fn build_profile_thickness_cursor(
 }
 
 pub fn build_window_translation_cursor(
-    params: &LazyRoundCabinSegment,
+    params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let LazyRoundCabinSegment {
+    let RoundCabinSegment {
         profile_width,
         profile_height,
         profile_corner_radius,

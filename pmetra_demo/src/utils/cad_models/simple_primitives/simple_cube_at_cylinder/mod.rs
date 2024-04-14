@@ -17,7 +17,7 @@ pub mod cylinder;
 /// Basic Parametric Station Segment.
 #[derive(Debug, Reflect, Component, Clone, InspectorOptions)]
 #[reflect(InspectorOptions)]
-pub struct SimpleLazyCubeAtCylinder {
+pub struct SimpleCubeAtCylinder {
     #[inspector(min = 0.1)]
     pub cylinder_radius: f64,
     #[inspector(min = 0.1)]
@@ -28,7 +28,7 @@ pub struct SimpleLazyCubeAtCylinder {
     pub cube_side_length: f64,
 }
 
-impl Default for SimpleLazyCubeAtCylinder {
+impl Default for SimpleCubeAtCylinder {
     fn default() -> Self {
         Self {
             cylinder_radius: 1.2,
@@ -57,7 +57,7 @@ pub enum CadCursorIds {
     CubeSideLength,
 }
 
-impl ParametricModelling for SimpleLazyCubeAtCylinder {
+impl ParametricModelling for SimpleCubeAtCylinder {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -72,7 +72,7 @@ impl ParametricModelling for SimpleLazyCubeAtCylinder {
     }
 }
 
-impl ParametricCad for SimpleLazyCubeAtCylinder {
+impl ParametricCad for SimpleCubeAtCylinder {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

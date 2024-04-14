@@ -22,7 +22,7 @@ pub mod cuboid_enclosure;
 /// Basic Parametric Station Segment.
 #[derive(Debug, Reflect, Component, Clone, InspectorOptions)]
 #[reflect(InspectorOptions)]
-pub struct LazyTowerExtension {
+pub struct TowerExtension {
     #[inspector(min = 0.1)]
     pub tower_length: f64,
     // Straight Beams...
@@ -42,7 +42,7 @@ pub struct LazyTowerExtension {
     pub enclosure_profile_depth: f64,
 }
 
-impl Default for LazyTowerExtension {
+impl Default for TowerExtension {
     fn default() -> Self {
         Self {
             tower_length: 1.0,
@@ -56,7 +56,7 @@ impl Default for LazyTowerExtension {
     }
 }
 
-impl LazyTowerExtension {
+impl TowerExtension {
     pub fn num_of_cross_segments(&self) -> u32 {
         (self.tower_length / 0.2).floor() as u32
     }
@@ -114,7 +114,7 @@ pub enum CadCursorIds {
     TowerLengthCursor,
 }
 
-impl ParametricModelling for LazyTowerExtension {
+impl ParametricModelling for TowerExtension {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -134,13 +134,13 @@ impl ParametricModelling for LazyTowerExtension {
     }
 }
 
-impl ParametricCad for LazyTowerExtension {
+impl ParametricCad for TowerExtension {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesBuildersByCadShell<Self>> {
         // Create enclosure...
-        let mut cad_meshes_lazy_builders_by_cad_shell =
+        let mut cad_meshes_builders_by_cad_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::CuboidEnclosure.to_string()),
@@ -182,7 +182,7 @@ impl ParametricCad for LazyTowerExtension {
             .with_rotation(Quat::from_rotation_y(std::f32::consts::FRAC_PI_2)),
         ];
         for (idx, transform) in straight_beam_transforms.iter().enumerate() {
-            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
+            cad_meshes_builders_by_cad_shell.add_mesh_builder(
                 CadShellName(CadShellIds::StraightBeam.to_string()),
                 CadMeshIds::StraightBeam.to_string() + &idx.to_string(),
                 straight_beam_mesh_builder(
@@ -232,7 +232,7 @@ impl ParametricCad for LazyTowerExtension {
                 transform.translation.y +=
                     (jdx - idx as u32) as f32 * (cross_segment_length as f32);
 
-                cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
+                cad_meshes_builders_by_cad_shell.add_mesh_builder(
                     CadShellName(CadShellIds::CrossBeam.to_string()),
                     CadMeshIds::CrossBeam.to_string()
                         + "-"
@@ -248,7 +248,7 @@ impl ParametricCad for LazyTowerExtension {
             }
         }
 
-        Ok(cad_meshes_lazy_builders_by_cad_shell)
+        Ok(cad_meshes_builders_by_cad_shell)
     }
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {

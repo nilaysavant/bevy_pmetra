@@ -10,7 +10,7 @@ use bevy_pmetra::{
 };
 use itertools::Itertools;
 
-use super::{CadShellIds, LazyTowerExtension};
+use super::{CadShellIds, TowerExtension};
 
 /// Straight Beam Shell Builder.
 ///
@@ -36,8 +36,8 @@ use super::{CadShellIds, LazyTowerExtension};
 ///
 ///
 ///
-pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadShell> {
-    let LazyTowerExtension {
+pub fn build_cuboid_enclosure_shell(params: &TowerExtension) -> Result<CadShell> {
+    let TowerExtension {
         tower_length,
         enclosure_profile_width,
         enclosure_profile_depth,
@@ -111,10 +111,10 @@ pub fn build_cuboid_enclosure_shell(params: &LazyTowerExtension) -> Result<CadSh
 }
 
 pub fn cuboid_enclosure_mesh_builder(
-    params: &LazyTowerExtension,
+    params: &TowerExtension,
     shell_name: CadShellName,
-) -> Result<CadMeshBuilder<LazyTowerExtension>> {
-    let LazyTowerExtension {
+) -> Result<CadMeshBuilder<TowerExtension>> {
+    let TowerExtension {
         tower_length,
         enclosure_profile_depth,
         enclosure_profile_width,
@@ -131,10 +131,10 @@ pub fn cuboid_enclosure_mesh_builder(
 }
 
 pub fn build_tower_length_cursor(
-    params: &LazyTowerExtension,
+    params: &TowerExtension,
     cad_shells_by_name: &CadShellsByName,
 ) -> Result<CadCursor> {
-    let &LazyTowerExtension { tower_length, .. } = params;
+    let &TowerExtension { tower_length, .. } = params;
 
     let cad_shell = cad_shells_by_name
         .get(&CadShellName(CadShellIds::CuboidEnclosure.to_string()))

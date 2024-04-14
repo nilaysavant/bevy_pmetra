@@ -5,10 +5,10 @@ use bevy_rapier3d::prelude::*;
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
-        simple_primitives::lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
+        simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{
-            round_cabin_segment::LazyRoundCabinSegment,
-            tower_extension::LazyTowerExtension,
+            round_cabin_segment::RoundCabinSegment,
+            tower_extension::TowerExtension,
         },
     },
 };
@@ -17,9 +17,9 @@ pub fn spawn_cad_model(
     mut commands: Commands,
     cad_model_spawner: Res<CadGeneratedModelSpawner>,
     cad_models: Query<Entity, With<CadGeneratedRoot>>,
-    mut spawn_lazy_simple_cube_at_cylinder: EventWriter<GenerateCadModel<SimpleLazyCubeAtCylinder>>,
-    mut lazy_tower_extension: EventWriter<GenerateCadModel<LazyTowerExtension>>,
-    mut lazy_round_cabin_segment: EventWriter<GenerateCadModel<LazyRoundCabinSegment>>,
+    mut spawn_simple_cube_at_cylinder: EventWriter<GenerateCadModel<SimpleCubeAtCylinder>>,
+    mut tower_extension: EventWriter<GenerateCadModel<TowerExtension>>,
+    mut round_cabin_segment: EventWriter<GenerateCadModel<RoundCabinSegment>>,
 ) {
     if !cad_model_spawner.is_changed() {
         return;
@@ -33,14 +33,14 @@ pub fn spawn_cad_model(
     }
     // fire event to spawn new model...
     match cad_model_spawner.selected_params {
-        CadGeneratedModelParamsId::SimplLazyCubeAtCylinder => {
-            spawn_lazy_simple_cube_at_cylinder.send(GenerateCadModel::default());
+        CadGeneratedModelParamsId::SimplCubeAtCylinder => {
+            spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
         }
-        CadGeneratedModelParamsId::LazyTowerExtension => {
-            lazy_tower_extension.send(GenerateCadModel::default());
+        CadGeneratedModelParamsId::TowerExtension => {
+            tower_extension.send(GenerateCadModel::default());
         }
-        CadGeneratedModelParamsId::LazyRoundCabinSegment => {
-            lazy_round_cabin_segment.send(GenerateCadModel::default());
+        CadGeneratedModelParamsId::RoundCabinSegment => {
+            round_cabin_segment.send(GenerateCadModel::default());
         }
     }
 }

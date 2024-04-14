@@ -19,7 +19,7 @@ pub mod cabin;
 /// Basic Parametric Station Segment.
 #[derive(Debug, Reflect, Component, Clone, InspectorOptions)]
 #[reflect(InspectorOptions)]
-pub struct LazyRoundCabinSegment {
+pub struct RoundCabinSegment {
     #[inspector(min = 0.1)]
     pub profile_width: f64,
     #[inspector(min = 0.1)]
@@ -35,7 +35,7 @@ pub struct LazyRoundCabinSegment {
     window_translation: DVec3,
 }
 
-impl Default for LazyRoundCabinSegment {
+impl Default for RoundCabinSegment {
     fn default() -> Self {
         Self {
             profile_width: 1.3,
@@ -82,7 +82,7 @@ pub enum CadMaterialIds {
     Roof,
 }
 
-impl ParametricModelling for LazyRoundCabinSegment {
+impl ParametricModelling for RoundCabinSegment {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -94,12 +94,12 @@ impl ParametricModelling for LazyRoundCabinSegment {
     }
 }
 
-impl ParametricCad for LazyRoundCabinSegment {
+impl ParametricCad for RoundCabinSegment {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
     ) -> Result<CadMeshesBuildersByCadShell<Self>> {
-        let cad_meshes_lazy_builders_by_cad_shell =
+        let cad_meshes_builders_by_cad_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
                 .add_mesh_builder(
                     CadShellName(CadShellIds::CabinShell.to_string()),
@@ -107,7 +107,7 @@ impl ParametricCad for LazyRoundCabinSegment {
                     build_cabin_mesh(self, CadShellName(CadShellIds::CabinShell.to_string()))?,
                 )?;
 
-        Ok(cad_meshes_lazy_builders_by_cad_shell)
+        Ok(cad_meshes_builders_by_cad_shell)
     }
 
     fn cursors(&self, shells_by_name: &CadShellsByName) -> Result<CadCursors> {

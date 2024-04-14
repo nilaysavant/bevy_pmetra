@@ -24,10 +24,10 @@ use crate::{
         scene::{scene_setup, test_manual_mesh_gen},
     },
     utils::cad_models::{
-        simple_primitives::lazy_cube_at_cylinder::SimpleLazyCubeAtCylinder,
+        simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{
-            round_cabin_segment::LazyRoundCabinSegment,
-            tower_extension::LazyTowerExtension, RoundRectCuboid,
+            round_cabin_segment::RoundCabinSegment,
+            tower_extension::TowerExtension, RoundRectCuboid,
         },
     },
 };
@@ -90,9 +90,9 @@ impl Plugin for PmetraDemoPlugin {
                 ParametricCadModellingBasePlugin {
                     allow_wire_frames: true,
                 },
-                ParametricCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
-                ParametricCadParamsPlugin::<LazyTowerExtension>::default(),
-                ParametricCadParamsPlugin::<LazyRoundCabinSegment>::default(),
+                ParametricCadParamsPlugin::<SimpleCubeAtCylinder>::default(),
+                ParametricCadParamsPlugin::<TowerExtension>::default(),
+                ParametricCadParamsPlugin::<RoundCabinSegment>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()
@@ -104,9 +104,9 @@ impl Plugin for PmetraDemoPlugin {
             // exporter
             .add_plugins(GltfExporterPlugin)
             // inspectors...
-            .register_type::<SimpleLazyCubeAtCylinder>()
-            .register_type::<LazyTowerExtension>()
-            .register_type::<LazyRoundCabinSegment>()
+            .register_type::<SimpleCubeAtCylinder>()
+            .register_type::<TowerExtension>()
+            .register_type::<RoundCabinSegment>()
             .register_type::<RoundRectCuboid>()
             .add_plugins(
                 FilterQueryInspectorPlugin::<With<CadGeneratedRoot>>::default()
