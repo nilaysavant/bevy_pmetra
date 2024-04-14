@@ -5,13 +5,7 @@ use bevy_inspector_egui::quick::{
 };
 use bevy_rapier3d::prelude::*;
 
-use bevy_pmetra::{
-    bevy_plugin::{
-        lazy_plugins::{ParametricLazyCadModellingBasePlugin, ParametricLazyCadParamsPlugin},
-        resources::MeshesBuilderQueueInspector,
-    },
-    prelude::*,
-};
+use bevy_pmetra::{bevy_plugin::resources::MeshesBuilderQueueInspector, prelude::*};
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
 use crate::{
@@ -101,12 +95,12 @@ impl Plugin for PmetraDemoPlugin {
             //     ParametricCadParamsPlugin::<SimpleGear>::default(),
             // ))
             .add_plugins((
-                ParametricLazyCadModellingBasePlugin {
+                ParametricCadModellingBasePlugin {
                     allow_wire_frames: true,
                 },
-                ParametricLazyCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
-                ParametricLazyCadParamsPlugin::<LazyTowerExtension>::default(),
-                ParametricLazyCadParamsPlugin::<LazyRoundCabinSegment>::default(),
+                ParametricCadParamsPlugin::<SimpleLazyCubeAtCylinder>::default(),
+                ParametricCadParamsPlugin::<LazyTowerExtension>::default(),
+                ParametricCadParamsPlugin::<LazyRoundCabinSegment>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()

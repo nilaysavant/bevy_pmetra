@@ -48,14 +48,14 @@ use super::{
 
 /// Base [`bevy`] [`Plugin`] for Parametric CAD Modelling.
 #[derive(Default)]
-pub struct ParametricLazyCadModellingBasePlugin {
+pub struct ParametricCadModellingBasePlugin {
     /// Allows setting the wire-frame display on meshes via [`WireFramePlugin`].
     ///
     /// PS: **Only available in native environments.**
     pub allow_wire_frames: bool,
 }
 
-impl Plugin for ParametricLazyCadModellingBasePlugin {
+impl Plugin for ParametricCadModellingBasePlugin {
     fn build(&self, app: &mut App) {
         let Self {
             allow_wire_frames, ..
@@ -144,13 +144,13 @@ impl Plugin for ParametricLazyCadModellingBasePlugin {
 ///
 /// The [`Plugin`] then allows generating CAD models using the passed [`Params`].
 #[derive(Default)]
-pub struct ParametricLazyCadParamsPlugin<Params: ParametricLazyCad + Component> {
+pub struct ParametricCadParamsPlugin<Params: ParametricLazyCad + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
 impl<Params: ParametricLazyCad + Component + Clone> Plugin
-    for ParametricLazyCadParamsPlugin<Params>
+    for ParametricCadParamsPlugin<Params>
 {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
