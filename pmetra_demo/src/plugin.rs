@@ -5,7 +5,7 @@ use bevy_inspector_egui::quick::{
 };
 use bevy_rapier3d::prelude::*;
 
-use bevy_pmetra::{bevy_plugin::resources::MeshesBuilderQueueInspector, prelude::*};
+use bevy_pmetra::{pmetra_plugins::resources::MeshesBuilderQueueInspector, prelude::*};
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
 use crate::{

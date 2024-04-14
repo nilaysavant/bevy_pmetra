@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::bevy_plugin::components::cad::{
+use crate::pmetra_plugins::components::cad::{
     CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
 };
 

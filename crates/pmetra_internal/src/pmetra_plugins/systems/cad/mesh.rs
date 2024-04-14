@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
 use crate::{
-    bevy_plugin::components::cad::{
+    pmetra_plugins::components::cad::{
         CadGeneratedMesh,
         CadGeneratedMeshOutlinesState,
     },

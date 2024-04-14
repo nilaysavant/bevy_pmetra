@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_picking::picking_core::Pickable;
 
 use crate::{
-    bevy_plugin::{
+    pmetra_plugins::{
         components::{
             cad::{
                 BelongsToCadGeneratedCursor, BelongsToCadGeneratedRoot, CadGeneratedCursor,

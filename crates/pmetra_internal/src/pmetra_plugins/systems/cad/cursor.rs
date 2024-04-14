@@ -4,7 +4,7 @@ use bevy_mod_picking::{
 };
 
 use crate::{
-    bevy_plugin::{
+    pmetra_plugins::{
         cleanup_manager::Cleanup,
         components::{
             cad::{

@@ -8,7 +8,7 @@ use bevy::{
 use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlugins};
 
 use crate::{
-    bevy_plugin::components::{
+    pmetra_plugins::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
     },
     pmetra_core::builders::ParametricCad,

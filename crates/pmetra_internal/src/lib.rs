@@ -4,8 +4,8 @@
 
 /// [`bevy`] meshing utils.
 pub mod bevy_mesh;
-/// Plugin for integrating with [`bevy`].
-pub mod bevy_plugin;
+/// Plugin(s) for integrating with [`bevy`].
+pub mod pmetra_plugins;
 /// Core Data Structures/Traits/Extensions/Types.
 pub mod pmetra_core;
 /// Constants.
@@ -19,7 +19,7 @@ pub mod prelude {
 
     pub use {
         bevy_mesh::BevyMeshBuilder,
-        bevy_plugin::{
+        pmetra_plugins::{
             components::cad::*, components::camera::*, components::wire_frame::*, events::cad::*,
             plugins::*,
         },

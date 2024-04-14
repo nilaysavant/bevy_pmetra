@@ -1,6 +1,6 @@
 use bevy::{pbr::wireframe::Wireframe, prelude::*};
 
-use crate::bevy_plugin::components::wire_frame::WireFrameDisplaySettings;
+use crate::pmetra_plugins::components::wire_frame::WireFrameDisplaySettings;
 
 pub fn control_wire_frame_display(
     mut commands: Commands,
