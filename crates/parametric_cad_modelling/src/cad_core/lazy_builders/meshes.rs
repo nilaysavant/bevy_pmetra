@@ -1,14 +1,15 @@
 use anyhow::{anyhow, Result};
 use bevy::{prelude::*, utils::HashMap};
+use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
+use truck_modeling::{builder, Shell};
 
-use crate::
+use crate::{
     cad_core::{
-        builders::{
-            BuildCadMeshOutlines, CadMeshName, CadMeshOutlines,
-        },
+        dimensions::AsBevyVec3,
         meshing::{BuildBevyMesh, BuildPolygon},
-    }
-;
+    },
+    constants::CUSTOM_TRUCK_TOLERANCE_1,
+};
 
 use super::{CadShellName, CadShellsByName};
 
@@ -104,6 +105,15 @@ impl<P: Default + Clone> CadMeshesLazyBuilder<P> {
     }
 }
 
+#[derive(Debug, Clone, Deref, DerefMut, Hash, PartialEq, Eq, Component)]
+pub struct CadMeshName(pub String);
+
+impl From<String> for CadMeshName {
+    fn from(value: String) -> Self {
+        CadMeshName(value)
+    }
+}
+
 /// Builder for building a [`CadMesh`].
 #[derive(Debug, Clone, Default, Component)]
 pub struct CadMeshLazyBuilder<P: Default + Clone> {
@@ -146,16 +156,6 @@ impl<P: Default + Clone> CadMeshLazyBuilder<P> {
         Ok(self.clone())
     }
 
-    // pub fn add_cursor(
-    //     &mut self,
-    //     cursor_name: String,
-    //     build_fn: fn(&Self, &CadShell) -> Result<CadCursor>,
-    // ) -> Result<Self> {
-    //     let cursor = build_fn(self, &self.shell).with_context(|| "Failed to build cursor!")?;
-    //     self.cursors.insert(cursor_name.into(), cursor);
-    //     Ok(self.clone())
-    // }
-
     pub fn build(&self) -> Result<CadLazyMesh> {
         Ok(CadLazyMesh {
             mesh_hdl: self
@@ -177,4 +177,47 @@ pub struct CadLazyMesh {
     pub transform: Transform,
     pub outlines: CadMeshOutlines,
     // pub cursors: HashMap<CadCursorName, CadCursor>,
+}
+
+/// Outlines for [`InteractiveCadMesh`]
+#[derive(Debug, Clone, Default, Deref, DerefMut, Reflect)]
+pub struct CadMeshOutlines(pub Vec<Vec<Vec3>>);
+
+/// Trait which allows building [`CadMeshOutlines`] for given truck primitive elem.
+pub trait BuildCadMeshOutlines {
+    /// Build [`CadMeshOutlines`] for given struct.
+    fn build_outlines(&self) -> CadMeshOutlines;
+}
+
+impl BuildCadMeshOutlines for Shell {
+    fn build_outlines(&self) -> CadMeshOutlines {
+        let outlines = self
+            .face_iter()
+            .flat_map(|face| {
+                let face_outlines = face
+                    .boundaries()
+                    .iter()
+                    .filter_map(|wire| {
+                        let Some(face) = builder::try_attach_plane(&[wire.clone()]).ok() else {
+                            return None;
+                        };
+                        let shell = Shell::from(vec![face]);
+                        let polygon_mesh = shell
+                            .compress()
+                            .triangulation(CUSTOM_TRUCK_TOLERANCE_1)
+                            .to_polygon();
+                        let pos_vectors = polygon_mesh
+                            .positions()
+                            .iter()
+                            .map(|p| p.as_bevy_vec3())
+                            .collect::<Vec<_>>();
+                        Some(pos_vectors)
+                    })
+                    .collect::<Vec<_>>();
+                face_outlines
+            })
+            .collect::<Vec<_>>();
+
+        CadMeshOutlines(outlines)
+    }
 }

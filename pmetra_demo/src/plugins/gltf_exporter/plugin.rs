@@ -1,7 +1,5 @@
 use bevy::{prelude::*, tasks::IoTaskPool};
-use bevy_pmetra::{
-    bevy_plugin::components::cad::CadGeneratedMesh, cad_core::builders::CadMeshName,
-};
+use bevy_pmetra::{bevy_plugin::components::cad::CadGeneratedMesh, cad_core::lazy_builders::CadMeshName};
 
 use crate::plugins::gltf_exporter::gltf::converters::StandardMaterialWithImages;
 

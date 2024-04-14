@@ -18,18 +18,17 @@ use crate::{
             wire_frame::WireFrameDisplaySettings,
         },
         events::{
-            cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
             cad::{GenerateCadModel, SpawnMeshesBuilder},
+            cursor::{CursorPointerMoveEvent, CursorPointerOutEvent},
         },
         resources::{
             MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         },
     },
     cad_core::{
-        builders::{CadCursor, CadCursorName, CadMeshName},
+        builders::{CadCursor, CadCursorName},
         lazy_builders::{
-            CadLazyMesh, CadMeshLazyBuilder, CadShellName, CadShellsByName,
-            ParametricLazyCad,
+            CadLazyMesh, CadMeshLazyBuilder, CadMeshName, CadShellName, CadShellsByName, ParametricLazyCad
         },
     },
 };

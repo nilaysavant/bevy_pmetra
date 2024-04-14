@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::cad_core::builders::{CadCursorType, CadMeshOutlines};
+use crate::cad_core::{builders::CadCursorType, lazy_builders::CadMeshOutlines};
 
 /// Marker for CAD generated entities root.
 #[derive(Debug, Component, Reflect)]

@@ -1,8 +1,6 @@
 use anyhow::Result;
 use bevy::{prelude::*, utils::HashMap};
 
-use super::CadCursorName;
-
 #[derive(Debug, Clone, Deref, DerefMut, Default)]
 pub struct CadCursors(pub HashMap<CadCursorName, CadCursor>);
 
@@ -11,6 +9,15 @@ impl CadCursors {
     pub fn add_cursor(&mut self, cursor_name: CadCursorName, cursor: CadCursor) -> Result<Self> {
         self.insert(cursor_name, cursor);
         Ok(self.clone())
+    }
+}
+
+#[derive(Debug, Clone, Deref, DerefMut, Hash, PartialEq, Eq, Component)]
+pub struct CadCursorName(pub String);
+
+impl From<String> for CadCursorName {
+    fn from(value: String) -> Self {
+        CadCursorName(value)
     }
 }
 
