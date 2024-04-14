@@ -57,7 +57,7 @@ pub enum CadCursorIds {
     CubeSideLength,
 }
 
-impl ParametricModelling for SimpleCubeAtCylinder {
+impl PmetraCad for SimpleCubeAtCylinder {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -72,7 +72,7 @@ impl ParametricModelling for SimpleCubeAtCylinder {
     }
 }
 
-impl ParametricCad for SimpleCubeAtCylinder {
+impl PmetraModelling for SimpleCubeAtCylinder {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

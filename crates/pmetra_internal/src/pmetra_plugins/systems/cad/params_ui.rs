@@ -13,7 +13,7 @@ use crate::{
         },
         events::cursor::{CursorPointerMoveEvent, CursorPointerOutEvent, TransformCursorEvent},
     },
-    pmetra_core::builders::{CadCursorName, ParametricCad},
+    pmetra_core::builders::{CadCursorName, PmetraModelling},
     constants::PARAMS_UI_BOTTOM_SHIFT_PX,
 };
 
@@ -50,7 +50,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
     ));
 }
 
-pub fn show_params_display_ui_on_hover_cursor<Params: ParametricCad + Component>(
+pub fn show_params_display_ui_on_hover_cursor<Params: PmetraModelling + Component>(
     mut events: EventReader<CursorPointerMoveEvent>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
@@ -111,7 +111,7 @@ pub fn hide_params_display_ui_on_out_cursor(
     }
 }
 
-pub fn move_params_display_ui_on_transform_cursor<Params: ParametricCad + Component>(
+pub fn move_params_display_ui_on_transform_cursor<Params: PmetraModelling + Component>(
     mut events: EventReader<TransformCursorEvent>,
     cursor_drag_planes: Query<&BelongsToCadGeneratedCursor, With<CadGeneratedCursorDragPlane>>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,

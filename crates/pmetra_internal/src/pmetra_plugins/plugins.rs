@@ -11,7 +11,7 @@ use crate::{
     pmetra_plugins::components::{
         cad::CadGeneratedRootSelectionState, wire_frame::WireFrameDisplaySettings,
     },
-    pmetra_core::builders::ParametricCad,
+    pmetra_core::builders::PmetraModelling,
 };
 
 use super::{
@@ -149,12 +149,12 @@ impl Plugin for PmetraBasePlugin {
 /// 
 /// You will have to add multiple instances of this plugin with different [`Params`] type for each kind of composition.
 #[derive(Default)]
-pub struct PmetraModellingPlugin<Params: ParametricCad + Component> {
+pub struct PmetraModellingPlugin<Params: PmetraModelling + Component> {
     /// Owns the params type to prevent compiler complains.
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: ParametricCad + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
+impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlugin<Params> {
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App

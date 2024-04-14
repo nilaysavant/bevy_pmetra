@@ -8,14 +8,15 @@ pub mod tags;
 
 pub use {cursors::*, meshes::*, shells::*, tags::*};
 
-/// Trait for parametrically generating [`CadShell`]s from struct.
-pub trait ParametricModelling: Clone + Default {
-    /// Gets the [`CadShellsBuilders`] for this params struct.
+/// Used for generating [`CadShell`]s using this struct via `truck`'s modelling APIs.
+pub trait PmetraCad: Clone + Default {
+    /// Get the [`CadShellsBuilders`] for this params struct.
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>>;
 }
 
 /// Trait for parametrically generating models with cursors from struct.
-pub trait ParametricCad: ParametricModelling {
+pub trait PmetraModelling: PmetraCad {
+    /// Configure the [`CadMesh`]s to be generated for each of the [`CadShell`]s.
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,
@@ -49,7 +50,7 @@ mod test {
             pub width: f64,
         }
 
-        impl ParametricModelling for Cube {
+        impl PmetraCad for Cube {
             fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
                 CadShellsBuilders::default().add_shell_builder(
                     CadShellName("s1".into()),
@@ -58,7 +59,7 @@ mod test {
             }
         }
 
-        impl ParametricCad for Cube {
+        impl PmetraModelling for Cube {
             fn meshes_builders_by_shell(
                 &self,
                 shells_by_name: &CadShellsByName,

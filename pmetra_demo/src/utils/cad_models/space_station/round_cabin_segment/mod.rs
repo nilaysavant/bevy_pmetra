@@ -82,7 +82,7 @@ pub enum CadMaterialIds {
     Roof,
 }
 
-impl ParametricModelling for RoundCabinSegment {
+impl PmetraCad for RoundCabinSegment {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -94,7 +94,7 @@ impl ParametricModelling for RoundCabinSegment {
     }
 }
 
-impl ParametricCad for RoundCabinSegment {
+impl PmetraModelling for RoundCabinSegment {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

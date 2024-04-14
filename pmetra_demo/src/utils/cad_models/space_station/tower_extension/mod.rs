@@ -114,7 +114,7 @@ pub enum CadCursorIds {
     TowerLengthCursor,
 }
 
-impl ParametricModelling for TowerExtension {
+impl PmetraCad for TowerExtension {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
         let builders = CadShellsBuilders::new(self.clone())? // builder
             .add_shell_builder(
@@ -134,7 +134,7 @@ impl ParametricModelling for TowerExtension {
     }
 }
 
-impl ParametricCad for TowerExtension {
+impl PmetraModelling for TowerExtension {
     fn meshes_builders_by_shell(
         &self,
         shells_by_name: &CadShellsByName,

@@ -18,7 +18,7 @@ use crate::{
         },
         events::cursor::TransformCursorEvent,
     },
-    pmetra_core::builders::{CadCursorName, CadCursorType, ParametricCad},
+    pmetra_core::builders::{CadCursorName, CadCursorType, PmetraModelling},
     math::get_rotation_from_normals,
     prelude::CadGeneratedRootSelectionState,
 };
@@ -257,7 +257,7 @@ pub fn transform_cursor(
     }
 }
 
-pub fn update_params_from_cursors<Params: ParametricCad + Component>(
+pub fn update_params_from_cursors<Params: PmetraModelling + Component>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
     cursors: Query<
         (

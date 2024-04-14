@@ -1,23 +1,23 @@
 use bevy::prelude::*;
 
 use crate::{
-    pmetra_core::builders::{CadMeshesBuilder, CadShellName, ParametricCad},
+    pmetra_core::builders::{CadMeshesBuilder, CadShellName, PmetraModelling},
     prelude::BelongsToCadGeneratedRoot,
 };
 
 /// Event when fired, **generates CAD Model** for the passed [`Params`].
 ///
 /// Prerequisites:
-/// - Add plugin: [`ParametricCadModellingPlugin<Params>`].
+/// - Add plugin: [`PmetraModelling<Params>`].
 #[derive(Debug, Event, Reflect)]
-pub struct GenerateCadModel<Params: ParametricCad + Component> {
+pub struct GenerateCadModel<Params: PmetraModelling + Component> {
     /// Params used to generate cad model.
     pub params: Params,
     /// Remove any existing models generated with these [`Params`].
     pub remove_existing_models: bool,
 }
 
-impl<Params: ParametricCad + Component + Default> Default for GenerateCadModel<Params> {
+impl<Params: PmetraModelling + Component + Default> Default for GenerateCadModel<Params> {
     fn default() -> Self {
         Self {
             params: Default::default(),
@@ -28,7 +28,7 @@ impl<Params: ParametricCad + Component + Default> Default for GenerateCadModel<P
 
 /// Event used to spawn individual mesh builders for parallel meshing.
 #[derive(Debug, Event, Reflect, Clone)]
-pub struct SpawnMeshesBuilder<Params: ParametricCad + Component> {
+pub struct SpawnMeshesBuilder<Params: PmetraModelling + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,
     pub meshes_builder: CadMeshesBuilder<Params>,
