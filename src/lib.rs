@@ -2,7 +2,7 @@
 //!
 //! The `bevy_pmetra` crate is just a container crate that makes it easier to consume the sub-crates:
 //!
-//! - `parametric_cad_modelling`
+//! - `pmetra_internal`
 
-// Just re-export the main plugin for now...
-pub use parametric_cad_modelling::*;
+// Just re-export the modules of internal crate for now...
+pub use pmetra_internal::*;

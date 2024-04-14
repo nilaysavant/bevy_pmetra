@@ -1,6 +1,6 @@
 [package]
 name = "bevy_pmetra"
-description = "Parametric/CAD modelling in Bevy Engine using Truck CAD kernel."
+description = "Interactive/Parametric/CAD Modelling for Bevy using Truck kernel."
 version = "0.1.0"
 edition = "2021"
 authors = ["Nilay Savant"]
@@ -29,7 +29,7 @@ readme = "README.md"
 
 
 [dependencies]
-parametric_cad_modelling = { path = "crates/parametric_cad_modelling" }
+pmetra_internal = { path = "crates/pmetra_internal" }
 
 
 [workspace]
