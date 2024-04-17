@@ -122,6 +122,9 @@ impl Plugin for PmetraDemoPlugin {
                 ResourceInspectorPlugin::<MeshesBuilderQueueInspector>::default()
                     .run_if(toggle_inspector_is_active),
             )
+            // Settings Inspector
+            .register_type::<PmetraGlobalSettings>()
+            .add_plugins(ResourceInspectorPlugin::<PmetraGlobalSettings>::default())
             // rest...
             .add_systems(Startup, || info!("TruckIntegrationTestPlugin started!"));
     }

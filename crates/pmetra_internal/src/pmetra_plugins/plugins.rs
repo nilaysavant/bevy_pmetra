@@ -20,7 +20,10 @@ use super::{
         cad::{GenerateCadModel, SpawnMeshesBuilder},
         slider::{SliderPointerMoveEvent, SliderPointerOutEvent, TransformSliderEvent},
     },
-    resources::{MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector},
+    resources::{
+        MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
+        PmetraGlobalSettings,
+    },
     systems::{
         cad::{
             mesh::{
@@ -32,11 +35,12 @@ use super::{
                 shells_to_mesh_builder_events, shells_to_sliders, spawn_shells_by_name_on_generate,
                 update_shells_by_name_on_params_change,
             },
-            outlines::generate_mesh_outlines,
+            outlines::render_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_out_slider, move_params_display_ui_on_transform_slider,
                 setup_param_display_ui, show_params_display_ui_on_hover_slider,
             },
+            settings::{show_selected_mesh_local_debug_axis, show_selected_mesh_outlines},
             slider::{
                 draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,
                 update_params_from_sliders, update_slider_visibility_based_on_root_selection,
@@ -93,6 +97,8 @@ impl Plugin for PmetraBasePlugin {
 
         // Add all the plugins/systems/resources/events that are not specific to params...
         app // app
+            // resources...
+            .init_resource::<PmetraGlobalSettings>()
             // picking events...
             .add_event::<TransformSliderEvent>()
             .add_event::<SliderPointerMoveEvent>()
@@ -106,10 +112,10 @@ impl Plugin for PmetraBasePlugin {
             .add_systems(
                 Update,
                 (
-                    generate_mesh_outlines,
+                    render_mesh_outlines.run_if(show_selected_mesh_outlines),
                     handle_mesh_selection,
                     update_root_selection_based_on_mesh_selection,
-                    show_mesh_local_debug_axis,
+                    show_mesh_local_debug_axis.run_if(show_selected_mesh_local_debug_axis),
                 ),
             )
             // slider systems...

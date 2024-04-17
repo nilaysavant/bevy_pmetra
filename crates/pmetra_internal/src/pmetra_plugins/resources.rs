@@ -20,3 +20,23 @@ pub struct MeshesBuilderQueueInspector {
 pub struct MeshesBuilderFinishedResultsMap<Params: PmetraModelling + Component + Clone>(
     HashMap<(Entity, CadShellName), (Mesh, SpawnMeshesBuilder<Params>)>,
 );
+
+/// Global Settings for Pmetra.
+#[derive(Debug, Clone, Resource, Reflect)]
+pub struct PmetraGlobalSettings {
+    /// Show selected mesh's local axis/orientation.
+    ///
+    /// Useful for debugging.
+    pub show_selected_mesh_local_debug_axis: bool,
+    /// Show outlines of selected mesh.
+    pub show_selected_mesh_outlines: bool,
+}
+
+impl Default for PmetraGlobalSettings {
+    fn default() -> Self {
+        Self {
+            show_selected_mesh_local_debug_axis: true,
+            show_selected_mesh_outlines: true,
+        }
+    }
+}

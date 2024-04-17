@@ -4,7 +4,7 @@ use crate::pmetra_plugins::components::cad::{
     CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
 };
 
-pub fn generate_mesh_outlines(
+pub fn render_mesh_outlines(
     cad_meshes: Query<
         (
             Entity,
@@ -16,8 +16,12 @@ pub fn generate_mesh_outlines(
     >,
     mut gizmos: Gizmos,
 ) {
-    for (cad_mesh_ent, glob_transform, outlines_state, CadGeneratedMeshOutlines(line_strip_positions)) in
-        cad_meshes.iter()
+    for (
+        cad_mesh_ent,
+        glob_transform,
+        outlines_state,
+        CadGeneratedMeshOutlines(line_strip_positions),
+    ) in cad_meshes.iter()
     {
         let color = match *outlines_state {
             CadGeneratedMeshOutlinesState::Invisible => Color::NONE,

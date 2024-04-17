@@ -23,7 +23,7 @@ pub mod prelude {
         pmetra_core::{builders::*, centroid::CadCentroid, dimensions::*, meshing::*},
         pmetra_plugins::{
             components::cad::*, components::camera::*, components::wire_frame::*, events::cad::*,
-            plugins::*,
+            plugins::*, resources::PmetraGlobalSettings,
         },
     };
 }
