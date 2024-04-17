@@ -1,8 +1,6 @@
 use bevy::{pbr::DirectionalLightShadowMap, prelude::*, window::close_on_esc};
 use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::quick::{
-    FilterQueryInspectorPlugin, ResourceInspectorPlugin, WorldInspectorPlugin,
-};
+use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, ResourceInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
 use bevy_pmetra::{pmetra_plugins::resources::MeshesBuilderQueueInspector, prelude::*};
@@ -26,8 +24,8 @@ use crate::{
     utils::cad_models::{
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{
-            round_cabin_segment::RoundCabinSegment,
-            tower_extension::TowerExtension, RoundRectCuboid,
+            round_cabin_segment::RoundCabinSegment, tower_extension::TowerExtension,
+            RoundRectCuboid,
         },
     },
 };
