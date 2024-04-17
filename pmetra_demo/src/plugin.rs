@@ -124,7 +124,6 @@ impl Plugin for PmetraDemoPlugin {
                 ResourceInspectorPlugin::<MeshesBuilderQueueInspector>::default()
                     .run_if(toggle_inspector_is_active),
             )
-            .add_plugins(WorldInspectorPlugin::default().run_if(toggle_inspector_is_active))
             // rest...
             .add_systems(Startup, || info!("TruckIntegrationTestPlugin started!"));
     }
