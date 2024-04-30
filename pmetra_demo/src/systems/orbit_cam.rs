@@ -35,7 +35,7 @@ pub fn orbit_cam_custom_input_map_controller(
         cursor_delta += event.delta;
     }
 
-    if mouse_buttons.pressed(MouseButton::Middle) {
+    if mouse_buttons.pressed(MouseButton::Right) {
         if keyboard.pressed(KeyCode::ShiftLeft) {
             events.send(ControlEvent::TranslateTarget(
                 mouse_translate_sensitivity * cursor_delta,
@@ -64,10 +64,10 @@ pub fn fire_balls_at_look_point(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mouse_input: Res<ButtonInput<MouseButton>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     query_orbit_cam: Query<&LookTransform, With<OrbitCameraController>>,
 ) {
-    if !mouse_input.just_pressed(MouseButton::Right) {
+    if !keyboard_input.just_pressed(KeyCode::Space) {
         return;
     }
     let Ok(LookTransform { eye, target, up }) = query_orbit_cam.get_single() else {
