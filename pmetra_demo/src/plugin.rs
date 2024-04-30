@@ -16,6 +16,7 @@ use crate::{
     resources::CadGeneratedModelSpawner,
     systems::{
         cad::{add_collider_to_generated_cad_model, spawn_cad_model},
+        info_ui::{setup_info_ui, update_info_ui},
         inspector::toggle_inspector_is_active,
         orbit_cam::{fire_balls_at_look_point, orbit_cam_custom_input_map_controller},
         rapier::{control_debug_render, setup_debug_render},
@@ -105,7 +106,9 @@ impl Plugin for PmetraDemoPlugin {
             .add_systems(PostUpdate, add_collider_to_generated_cad_model)
             // scene...
             .add_systems(Startup, scene_setup)
-            // exporter
+            // info...
+            .add_systems(Update, (setup_info_ui, update_info_ui))
+            // exporter...
             .add_plugins(GltfExporterPlugin)
             // inspectors...
             .register_type::<SimpleCubeAtCylinder>()
