@@ -22,7 +22,7 @@ pub fn get_shortcuts_info() -> [ShortcutInfo; 6] {
     [
         ShortcutInfo {
             shortcut: vec![KeyType::MouseKey(MouseButton::Left)],
-            description: "Select".to_string(),
+            description: "Interact".to_string(),
         },
         ShortcutInfo {
             shortcut: vec![KeyType::MouseKey(MouseButton::Right)],
@@ -66,9 +66,10 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                     justify_content: JustifyContent::Center,
                     position_type: PositionType::Absolute,
                     bottom: Val::Px(0.), // place at the bottom of the window
-                    padding: UiRect::all(Val::Px(5.)),
+                    padding: UiRect::all(Val::Px(2.5)),
                     ..Default::default()
                 },
+                background_color: BackgroundColor(Color::BLACK.with_a(0.8)),
                 ..Default::default()
             },
             Pickable::IGNORE, // Ignore picking events on the UI.
@@ -115,7 +116,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                         margin: UiRect::all(Val::Px(5.)),
                         ..default()
                     },
-                    background_color: BackgroundColor(Color::BLACK.with_a(0.8)),
+                    background_color: BackgroundColor(Color::NONE),
                     ..default()
                 },
                 shortcut_info,
