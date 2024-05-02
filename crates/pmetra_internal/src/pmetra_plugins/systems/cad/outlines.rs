@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use crate::pmetra_plugins::components::cad::{
-    CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState,
+use crate::pmetra_plugins::{
+    components::cad::{CadGeneratedMesh, CadGeneratedMeshOutlines, CadGeneratedMeshOutlinesState},
+    systems::gizmos::PmetraOutlineGizmos,
 };
 
 pub fn render_mesh_outlines(
@@ -14,7 +15,7 @@ pub fn render_mesh_outlines(
         ),
         With<CadGeneratedMesh>,
     >,
-    mut gizmos: Gizmos,
+    mut gizmos: Gizmos<PmetraOutlineGizmos>,
 ) {
     for (
         cad_mesh_ent,

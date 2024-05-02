@@ -46,6 +46,7 @@ use super::{
                 update_params_from_sliders, update_slider_visibility_based_on_root_selection,
             },
         },
+        gizmos::{configure_custom_gizmos, PmetraOutlineGizmos},
         wire_frame::control_wire_frame_display,
     },
 };
@@ -99,6 +100,9 @@ impl Plugin for PmetraBasePlugin {
         app // app
             // resources...
             .init_resource::<PmetraGlobalSettings>()
+            // gizmos...
+            .init_gizmo_group::<PmetraOutlineGizmos>()
+            .add_systems(Update, configure_custom_gizmos)
             // picking events...
             .add_event::<TransformSliderEvent>()
             .add_event::<SliderPointerMoveEvent>()

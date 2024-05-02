@@ -30,6 +30,8 @@ pub struct PmetraGlobalSettings {
     pub show_selected_mesh_local_debug_axis: bool,
     /// Show outlines of selected mesh.
     pub show_selected_mesh_outlines: bool,
+    /// Width of the outlines.
+    pub selected_mesh_outlines_width: f32,
 }
 
 impl Default for PmetraGlobalSettings {
@@ -37,6 +39,7 @@ impl Default for PmetraGlobalSettings {
         Self {
             show_selected_mesh_local_debug_axis: true,
             show_selected_mesh_outlines: true,
+            selected_mesh_outlines_width: 1.0,
         }
     }
 }
