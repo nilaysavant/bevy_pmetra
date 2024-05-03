@@ -180,10 +180,15 @@ fn cube_mesh_builder(
 
 impl PmetraInteractions for SimpleCube {
     fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
-        let sliders = CadSliders::default().add_slider(
-            CadSliderName("SideLengthSlider".into()),
-            build_side_length_slider(self, shells_by_name)?,
-        )?;
+        let sliders = CadSliders::default() // sliders
+            .add_slider(
+                CadSliderName("SideLengthSlider".into()),
+                build_side_length_slider(self, shells_by_name)?,
+            )?
+            .add_slider(
+                CadSliderName("ArrayCountSlider".into()),
+                build_array_count_slider(self, shells_by_name)?,
+            )?;
 
         Ok(sliders)
     }
@@ -210,6 +215,7 @@ impl PmetraInteractions for SimpleCube {
         }
     }
 }
+
 fn build_side_length_slider(
     params: &SimpleCube,
     shells_by_name: &CadShellsByName,
@@ -237,6 +243,41 @@ fn build_side_length_slider(
         slider_type: CadSliderType::Linear {
             direction: Vec3::Z,
             limit_min: Some(Vec3::Z * 0.2),
+            limit_max: Some(Vec3::INFINITY),
+        },
+        ..default()
+    })
+}
+
+fn build_array_count_slider(
+    params: &SimpleCube,
+    shells_by_name: &CadShellsByName,
+) -> Result<CadSlider> {
+    let SimpleCube { side_length, .. } = &params;
+    let cad_shell = shells_by_name
+        .get(&CadShellName("SimpleCube".to_string()))
+        .ok_or_else(|| anyhow!("Could not get cube shell!"))?;
+    let Some(CadElement::Face(face)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
+    else {
+        return Err(anyhow!("Could not find face!"));
+    };
+    let face_normal = face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
+    let face_boundaries = face.boundaries();
+    let face_wire = face_boundaries.last().expect("No wire found!");
+    let face_centroid = face_wire.get_centroid();
+    let slider_pos = face_centroid.as_vec3()
+        + Vec3::X * (*side_length as f32 + 0.2) / 2.
+        + Vec3::Y * *side_length as f32;
+    let slider_transform = Transform::from_translation(slider_pos)
+        .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
+
+    Ok(CadSlider {
+        normal: face_normal,
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
+            direction: Vec3::X,
+            limit_min: Some(Vec3::X * 0.35),
             limit_max: Some(Vec3::INFINITY),
         },
         ..default()
