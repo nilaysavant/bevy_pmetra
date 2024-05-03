@@ -32,9 +32,3 @@ truck-base = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v
 rustc-hash = "1.1.0"
 # async
 bevy_async_task = "0.1.0"
-
-
-[dev-dependencies]
-smooth-bevy-cameras = "0.11"
-bevy_egui = "0.25"
-bevy-inspector-egui = "0.23"

@@ -27,14 +27,17 @@ keywords = [
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 
+[workspace]
+resolver = "2"
+members = ["crates/*", "pmetra_demo"]
 
 [dependencies]
 pmetra_internal = { path = "crates/pmetra_internal" }
 
-
-[workspace]
-resolver = "2"
-members = ["crates/*", "pmetra_demo"]
+[dev-dependencies]
+smooth-bevy-cameras = "0.11"
+bevy_egui = "0.25"
+bevy-inspector-egui = "0.23"
 
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
