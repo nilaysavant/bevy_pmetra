@@ -1177,7 +1177,7 @@ dependencies = [
 name = "bevy_pmetra"
 version = "0.1.0"
 dependencies = [
- "parametric_cad_modelling",
+ "pmetra_internal",
 ]
 
 [[package]]
@@ -3564,29 +3564,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parametric_cad_modelling"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bevy",
- "bevy-inspector-egui",
- "bevy_async_task",
- "bevy_egui",
- "bevy_mod_picking",
- "image",
- "lazy_static",
- "rustc-hash",
- "smooth-bevy-cameras",
- "strum",
- "tiny-skia",
- "truck-base",
- "truck-meshalgo",
- "truck-modeling",
- "truck-shapeops",
- "truck-topology",
-]
-
-[[package]]
 name = "parking"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3715,6 +3692,27 @@ dependencies = [
  "noise",
  "smooth-bevy-cameras",
  "strum",
+]
+
+[[package]]
+name = "pmetra_internal"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy_async_task",
+ "bevy_egui",
+ "bevy_mod_picking",
+ "lazy_static",
+ "rustc-hash",
+ "smooth-bevy-cameras",
+ "strum",
+ "truck-base",
+ "truck-meshalgo",
+ "truck-modeling",
+ "truck-shapeops",
+ "truck-topology",
 ]
 
 [[package]]
@@ -4384,12 +4382,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "strict-num"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6637bab7722d379c8b41ba849228d680cc12d0a45ba1fa2b48f2a30577a06731"
-
-[[package]]
 name = "strum"
 version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4513,32 +4505,6 @@ dependencies = [
  "flate2",
  "jpeg-decoder",
  "weezl",
-]
-
-[[package]]
-name = "tiny-skia"
-version = "0.11.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83d13394d44dae3207b52a326c0c85a8bf87f1541f23b0d143811088497b09ab"
-dependencies = [
- "arrayref",
- "arrayvec",
- "bytemuck",
- "cfg-if",
- "log",
- "png",
- "tiny-skia-path",
-]
-
-[[package]]
-name = "tiny-skia-path"
-version = "0.11.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c9e7fc0c2e86a30b117d0462aa261b72b7a99b7ebd7deb3a14ceda95c5bdc93"
-dependencies = [
- "arrayref",
- "bytemuck",
- "strict-num",
 ]
 
 [[package]]
@@ -4690,7 +4656,7 @@ dependencies = [
 [[package]]
 name = "truck-base"
 version = "0.4.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "cgmath",
  "matext4cgmath",
@@ -4701,7 +4667,7 @@ dependencies = [
 [[package]]
 name = "truck-geoderive"
 version = "0.1.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -4712,7 +4678,7 @@ dependencies = [
 [[package]]
 name = "truck-geometry"
 version = "0.4.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "serde",
  "thiserror",
@@ -4723,7 +4689,7 @@ dependencies = [
 [[package]]
 name = "truck-geotrait"
 version = "0.3.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "getrandom 0.2.12",
  "rand 0.8.5",
@@ -4735,7 +4701,7 @@ dependencies = [
 [[package]]
 name = "truck-meshalgo"
 version = "0.3.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "array-macro",
  "derive_more",
@@ -4753,7 +4719,7 @@ dependencies = [
 [[package]]
 name = "truck-modeling"
 version = "0.5.1"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "derive_more",
  "rustc-hash",
@@ -4769,7 +4735,7 @@ dependencies = [
 [[package]]
 name = "truck-polymesh"
 version = "0.5.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "array-macro",
  "bytemuck",
@@ -4784,7 +4750,7 @@ dependencies = [
 [[package]]
 name = "truck-shapeops"
 version = "0.3.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "derive_more",
  "rustc-hash",
@@ -4797,7 +4763,7 @@ dependencies = [
 [[package]]
 name = "truck-topology"
 version = "0.5.0"
-source = "git+https://github.com/nilaysavant/truck.git?rev=fce162b#fce162bc815e1ddaa27a51176864a041f2409d38"
+source = "git+https://github.com/nilaysavant/truck.git?tag=pmetra.v0.1.0#fce162bc815e1ddaa27a51176864a041f2409d38"
 dependencies = [
  "parking_lot",
  "rayon",
