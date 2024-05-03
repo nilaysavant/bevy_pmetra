@@ -35,6 +35,7 @@ members = ["crates/*", "pmetra_demo"]
 pmetra_internal = { path = "crates/pmetra_internal" }
 
 [dev-dependencies]
+bevy = "0.13"
 smooth-bevy-cameras = "0.11"
 bevy_egui = "0.25"
 bevy-inspector-egui = "0.23"
