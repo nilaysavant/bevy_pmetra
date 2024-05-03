@@ -157,7 +157,13 @@ impl PmetraModelling for SimpleCube {
             cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
                 CadShellName("SimpleCube".into()),
                 "SimpleCube".to_string() + &i.to_string(),
-                cube_mesh_builder(self, CadShellName("SimpleCube".into()))?,
+                cube_mesh_builder(
+                    self,
+                    CadShellName("SimpleCube".into()),
+                    Transform::from_translation(
+                        Vec3::X * (i as f32 * (self.side_length as f32 * 1.5)),
+                    ),
+                )?,
             )?;
         }
 
@@ -168,9 +174,8 @@ impl PmetraModelling for SimpleCube {
 fn cube_mesh_builder(
     params: &SimpleCube,
     shell_name: CadShellName,
+    transform: Transform,
 ) -> Result<CadMeshBuilder<SimpleCube>> {
-    let SimpleCube { array_count, .. } = &params;
-    let transform = Transform::from_translation(Vec3::X * (*array_count as f32 - 1.));
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::RED.into())?;
@@ -204,12 +209,19 @@ impl PmetraInteractions for SimpleCube {
             if delta.length() > 0. {
                 self.side_length += delta.z as f64;
             }
+        } else if name.0 == "ArrayCountSlider" {
+            let delta = new_transform.translation - prev_transform.translation;
+            if delta.length() > 0. {
+                self.array_count = (new_transform.translation.x / (self.side_length as f32 * 1.5)).floor() as u32 + 1;
+            }
         }
     }
 
     fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
         if name.0 == "SideLengthSlider" {
             Ok(Some(format!("side_length: {:.2}", self.side_length)))
+        } else if name.0 == "ArrayCountSlider" {
+            Ok(Some(format!("array_count: {}", self.array_count)))
         } else {
             Ok(None)
         }
@@ -253,7 +265,10 @@ fn build_array_count_slider(
     params: &SimpleCube,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let SimpleCube { side_length, .. } = &params;
+    let SimpleCube {
+        side_length,
+        array_count,
+    } = &params;
     let cad_shell = shells_by_name
         .get(&CadShellName("SimpleCube".to_string()))
         .ok_or_else(|| anyhow!("Could not get cube shell!"))?;
@@ -267,7 +282,7 @@ fn build_array_count_slider(
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
     let slider_pos = face_centroid.as_vec3()
-        + Vec3::X * (*side_length as f32 + 0.2) / 2.
+        + Vec3::X * (*array_count as f32 * (*side_length as f32 * 1.5))
         + Vec3::Y * *side_length as f32;
     let slider_transform = Transform::from_translation(slider_pos)
         .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
