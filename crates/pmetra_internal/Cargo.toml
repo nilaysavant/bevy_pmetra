@@ -23,11 +23,11 @@ lazy_static = "1.4"
 # picking
 bevy_mod_picking = "0.18"
 # truck stuff
-truck-modeling = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
-truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
-truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
-truck-topology = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
-truck-base = { git = "https://github.com/nilaysavant/truck.git", rev = "fce162b" }
+truck-modeling = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
+truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
+truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
+truck-topology = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
+truck-base = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async
