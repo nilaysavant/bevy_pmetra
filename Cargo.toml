@@ -13,7 +13,7 @@ categories = [
     "3D",
     "graphics",
 ]
-exclude = ["assets/", ".github/", "crates/"]
+exclude = ["assets/", ".github/"]
 keywords = [
     "bevy",
     "parametric",
