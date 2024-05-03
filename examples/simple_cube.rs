@@ -170,7 +170,7 @@ fn cube_mesh_builder(
     shell_name: CadShellName,
 ) -> Result<CadMeshBuilder<SimpleCube>> {
     let SimpleCube { array_count, .. } = &params;
-    let transform = Transform::from_translation(Vec3::X * *array_count as f32);
+    let transform = Transform::from_translation(Vec3::X * (*array_count as f32 - 1.));
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::RED.into())?;
@@ -197,14 +197,14 @@ impl PmetraInteractions for SimpleCube {
         if name.0 == "SideLengthSlider" {
             let delta = new_transform.translation - prev_transform.translation;
             if delta.length() > 0. {
-                self.side_length = delta.length() as f64;
+                self.side_length += delta.z as f64;
             }
         }
     }
 
     fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
         if name.0 == "SideLengthSlider" {
-            Ok(Some(format!("Side Length: {:.2}", self.side_length)))
+            Ok(Some(format!("side_length: {:.2}", self.side_length)))
         } else {
             Ok(None)
         }
@@ -215,21 +215,9 @@ fn build_side_length_slider(
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
     let SimpleCube { side_length, .. } = &params;
-
     let cad_shell = shells_by_name
         .get(&CadShellName("SimpleCube".to_string()))
         .ok_or_else(|| anyhow!("Could not get cube shell!"))?;
-
-    let Some(CadElement::Vertex(vertex_v0)) =
-        cad_shell.get_element_by_tag(CadElementTag::new("VertexV0"))
-    else {
-        return Err(anyhow!("Could not find vertex!"));
-    };
-    let Some(CadElement::Vertex(vertex_v1)) =
-        cad_shell.get_element_by_tag(CadElementTag::new("VertexV1"))
-    else {
-        return Err(anyhow!("Could not find vertex!"));
-    };
     let Some(CadElement::Face(face)) =
         cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
     else {
@@ -239,20 +227,17 @@ fn build_side_length_slider(
     let face_boundaries = face.boundaries();
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
-    let local_right_direction =
-        (vertex_v1.point().as_bevy_vec3() - vertex_v0.point().as_bevy_vec3()).normalize();
-
-    let slider_pos = face_centroid.as_vec3() - Vec3::Z * (*side_length as f32 / 2. + 0.1);
+    let slider_pos = face_centroid.as_vec3() + Vec3::Z * (*side_length as f32 / 2. + 0.1);
     let slider_transform = Transform::from_translation(slider_pos)
-        .with_rotation(get_rotation_from_normals(Vec3::Y, face_normal));
+        .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
     Ok(CadSlider {
-        normal: *slider_transform.up(),
+        normal: face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
-            direction: *slider_transform.local_x(),
-            limit_min: None,
-            limit_max: None,
+            direction: Vec3::Z,
+            limit_min: Some(Vec3::Z * 0.2),
+            limit_max: Some(Vec3::INFINITY),
         },
         ..default()
     })
