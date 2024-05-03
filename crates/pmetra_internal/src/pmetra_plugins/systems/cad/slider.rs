@@ -19,6 +19,7 @@ use crate::{
             params_ui::ParamDisplayUi,
         },
         events::slider::TransformSliderEvent,
+        systems::gizmos::PmetraSliderOutlineGizmos,
     },
 };
 
@@ -301,7 +302,7 @@ pub fn draw_slider_gizmo(
         ),
         (With<CadGeneratedSlider>, Without<CadGeneratedMesh>),
     >,
-    mut gizmos: Gizmos,
+    mut gizmos: Gizmos<PmetraSliderOutlineGizmos>,
 ) {
     for (root_ent, selection_state) in cad_generated.iter() {
         for (&BelongsToCadGeneratedRoot(cur_root_ent), config, glob_transform) in sliders.iter() {
