@@ -27,6 +27,8 @@ fn main() {
         ))
         // scene...
         .add_systems(Startup, scene_setup)
+        // debug...
+        .add_systems(Update, render_origin_gizmo)
         // rest...
         .add_systems(Startup, || info!("SimpleCube example started!"))
         .run();
@@ -71,6 +73,15 @@ fn scene_setup(
     });
     // Spawn the simple cube...
     spawn_simple_cube.send(GenerateCadModel::default());
+}
+
+fn render_origin_gizmo(mut gizmos: Gizmos) {
+    // x
+    gizmos.arrow(Vec3::ZERO, Vec3::X, Color::RED);
+    // y
+    gizmos.arrow(Vec3::ZERO, Vec3::Y, Color::GREEN);
+    // z
+    gizmos.arrow(Vec3::ZERO, Vec3::Z, Color::BLUE);
 }
 
 /// Create struct for the simple parametric cube.
