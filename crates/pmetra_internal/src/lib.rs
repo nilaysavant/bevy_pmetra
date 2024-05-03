@@ -30,5 +30,7 @@ pub mod prelude {
 
 /// Re-exported library modules. (incl truck modules).
 pub mod re_exports {
-    pub use {bevy_mod_picking, truck_meshalgo, truck_modeling, truck_shapeops, truck_topology};
+    pub use {
+        anyhow, bevy_mod_picking, truck_meshalgo, truck_modeling, truck_shapeops, truck_topology,
+    };
 }
