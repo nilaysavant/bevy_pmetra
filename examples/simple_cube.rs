@@ -16,6 +16,7 @@ use smooth_bevy_cameras::{
 fn main() {
     App::new() // app
         .add_plugins(DefaultPlugins)
+        .insert_resource(ClearColor(Color::BLACK))
         // orbit camera...
         .add_plugins((LookTransformPlugin, OrbitCameraPlugin::default()))
         // pmetra...
