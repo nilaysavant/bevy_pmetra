@@ -39,7 +39,7 @@ impl Default for PmetraGlobalSettings {
         Self {
             show_selected_mesh_local_debug_axis: true,
             show_selected_mesh_outlines: true,
-            selected_mesh_outlines_width: 1.0,
+            selected_mesh_outlines_width: 1.25,
         }
     }
 }
