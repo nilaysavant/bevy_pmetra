@@ -3,7 +3,6 @@
   padding: 0;
 }
 
-body,
 html {
   height: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -11,6 +10,8 @@ html {
 }
 
 body {
+  height: 100vh;
+  width: 100vw;
   background-color: #151515;
   margin: 0;
   display: flex;
@@ -19,7 +20,8 @@ body {
 }
 
 main {
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
