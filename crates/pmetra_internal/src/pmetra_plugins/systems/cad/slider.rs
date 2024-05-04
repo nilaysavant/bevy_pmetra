@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    pbr::{NotShadowCaster, NotShadowReceiver},
+    prelude::*,
+};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*,
 };
@@ -19,6 +22,7 @@ use crate::{
             params_ui::ParamDisplayUi,
         },
         events::slider::TransformSliderEvent,
+        resources::PmetraGlobalSettings,
         systems::gizmos::PmetraSliderOutlineGizmos,
     },
 };
@@ -57,6 +61,7 @@ pub fn slider_drag_start(
         ),
         With<CadGeneratedSlider>,
     >,
+    global_settings: Res<PmetraGlobalSettings>,
 ) {
     let slider = drag_event.target();
     let Ok((
@@ -72,6 +77,11 @@ pub fn slider_drag_start(
     else {
         return;
     };
+    let PmetraGlobalSettings {
+        slider_drag_plane_size,
+        slider_drag_plane_debug,
+        ..
+    } = *global_settings;
     // set state to dragging
     *slider_state = CadGeneratedSliderState::Dragging;
 
@@ -83,9 +93,13 @@ pub fn slider_drag_start(
     let drag_plane = commands
         .spawn((
             PbrBundle {
-                mesh: meshes.add(shape::Plane::from_size(100.)),
+                mesh: meshes.add(shape::Plane::from_size(slider_drag_plane_size)),
                 material: materials.add(StandardMaterial {
-                    base_color: Color::WHITE.with_a(0.0),
+                    base_color: Color::GREEN.with_a(if slider_drag_plane_debug {
+                        0.75
+                    } else {
+                        0.0
+                    }),
                     alpha_mode: AlphaMode::Blend,
                     double_sided: true,
                     cull_mode: None,
@@ -94,6 +108,8 @@ pub fn slider_drag_start(
                 transform,
                 ..default()
             },
+            NotShadowCaster,
+            NotShadowReceiver,
             CadGeneratedSliderDragPlane,
             BelongsToCadGeneratedSlider(slider),
             BelongsToCadGeneratedRoot(*cad_root),
