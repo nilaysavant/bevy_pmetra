@@ -11,7 +11,7 @@
     <link data-trunk rel="inline" href="web/styles.css" />
     <link data-trunk rel="tailwind-css" href="web/tailwind.css" />
   </head>
-  <body class="bg-slate-900 w-screen flex flex-col items-stretch">
+  <body class="bg-slate-900 w-screen min-h-screen flex flex-col items-stretch">
     <link
       data-trunk
       rel="rust"
@@ -31,7 +31,7 @@
         <span
           class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-700 flex flex-wrap items-center text-base justify-center"
         >
-          Parametric modelling for Bevy Engine
+          Parametric modelling for Bevy Game Engine
         </span>
         <a
           class="inline-flex items-center bg-gray-800 border-0 py-2 px-2 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0"
@@ -67,13 +67,14 @@
         <div class="text-white mt-4">LOADING</div>
       </div>
       <canvas id="bevy">Javascript and support for canvas is required</canvas>
-    </main>
-    <div class="flex-col items-center justify-center text-center mb-8">
-      <div class="text-gray-400">
-        With ❤️ using <a>Bevy Engine</a>, <a>Truck</a> and
-        <a>Rust 🦀</a>
+      <div class="flex-col items-center justify-center text-center mt-6">
+        <div class="text-gray-400">
+          With ❤️ using <a>Bevy Engine</a>, <a>Truck</a> and
+          <a>Rust 🦀</a>
+        </div>
       </div>
-    </div>
+    </main>
+    <div class="mt-auto"></div>
     <footer class="bg-gray-900">
       <div
         class="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row"
