@@ -1,31 +1,11 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-
 body {
-  height: 100vh;
+  /* height: 100vh;
   width: 100vw;
   background-color: #151515;
   margin: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-}
-
-main {
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0.8;
+  align-items: center; */
   background: rgb(1, 0, 24);
   background: linear-gradient(
     0deg,
@@ -40,27 +20,20 @@ main {
 }
 
 .game-container {
-  padding-top: 1rem;
+  /* padding-top: 1rem;
   padding-bottom: 1rem;
   background-color: #ffffff11;
   width: 100vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
 }
 
 .lds-dual-ring {
   color: white;
   text-align: center;
   align-items: center;
-  display: inline-block;
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width: 80px;
-  height: 80px;
 }
 
 .lds-dual-ring:before {
@@ -85,7 +58,7 @@ main {
 
 canvas {
   min-height: 720px;
-  min-width: 1280px;
+  max-width: 100%;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   outline: #0015ff;
   -webkit-tap-highlight-color: rgb(8, 0, 255); /* mobile webkit */
