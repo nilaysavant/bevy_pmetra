@@ -2,17 +2,25 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
     <title>Pmetra Demo</title>
     <link data-trunk rel="copy-dir" href="assets" />
-    <!-- <link data-trunk rel="css" href="build/web/styles.css" /> -->
+    <link data-trunk rel="inline" href="web/styles.css" />
   </head>
   <body>
-    <link data-trunk rel="rust" href="./pmetra_demo" data-type="main" data-wasm-opt="0" />
-    <div class="container">
-      <span id="wasm-loading-text" class="container__loadingText"
-        >Loading...</span
-      >
-      <canvas id="bevy"></canvas>
+    <link
+      data-trunk
+      rel="rust"
+      href="./pmetra_demo"
+      data-type="main"
+      data-wasm-opt="0"
+    />
+    <div class="game-container">
+      <div class="lds-dual-ring"></div>
+      <canvas id="bevy"> Javascript and support for canvas is required </canvas>
     </div>
   </body>
 </html>
