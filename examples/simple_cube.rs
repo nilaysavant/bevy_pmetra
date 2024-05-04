@@ -76,11 +76,8 @@ fn scene_setup(
 }
 
 fn render_origin_gizmo(mut gizmos: Gizmos) {
-    // x
     gizmos.arrow(Vec3::ZERO, Vec3::X, Color::RED);
-    // y
     gizmos.arrow(Vec3::ZERO, Vec3::Y, Color::GREEN);
-    // z
     gizmos.arrow(Vec3::ZERO, Vec3::Z, Color::BLUE);
 }
 
