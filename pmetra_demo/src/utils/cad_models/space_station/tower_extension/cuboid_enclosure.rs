@@ -165,7 +165,7 @@ pub fn build_tower_length_slider(
             .with_rotation(get_rotation_from_normals(Vec3::Z, front_face_normal));
 
     Ok(CadSlider {
-        normal: front_face_normal,
+        drag_plane_normal: front_face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: top_face_normal,

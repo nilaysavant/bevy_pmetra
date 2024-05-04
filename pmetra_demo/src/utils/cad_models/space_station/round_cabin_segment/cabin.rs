@@ -344,7 +344,7 @@ pub fn build_extrude_slider(
         .get_centroid();
 
     Ok(CadSlider {
-        normal: slider_normal,
+        drag_plane_normal: slider_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: extruded_profile_face_normal,
@@ -404,7 +404,7 @@ pub fn build_corner_radius_slider(
     let max_corner_radius = (profile_width / 2.).min(profile_height / 2.);
 
     Ok(CadSlider {
-        normal: extruded_profile_face_normal,
+        drag_plane_normal: extruded_profile_face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: ref_edge_direction,
@@ -456,7 +456,7 @@ pub fn build_profile_width_slider(
             .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
     Ok(CadSlider {
-        normal: slider_normal,
+        drag_plane_normal: slider_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: right_face_normal,
@@ -513,7 +513,7 @@ pub fn build_profile_height_slider(
             .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
     Ok(CadSlider {
-        normal: slider_normal,
+        drag_plane_normal: slider_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: top_face_normal,
@@ -581,7 +581,7 @@ pub fn build_profile_thickness_slider(
             ));
 
     Ok(CadSlider {
-        normal: extruded_profile_face_normal,
+        drag_plane_normal: extruded_profile_face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: ref_edge_direction,
@@ -632,7 +632,7 @@ pub fn build_window_translation_slider(
             .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
     Ok(CadSlider {
-        normal: face_normal,
+        drag_plane_normal: face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Planer,
         ..default()

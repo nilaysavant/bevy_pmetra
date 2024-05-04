@@ -148,7 +148,7 @@ pub fn build_side_length_slider(
     slider_transform.rotate_y(std::f32::consts::FRAC_PI_2);
 
     Ok(CadSlider {
-        normal: *mesh_transform.up(),
+        drag_plane_normal: *mesh_transform.up(),
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: *mesh_transform.local_x(),

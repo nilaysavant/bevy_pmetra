@@ -241,7 +241,7 @@ fn build_side_length_slider(
         .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
     Ok(CadSlider {
-        normal: face_normal,
+        drag_plane_normal: face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: Vec3::Z,
@@ -279,7 +279,7 @@ fn build_array_count_slider(
         .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
     Ok(CadSlider {
-        normal: face_normal,
+        drag_plane_normal: face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: Vec3::X,

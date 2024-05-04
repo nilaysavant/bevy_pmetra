@@ -23,7 +23,7 @@ impl From<String> for CadSliderName {
 
 #[derive(Debug, Clone)]
 pub struct CadSlider {
-    pub normal: Vec3,
+    pub drag_plane_normal: Vec3,
     pub transform: Transform,
     pub thumb_radius: f32,
     pub slider_type: CadSliderType,
@@ -32,7 +32,7 @@ pub struct CadSlider {
 impl Default for CadSlider {
     fn default() -> Self {
         Self {
-            normal: Default::default(),
+            drag_plane_normal: Vec3::Y,
             transform: Default::default(),
             thumb_radius: 0.1,
             slider_type: Default::default(),

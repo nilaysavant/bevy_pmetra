@@ -182,7 +182,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
         };
         for (slider_name, slider) in sliders.iter() {
             let CadSlider {
-                normal,
+                drag_plane_normal,
                 transform,
                 thumb_radius,
                 slider_type,
@@ -240,7 +240,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                         CadGeneratedSlider,
                         CadGeneratedSliderConfig {
                             thumb_radius: *thumb_radius,
-                            drag_plane_normal: *normal,
+                            drag_plane_normal: *drag_plane_normal,
                             slider_type: slider_type.clone(),
                         },
                         CadGeneratedSliderState::default(),
