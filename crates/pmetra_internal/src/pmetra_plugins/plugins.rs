@@ -26,6 +26,7 @@ use super::{
     },
     systems::{
         cad::{
+            mesh::show_mesh_local_debug_axis,
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
                 shells_to_mesh_builder_events, shells_to_sliders, spawn_shells_by_name_on_generate,
@@ -36,7 +37,7 @@ use super::{
                 hide_params_display_ui_on_out_slider, move_params_display_ui_on_transform_slider,
                 setup_param_display_ui, show_params_display_ui_on_hover_slider,
             },
-            root::{deselect_all_root_if_clicked_outside, show_mesh_local_debug_axis},
+            root::deselect_all_root_if_clicked_outside,
             settings::{show_selected_mesh_local_debug_axis, show_selected_mesh_outlines},
             slider::{
                 draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,

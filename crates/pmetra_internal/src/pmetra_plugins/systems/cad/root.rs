@@ -1,21 +1,7 @@
-use bevy::{
-    prelude::*,
-    render::camera::NormalizedRenderTarget,
-    utils::{HashSet, Uuid},
-    window::NormalizedWindowRef,
-};
-use bevy_mod_picking::{
-    pointer::{InputPress, Location},
-    prelude::*,
-};
+use bevy::{prelude::*, utils::HashSet};
+use bevy_mod_picking::{pointer::InputPress, prelude::*};
 
-use crate::pmetra_plugins::{
-    cleanup_manager::Cleanup,
-    components::cad::{
-        BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedRoot,
-        CadGeneratedRootSelectionState,
-    },
-};
+use crate::pmetra_plugins::components::cad::{CadGeneratedRoot, CadGeneratedRootSelectionState};
 
 pub fn root_pointer_move(
     pointer_event: Listener<Pointer<Move>>,
@@ -94,34 +80,5 @@ pub fn deselect_all_root_if_clicked_outside(
                 *root_selection_state = CadGeneratedRootSelectionState::None;
             }
         }
-    }
-}
-
-pub fn show_mesh_local_debug_axis(
-    cad_meshes: Query<(Entity, &PickSelection, &Transform), With<CadGeneratedMesh>>,
-    mut gizmos: Gizmos,
-) {
-    for (entity, selection, transform) in cad_meshes.iter() {
-        if !selection.is_selected {
-            continue;
-        }
-        // x
-        gizmos.arrow(
-            transform.translation,
-            transform.translation + *transform.local_x(),
-            Color::RED,
-        );
-        // y
-        gizmos.arrow(
-            transform.translation,
-            transform.translation + *transform.local_y(),
-            Color::GREEN,
-        );
-        // z
-        gizmos.arrow(
-            transform.translation,
-            transform.translation + *transform.local_z(),
-            Color::BLUE,
-        );
     }
 }
