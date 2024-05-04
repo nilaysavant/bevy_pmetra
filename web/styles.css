@@ -59,6 +59,8 @@ body {
 }
 
 canvas {
+  min-height: 500px;
+  border: 1px solid rgba(53, 66, 87, 0.722);
   outline: #0015ff;
   -webkit-tap-highlight-color: rgb(8, 0, 255); /* mobile webkit */
 }
