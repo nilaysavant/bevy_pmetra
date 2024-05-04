@@ -106,19 +106,19 @@ pub fn show_mesh_local_debug_axis(
             continue;
         }
         // x
-        gizmos.line(
+        gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_x(),
             Color::RED,
         );
         // y
-        gizmos.line(
+        gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_y(),
             Color::GREEN,
         );
         // z
-        gizmos.line(
+        gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_z(),
             Color::BLUE,
