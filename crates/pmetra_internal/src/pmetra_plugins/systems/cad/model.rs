@@ -15,8 +15,8 @@ use crate::{
         components::{
             cad::{
                 BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedMeshOutlines,
-                CadGeneratedMeshOutlinesState, CadGeneratedRoot, CadGeneratedRootSelectionState,
-                CadGeneratedSlider, CadGeneratedSliderConfig, CadGeneratedSliderPreviousTransform,
+                CadGeneratedRoot, CadGeneratedRootSelectionState, CadGeneratedSlider,
+                CadGeneratedSliderConfig, CadGeneratedSliderPreviousTransform,
                 CadGeneratedSliderState,
             },
             wire_frame::WireFrameDisplaySettings,
@@ -543,7 +543,6 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
                     Name::new(mesh_name.0.clone()),
                     CadGeneratedMesh,
                     BelongsToCadGeneratedRoot(*root_ent),
-                    CadGeneratedMeshOutlinesState::default(),
                     WireFrameDisplaySettings::default(),
                     // picking...
                     PickableBundle::default(), // <- Makes the mesh pickable.

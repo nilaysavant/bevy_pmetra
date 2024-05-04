@@ -1,69 +1,41 @@
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 
-use crate::{
-    pmetra_plugins::components::cad::{
-        CadGeneratedMesh,
-        CadGeneratedMeshOutlinesState,
-    },
-    prelude::{BelongsToCadGeneratedRoot, CadGeneratedRoot, CadGeneratedRootSelectionState},
+use crate::pmetra_plugins::components::cad::{
+    BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedRoot, CadGeneratedRootSelectionState,
 };
 
 pub fn mesh_pointer_move(
     pointer_event: Listener<Pointer<Move>>,
-    mut cad_meshes: Query<
-        (Entity, &PickSelection, &mut CadGeneratedMeshOutlinesState),
-        With<CadGeneratedMesh>,
-    >,
+    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
+    mut cad_meshes: Query<&BelongsToCadGeneratedRoot, With<CadGeneratedMesh>>,
 ) {
     let cad_mesh_ent = pointer_event.listener();
-    let Ok((_, mesh_selection, mut outlines_state)) = cad_meshes.get_mut(cad_mesh_ent) else {
+    let Ok(&BelongsToCadGeneratedRoot(root_ent)) = cad_meshes.get_mut(cad_mesh_ent) else {
         return;
     };
-    if mesh_selection.is_selected {
-        *outlines_state = CadGeneratedMeshOutlinesState::Visible;
-    } else {
-        *outlines_state = CadGeneratedMeshOutlinesState::SlightlyVisible;
+    let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
+        return;
+    };
+    if let CadGeneratedRootSelectionState::None = *root_selection_state {
+        *root_selection_state = CadGeneratedRootSelectionState::Hovered;
     }
 }
 
 pub fn mesh_pointer_out(
     pointer_event: Listener<Pointer<Out>>,
-    mut cad_meshes: Query<
-        (Entity, &PickSelection, &mut CadGeneratedMeshOutlinesState),
-        With<CadGeneratedMesh>,
-    >,
+    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
+    cad_meshes: Query<&BelongsToCadGeneratedRoot, With<CadGeneratedMesh>>,
 ) {
     let cad_mesh_ent = pointer_event.listener();
-    let Ok((_, mesh_selection, mut outlines_state)) = cad_meshes.get_mut(cad_mesh_ent) else {
+    let Ok(&BelongsToCadGeneratedRoot(root_ent)) = cad_meshes.get(cad_mesh_ent) else {
         return;
     };
-    if mesh_selection.is_selected {
-        *outlines_state = CadGeneratedMeshOutlinesState::Visible;
-    } else {
-        *outlines_state = CadGeneratedMeshOutlinesState::default();
-    }
-}
-
-pub fn handle_mesh_selection(
-    mut cad_meshes: Query<
-        (
-            Entity,
-            &PickSelection,
-            &mut CadGeneratedMeshOutlinesState,
-            &BelongsToCadGeneratedRoot,
-        ),
-        (With<CadGeneratedMesh>, Changed<PickSelection>),
-    >,
-) {
-    for (cad_mesh_ent, selection, mut outlines_state, &BelongsToCadGeneratedRoot(root_ent)) in
-        cad_meshes.iter_mut()
-    {
-        if selection.is_selected {
-            *outlines_state = CadGeneratedMeshOutlinesState::Visible;
-        } else {
-            *outlines_state = CadGeneratedMeshOutlinesState::default();
-        }
+    let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
+        return;
+    };
+    if let CadGeneratedRootSelectionState::Hovered = *root_selection_state {
+        *root_selection_state = CadGeneratedRootSelectionState::None;
     }
 }
 
@@ -71,7 +43,7 @@ pub fn update_root_selection_based_on_mesh_selection(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     cad_meshes: Query<(Entity, &PickSelection, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
 ) {
-    for (root_ent, mut root_selection) in cad_generated.iter_mut() {
+    for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
         let any_mesh_selected =
             cad_meshes
                 .iter()
@@ -79,9 +51,9 @@ pub fn update_root_selection_based_on_mesh_selection(
                     cur_root_ent == root_ent && selection.is_selected
                 });
         if any_mesh_selected {
-            *root_selection = CadGeneratedRootSelectionState::Selected;
-        } else {
-            *root_selection = CadGeneratedRootSelectionState::None;
+            *root_selection_state = CadGeneratedRootSelectionState::Selected;
+        } else if !matches!(*root_selection_state, CadGeneratedRootSelectionState::Hovered) {
+            *root_selection_state = CadGeneratedRootSelectionState::None;
         }
     }
 }

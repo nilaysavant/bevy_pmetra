@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::pmetra_core::builders::{CadSliderType, CadMeshOutlines};
+use crate::pmetra_core::builders::{CadMeshOutlines, CadSliderType};
 
 /// Marker for CAD generated entities root.
 #[derive(Debug, Component, Reflect)]
@@ -12,6 +12,8 @@ pub enum CadGeneratedRootSelectionState {
     /// No selection.
     #[default]
     None,
+    /// Hovered.
+    Hovered,
     /// Selected.
     Selected,
 }
@@ -32,14 +34,6 @@ pub struct BelongsToCadGeneratedMesh(pub Entity);
 /// for [`CadGeneratedMesh`].
 #[derive(Debug, Component)]
 pub struct CadGeneratedMeshOutlines(pub CadMeshOutlines);
-
-#[derive(Debug, Component, Default)]
-pub enum CadGeneratedMeshOutlinesState {
-    #[default]
-    Invisible,
-    SlightlyVisible,
-    Visible,
-}
 
 #[derive(Debug, Component)]
 pub struct CadGeneratedSlider;
