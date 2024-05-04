@@ -39,9 +39,17 @@ pub fn spawn_cad_model(
         CadGeneratedModelParamsId::RoundCabinSegment => {
             round_cabin_segment.send(GenerateCadModel::default());
         }
-        CadGeneratedModelParamsId::MultiSimplCubeAtCylinderAndTowerExtension => {
+        CadGeneratedModelParamsId::MultiModelsSimplCubeAtCylinderAndTowerExtension => {
             spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
             tower_extension.send(GenerateCadModel {
+                remove_existing_models: false,
+                ..Default::default()
+            });
+        }
+        CadGeneratedModelParamsId::MultiModels2TowerExtensions => {
+            tower_extension.send(GenerateCadModel::default());
+            tower_extension.send(GenerateCadModel {
+                transform: Transform::from_translation(Vec3::X * 1.),
                 remove_existing_models: false,
                 ..Default::default()
             });

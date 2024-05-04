@@ -43,6 +43,7 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
 ) {
     for GenerateCadModel {
         params,
+        transform,
         remove_existing_models,
     } in events.read()
     {
@@ -59,7 +60,7 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
         // Spawn root...
         let root_ent = commands
             .spawn((
-                SpatialBundle::default(),
+                SpatialBundle::from_transform(*transform),
                 CadGeneratedRoot,
                 CadGeneratedRootSelectionState::default(),
                 params.clone(),
