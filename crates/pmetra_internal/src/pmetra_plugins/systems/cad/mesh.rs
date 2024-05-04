@@ -53,6 +53,7 @@ pub fn update_root_selection_based_on_mesh_selection(
         if any_mesh_selected {
             *root_selection_state = CadGeneratedRootSelectionState::Selected;
         } else if !matches!(*root_selection_state, CadGeneratedRootSelectionState::Hovered) {
+            // Only set to None if not already in hovered. Otherwise it wont show hovered (will override).
             *root_selection_state = CadGeneratedRootSelectionState::None;
         }
     }
