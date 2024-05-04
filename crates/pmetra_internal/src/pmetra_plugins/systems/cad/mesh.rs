@@ -1,8 +1,20 @@
-use bevy::{prelude::*, utils::HashSet};
-use bevy_mod_picking::{pointer::InputPress, prelude::*};
+use bevy::{
+    prelude::*,
+    render::camera::NormalizedRenderTarget,
+    utils::{HashSet, Uuid},
+    window::NormalizedWindowRef,
+};
+use bevy_mod_picking::{
+    pointer::{InputPress, Location},
+    prelude::*,
+};
 
-use crate::pmetra_plugins::components::cad::{
-    BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedRoot, CadGeneratedRootSelectionState,
+use crate::pmetra_plugins::{
+    cleanup_manager::Cleanup,
+    components::cad::{
+        BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedRoot,
+        CadGeneratedRootSelectionState,
+    },
 };
 
 pub fn root_pointer_move(
@@ -31,23 +43,15 @@ pub fn root_pointer_out(
     }
 }
 
-pub fn root_on_select(
-    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
-    selection_event: Listener<Pointer<Select>>,
+pub fn root_on_click(
+    mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
+    selection_event: Listener<Pointer<Click>>,
 ) {
-    let root_ent = selection_event.listener();
-    if let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) {
-        *root_selection_state = CadGeneratedRootSelectionState::Selected;
-    }
-}
-
-pub fn root_on_deselect(
-    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
-    deselection_event: Listener<Pointer<Deselect>>,
-) {
-    let root_ent = deselection_event.listener();
-    if let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) {
-        if !matches!(
+    let selected_root_ent = selection_event.listener();
+    for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
+        if root_ent == selected_root_ent {
+            *root_selection_state = CadGeneratedRootSelectionState::Selected;
+        } else if !matches!(
             *root_selection_state,
             CadGeneratedRootSelectionState::Hovered
         ) {

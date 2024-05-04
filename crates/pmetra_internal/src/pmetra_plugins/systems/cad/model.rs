@@ -32,7 +32,7 @@ use crate::{
 };
 
 use super::{
-    mesh::{root_on_deselect, root_on_select, root_pointer_move, root_pointer_out},
+    mesh::{root_on_click, root_pointer_move, root_pointer_out},
     slider::{slider_drag_end, slider_drag_start},
 };
 
@@ -66,8 +66,7 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
                 // picking...
                 On::<Pointer<Move>>::run(root_pointer_move),
                 On::<Pointer<Out>>::run(root_pointer_out),
-                On::<Pointer<Select>>::run(root_on_select),
-                On::<Pointer<Deselect>>::run(root_on_deselect),
+                On::<Pointer<Click>>::run(root_on_click),
             ))
             .id();
 
