@@ -122,14 +122,6 @@ fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
             .to_array()
             .into(),
     );
-    tagged_elements.insert(
-        CadElementTag("VertexV0".into()),
-        CadElement::Vertex(v0.clone()),
-    );
-    tagged_elements.insert(
-        CadElementTag("VertexV1".into()),
-        CadElement::Vertex(v1.clone()),
-    );
     let edge = builder::tsweep(&v0, v1.point().to_vec() - v0.point().to_vec());
     let face = builder::tsweep(&edge, -Vector3::unit_z() * *side_length);
     tagged_elements.insert(
@@ -212,7 +204,9 @@ impl PmetraInteractions for SimpleCube {
         } else if name.0 == "ArrayCountSlider" {
             let delta = new_transform.translation - prev_transform.translation;
             if delta.length() > 0. {
-                self.array_count = (new_transform.translation.x / (self.side_length as f32 * 1.5)).floor() as u32 + 1;
+                self.array_count = (new_transform.translation.x / (self.side_length as f32 * 1.5))
+                    .floor() as u32
+                    + 1;
             }
         }
     }
