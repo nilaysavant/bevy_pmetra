@@ -212,7 +212,7 @@ pub fn transform_slider(
         let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedSlider(slider))) =
             slider_drag_planes.get(drag_plane)
         else {
-            error!("drag plane not found!");
+            warn!("drag plane not found!");
             return;
         };
         let Ok((_, root_transform)) = cad_generated.get(root_ent) else {

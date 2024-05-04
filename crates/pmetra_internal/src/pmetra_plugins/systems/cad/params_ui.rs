@@ -134,7 +134,7 @@ pub fn move_params_display_ui_on_transform_slider<Params: PmetraInteractions + C
     for TransformSliderEvent { target, hit } in events.read() {
         let drag_plane = *target;
         let Ok(BelongsToCadGeneratedSlider(slider)) = slider_drag_planes.get(drag_plane) else {
-            error!("drag plane not found!");
+            warn!("drag plane not found!");
             return;
         };
         let Ok((slider_transform, slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) =
