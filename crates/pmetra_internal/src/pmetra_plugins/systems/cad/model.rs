@@ -32,7 +32,7 @@ use crate::{
 };
 
 use super::{
-    mesh::{root_on_click, root_pointer_move, root_pointer_out},
+    root::{root_on_click, root_pointer_move, root_pointer_out},
     slider::{slider_drag_end, slider_drag_start},
 };
 
