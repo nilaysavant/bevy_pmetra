@@ -31,9 +31,12 @@ pub fn root_pointer_out(
 
 pub fn root_on_click(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    selection_event: Listener<Pointer<Click>>,
+    click_event: Listener<Pointer<Click>>,
 ) {
-    let selected_root_ent = selection_event.listener();
+    if click_event.button != PointerButton::Primary {
+        return;
+    }
+    let selected_root_ent = click_event.listener();
     for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
         if root_ent == selected_root_ent {
             *root_selection_state = CadGeneratedRootSelectionState::Selected;
