@@ -53,7 +53,8 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
                 let Some(mut ent_commands) = commands.get_entity(root_ent) else {
                     continue;
                 };
-                ent_commands.insert(Cleanup::Recursive);
+                // Using try_insert to prevent panic...
+                ent_commands.try_insert(Cleanup::Recursive);
             }
         }
 
