@@ -115,7 +115,7 @@ impl Plugin for PmetraBasePlugin {
                 Update,
                 (
                     render_mesh_outlines.run_if(show_selected_mesh_outlines),
-                    update_root_selection_based_on_mesh_selection,
+                    // update_root_selection_based_on_mesh_selection,
                     show_mesh_local_debug_axis.run_if(show_selected_mesh_local_debug_axis),
                 ),
             )

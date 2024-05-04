@@ -6,10 +6,7 @@ use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
-        space_station::{
-            round_cabin_segment::RoundCabinSegment,
-            tower_extension::TowerExtension,
-        },
+        space_station::{round_cabin_segment::RoundCabinSegment, tower_extension::TowerExtension},
     },
 };
 
@@ -41,6 +38,10 @@ pub fn spawn_cad_model(
         }
         CadGeneratedModelParamsId::RoundCabinSegment => {
             round_cabin_segment.send(GenerateCadModel::default());
+        }
+        CadGeneratedModelParamsId::MultiSimplCubeAtCylinderAndTowerExtension => {
+            spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
+            tower_extension.send(GenerateCadModel::default());
         }
     }
 }

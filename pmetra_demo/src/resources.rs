@@ -11,4 +11,5 @@ pub enum CadGeneratedModelParamsId {
     SimplCubeAtCylinder,
     TowerExtension,
     RoundCabinSegment,
+    MultiSimplCubeAtCylinderAndTowerExtension,
 }

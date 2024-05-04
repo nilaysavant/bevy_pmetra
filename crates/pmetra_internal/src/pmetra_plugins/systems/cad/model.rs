@@ -32,7 +32,7 @@ use crate::{
 };
 
 use super::{
-    mesh::{mesh_pointer_move, mesh_pointer_out},
+    mesh::{root_on_deselect, root_on_select, root_pointer_move, root_pointer_out},
     slider::{slider_drag_end, slider_drag_start},
 };
 
@@ -63,6 +63,11 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
                 CadGeneratedRoot,
                 CadGeneratedRootSelectionState::default(),
                 params.clone(),
+                // picking...
+                On::<Pointer<Move>>::run(root_pointer_move),
+                On::<Pointer<Out>>::run(root_pointer_out),
+                On::<Pointer<Select>>::run(root_on_select),
+                On::<Pointer<Deselect>>::run(root_on_deselect),
             ))
             .id();
 
@@ -553,9 +558,6 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
                         pressed: Some(HighlightKind::Fixed(material_hdl.clone())),
                         selected: Some(HighlightKind::Fixed(material_hdl.clone())),
                     },
-                    // Add drag plane on drag start...
-                    On::<Pointer<Move>>::run(mesh_pointer_move),
-                    On::<Pointer<Out>>::run(mesh_pointer_out),
                 ));
         }
     }

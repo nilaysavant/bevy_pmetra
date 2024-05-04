@@ -5,15 +5,11 @@ use crate::pmetra_plugins::components::cad::{
     BelongsToCadGeneratedRoot, CadGeneratedMesh, CadGeneratedRoot, CadGeneratedRootSelectionState,
 };
 
-pub fn mesh_pointer_move(
+pub fn root_pointer_move(
     pointer_event: Listener<Pointer<Move>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
-    mut cad_meshes: Query<&BelongsToCadGeneratedRoot, With<CadGeneratedMesh>>,
 ) {
-    let cad_mesh_ent = pointer_event.listener();
-    let Ok(&BelongsToCadGeneratedRoot(root_ent)) = cad_meshes.get_mut(cad_mesh_ent) else {
-        return;
-    };
+    let root_ent = pointer_event.listener();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
@@ -22,20 +18,41 @@ pub fn mesh_pointer_move(
     }
 }
 
-pub fn mesh_pointer_out(
+pub fn root_pointer_out(
     pointer_event: Listener<Pointer<Out>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
-    cad_meshes: Query<&BelongsToCadGeneratedRoot, With<CadGeneratedMesh>>,
 ) {
-    let cad_mesh_ent = pointer_event.listener();
-    let Ok(&BelongsToCadGeneratedRoot(root_ent)) = cad_meshes.get(cad_mesh_ent) else {
-        return;
-    };
+    let root_ent = pointer_event.listener();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
     if let CadGeneratedRootSelectionState::Hovered = *root_selection_state {
         *root_selection_state = CadGeneratedRootSelectionState::None;
+    }
+}
+
+pub fn root_on_select(
+    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
+    selection_event: Listener<Pointer<Select>>,
+) {
+    let root_ent = selection_event.listener();
+    if let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) {
+        *root_selection_state = CadGeneratedRootSelectionState::Selected;
+    }
+}
+
+pub fn root_on_deselect(
+    mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
+    deselection_event: Listener<Pointer<Deselect>>,
+) {
+    let root_ent = deselection_event.listener();
+    if let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) {
+        if !matches!(
+            *root_selection_state,
+            CadGeneratedRootSelectionState::Hovered
+        ) {
+            *root_selection_state = CadGeneratedRootSelectionState::None;
+        }
     }
 }
 
