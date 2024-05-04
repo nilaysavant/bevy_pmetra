@@ -118,7 +118,7 @@ pub fn move_params_display_ui_on_transform_slider<Params: PmetraInteractions + C
     mut ui_nodes: Query<(&mut Text, &mut Style, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
     sliders: Query<
-        (&Transform, &CadSliderName, &BelongsToCadGeneratedRoot),
+        (&GlobalTransform, &CadSliderName, &BelongsToCadGeneratedRoot),
         With<CadGeneratedSlider>,
     >,
 ) {
@@ -137,7 +137,7 @@ pub fn move_params_display_ui_on_transform_slider<Params: PmetraInteractions + C
             warn!("drag plane not found!");
             return;
         };
-        let Ok((slider_transform, slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) =
+        let Ok((slider_glob_transform, slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) =
             sliders.get(*slider)
         else {
             continue;
@@ -156,7 +156,7 @@ pub fn move_params_display_ui_on_transform_slider<Params: PmetraInteractions + C
         };
         // Get view translation to set the UI pos from world slider pos.
         let Some(viewport_pos) =
-            camera.world_to_viewport(cam_glob_transform, slider_transform.translation)
+            camera.world_to_viewport(cam_glob_transform, slider_glob_transform.translation())
         else {
             error!("Could not find world_to_viewport pos!");
             return;
