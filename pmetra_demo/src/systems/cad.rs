@@ -41,7 +41,10 @@ pub fn spawn_cad_model(
         }
         CadGeneratedModelParamsId::MultiSimplCubeAtCylinderAndTowerExtension => {
             spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
-            tower_extension.send(GenerateCadModel::default());
+            tower_extension.send(GenerateCadModel {
+                remove_existing_models: false,
+                ..Default::default()
+            });
         }
     }
 }
