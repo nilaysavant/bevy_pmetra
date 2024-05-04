@@ -56,23 +56,11 @@ pub fn root_on_deselect(
     }
 }
 
-pub fn update_root_selection_based_on_mesh_selection(
+pub fn deselect_all_root_if_clicked_outside(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    cad_meshes: Query<&BelongsToCadGeneratedRoot, With<CadGeneratedMesh>>,
     mut pointer_down: EventReader<Pointer<Down>>,
     mut presses: EventReader<InputPress>,
-    mut selections: EventReader<Pointer<Select>>,
 ) {
-    // Check for selections, if a mesh is selected, set the root to selected.
-    for selection_event in selections.read() {
-        if let Ok(&BelongsToCadGeneratedRoot(root_ent)) = cad_meshes.get(selection_event.target) {
-            let Ok((_, mut root_selection_state)) = cad_generated.get_mut(root_ent) else {
-                continue;
-            };
-            *root_selection_state = CadGeneratedRootSelectionState::Selected;
-        }
-    }
-
     // Following is borrowed from `bevy_mod_picking`: https://github.com/aevyrie/bevy_mod_picking/blob/0af5d0c80cd027c74373e74bbfe143119f791c06/crates/bevy_picking_selection/src/lib.rs#L155-L214
     // Used to de-select all root entities if a pointer has clicked on nothing...
 

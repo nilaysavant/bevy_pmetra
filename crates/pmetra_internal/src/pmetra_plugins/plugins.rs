@@ -26,7 +26,7 @@ use super::{
     },
     systems::{
         cad::{
-            mesh::{show_mesh_local_debug_axis, update_root_selection_based_on_mesh_selection},
+            mesh::{deselect_all_root_if_clicked_outside, show_mesh_local_debug_axis},
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
                 shells_to_mesh_builder_events, shells_to_sliders, spawn_shells_by_name_on_generate,
@@ -115,7 +115,7 @@ impl Plugin for PmetraBasePlugin {
                 Update,
                 (
                     render_mesh_outlines.run_if(show_selected_mesh_outlines),
-                    // update_root_selection_based_on_mesh_selection,
+                    deselect_all_root_if_clicked_outside,
                     show_mesh_local_debug_axis.run_if(show_selected_mesh_local_debug_axis),
                 ),
             )
