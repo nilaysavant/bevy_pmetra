@@ -1,11 +1,4 @@
 body {
-  /* height: 100vh;
-  width: 100vw;
-  background-color: #151515;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center; */
   background: rgb(1, 0, 24);
   background: linear-gradient(
     0deg,
@@ -17,17 +10,6 @@ body {
     rgba(5, 97, 179, 1) 100%,
     rgba(0, 212, 255, 1) 100%
   );
-}
-
-.game-container {
-  /* padding-top: 1rem;
-  padding-bottom: 1rem;
-  background-color: #ffffff11;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; */
 }
 
 .lds-dual-ring {
