@@ -36,6 +36,11 @@ build-pmetra-demo-web:
   sed -i -e "s/'\//'.\//g" index.html
   echo "fix paths (from absolute to relative) in index.html... done!"
 
+trunk-serve-web:
+  #!/bin/bash
+
+  trunk serve --release --no-default-features
+
 # Serve demo web release build.
 serve-pmetra-demo-web-release:
   #!/bin/bash

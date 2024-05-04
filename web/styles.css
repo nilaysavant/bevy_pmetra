@@ -1,10 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body,
 html {
   height: 100%;
 }
 
 body {
-  background-color: lightgray;
+  background-color: #151515;
   margin: 0;
   display: flex;
   justify-content: center;
@@ -19,6 +24,11 @@ body {
 }
 
 .lds-dual-ring {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  color: white;
+  text-align: center;
+  align-items: center;
   display: inline-block;
   position: absolute;
   left: 0;
@@ -28,7 +38,7 @@ body {
   height: 80px;
 }
 
-.lds-dual-ring:after {
+.lds-dual-ring:before {
   content: " ";
   display: block;
   width: 64px;
@@ -46,6 +56,11 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+canvas {
+  outline: #0015ff;
+  -webkit-tap-highlight-color: rgb(8, 0, 255); /* mobile webkit */
 }
 
 #bevy {

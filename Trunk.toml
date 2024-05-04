@@ -17,3 +17,6 @@ public_url = "./"
 #     }
 #     main();
 # </script>'''
+
+[serve]
+port = 3000
