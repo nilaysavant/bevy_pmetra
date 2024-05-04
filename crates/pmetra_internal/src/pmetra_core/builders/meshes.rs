@@ -31,11 +31,37 @@ impl<P: Default + Clone> CadMeshesBuildersByCadShell<P> {
     }
 
     /// Add a new [`CadMeshBuilder`] to the builders.
+    ///
+    /// Builds outlines for the mesh.
+    pub fn add_mesh_builder_with_outlines(
+        &mut self,
+        shell_name: CadShellName,
+        mesh_name: String,
+        mesh_builder: CadMeshBuilder<P>,
+    ) -> Result<Self> {
+        self.add_mesh_builder_internal(shell_name, mesh_name, mesh_builder, true)
+    }
+
+    /// Add a new [`CadMeshBuilder`] to the builders.
+    ///
+    /// Does not build outlines for the mesh.
+    /// Refer to [`add_mesh_builder_with_outlines`](Self::add_mesh_builder_with_outlines) for building outlines.
     pub fn add_mesh_builder(
         &mut self,
         shell_name: CadShellName,
         mesh_name: String,
         mesh_builder: CadMeshBuilder<P>,
+    ) -> Result<Self> {
+        self.add_mesh_builder_internal(shell_name, mesh_name, mesh_builder, false)
+    }
+
+    /// Internal function to add a new [`CadMeshBuilder`] to the builders.
+    fn add_mesh_builder_internal(
+        &mut self,
+        shell_name: CadShellName,
+        mesh_name: String,
+        mesh_builder: CadMeshBuilder<P>,
+        build_outlines: bool,
     ) -> Result<Self> {
         // Get the shell and set outlines on mesh builder...
         let shell = self
@@ -43,7 +69,9 @@ impl<P: Default + Clone> CadMeshesBuildersByCadShell<P> {
             .get(&shell_name)
             .ok_or_else(|| anyhow!("Could not find shell with name: {:?}", shell_name))?;
         let mut mesh_builder = mesh_builder;
-        mesh_builder.set_outlines(shell.shell.build_outlines())?;
+        if build_outlines {
+            mesh_builder.set_outlines(shell.shell.build_outlines())?;
+        }
         if let Some(meshes_builder) = self.meshes_builders.get_mut(&shell_name) {
             // Add the mesh builder to the existing meshes builder...
             meshes_builder.add_mesh_builder(mesh_name, mesh_builder)?;

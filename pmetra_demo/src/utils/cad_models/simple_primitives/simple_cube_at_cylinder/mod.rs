@@ -79,7 +79,7 @@ impl PmetraModelling for SimpleCubeAtCylinder {
     ) -> Result<CadMeshesBuildersByCadShell<Self>> {
         let mut cad_meshes_lazy_builders_by_cad_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
-                .add_mesh_builder(
+                .add_mesh_builder_with_outlines(
                     CadShellName(CadShellIds::Cylinder.to_string()),
                     CadMeshIds::Cylinder.to_string(),
                     cylinder_mesh_builder(self, CadShellName(CadShellIds::Cylinder.to_string()))?,
@@ -87,7 +87,7 @@ impl PmetraModelling for SimpleCubeAtCylinder {
 
         let cubes_count = (self.cylinder_radius * 4.).floor() as i32;
         for i in 0..cubes_count {
-            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder(
+            cad_meshes_lazy_builders_by_cad_shell.add_mesh_builder_with_outlines(
                 CadShellName(CadShellIds::Cube.to_string()),
                 CadMeshIds::Cube.to_string() + &i.to_string(),
                 cube_mesh_builder(

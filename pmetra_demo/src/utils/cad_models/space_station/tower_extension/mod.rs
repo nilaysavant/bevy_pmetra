@@ -142,7 +142,7 @@ impl PmetraModelling for TowerExtension {
         // Create enclosure...
         let mut cad_meshes_builders_by_cad_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
-                .add_mesh_builder(
+                .add_mesh_builder_with_outlines(
                     CadShellName(CadShellIds::CuboidEnclosure.to_string()),
                     CadMeshIds::CuboidEnclosure.to_string(),
                     cuboid_enclosure_mesh_builder(

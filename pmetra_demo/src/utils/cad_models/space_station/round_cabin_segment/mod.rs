@@ -101,7 +101,7 @@ impl PmetraModelling for RoundCabinSegment {
     ) -> Result<CadMeshesBuildersByCadShell<Self>> {
         let cad_meshes_builders_by_cad_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
-                .add_mesh_builder(
+                .add_mesh_builder_with_outlines(
                     CadShellName(CadShellIds::CabinShell.to_string()),
                     CadMeshIds::CabinShell.to_string(),
                     build_cabin_mesh(self, CadShellName(CadShellIds::CabinShell.to_string()))?,

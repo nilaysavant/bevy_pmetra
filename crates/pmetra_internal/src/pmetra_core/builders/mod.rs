@@ -68,7 +68,7 @@ mod test {
                 shells_by_name: &CadShellsByName,
             ) -> Result<CadMeshesBuildersByCadShell<Self>> {
                 CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?
-                    .add_mesh_builder(
+                    .add_mesh_builder_with_outlines(
                         CadShellName("s1".into()),
                         "m1".into(),
                         CadMeshBuilder::new(self.clone(), CadShellName("s1".into()))?
