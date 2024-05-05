@@ -60,7 +60,7 @@ Implement a few `traits` on our `SimpleCube` _struct_ for _parametric_ behavior:
 
 - `PmetraCad`: For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
 - `PmetraModelling`: For parametrically generating `Mesh`(s) from struct.
-- `PmetraInteractions`: (Optional) For interactive _sliders_.
+- `PmetraInteractions`: (Optional) Setup interactions for live manipulations on models using `CadSlider`(s).
 
 ## Bevy Compatibility
 
