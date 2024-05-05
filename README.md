@@ -137,7 +137,7 @@ impl PmetraModelling for SimpleCube {
 - We add a new mesh builder for our cube using `add_mesh_builder_with_outlines()`, which includes adding outlines for the generated meshes. We can use `add_mesh_builder()` for no outlines (**more performance**!).
 - To the above we pass the `shell_name`, a name for the mesh we will be generating, along with the builder for the same.
 - The `CadMeshBuilder` takes the parameter struct and the `shell_name`. We can set the `Transform` and the `Material` of our mesh here.
-- Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop and pass down the index (for naming) and also calculate and pass the **transform** for each cube.
+- Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop and pass down the index (for naming) and also calculate and set the **transform** for each cube.
 
 ## Bevy Compatibility
 
