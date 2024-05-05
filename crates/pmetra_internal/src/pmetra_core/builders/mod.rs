@@ -14,7 +14,7 @@ pub trait PmetraCad: Clone + Default {
     fn shells_builders(&self) -> Result<CadShellsBuilders<Self>>;
 }
 
-/// Trait for parametrically generating models with [`CadSlider`]s from struct.
+/// Trait for parametrically generating [`Mesh`]s from struct.
 pub trait PmetraModelling: PmetraCad {
     /// Configure the [`CadMesh`]s to be generated for each of the [`CadShell`]s.
     fn meshes_builders_by_shell(
