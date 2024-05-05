@@ -92,7 +92,6 @@ fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
     );
     let solid = builder::tsweep(&face, Vector3::unit_y() * *side_length);
     let shell = Shell::try_from_solid(&solid)?;
-
     Ok(CadShell {
         shell,
         tagged_elements,
@@ -126,7 +125,6 @@ impl PmetraModelling for SimpleCube {
                     .set_base_material(Color::RED.into())?,
             )?;
         }
-
         Ok(meshes_builders_by_shell)
     }
 }
