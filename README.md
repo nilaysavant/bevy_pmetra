@@ -4,6 +4,8 @@
 
 Parametric Modelling for [Bevy Engine][bevy-website] using [Truck][truck-github] CAD kernel.
 
+https://github.com/nilaysavant/bevy_pmetra/assets/47603308/4203fb15-539d-4ec6-b062-8519a9ec6c34
+
 [Web Demo][pmetra-demo-web]
 
 </div>
