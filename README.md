@@ -137,6 +137,10 @@ impl PmetraModelling for SimpleCube {
 - The `CadMeshBuilder` takes the parameter struct and the `shell_name`. We can set the `Transform` and the `Material` of our mesh here.
 - Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop passing down the index (for naming) and also set the **transform** for each cube.
 
+> [!TIP]
+>
+> If you do not need _interactions_ you can skip the [PmetraInteractions](#pmetrainteractions) section and jump to the [Plugins](#pmetra-plugins) section. With this you can already have parametric behavior. Just query for your parametric struct as a component (eg. `SimpleCube`), and adjust its parameters!
+
 #### PmetraInteractions
 
 Optionally you can implement this `trait` for _interactive_ _sliders_ that can manipulate parameters of the `SimpleCube`:
