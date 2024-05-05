@@ -58,9 +58,53 @@ impl Default for SimpleCube {
 
 Implement a few `traits` on our `SimpleCube` _struct_ for _parametric_ behavior:
 
-- `PmetraCad`: For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
+- [`PmetraCad`](#implement-pmetracad): For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
 - `PmetraModelling`: For parametrically generating `Mesh`(s) from struct.
 - `PmetraInteractions`: (Optional) Setup interactions for live manipulations on models using `CadSlider`(s).
+
+#### PmetraCad
+
+```rs
+impl PmetraCad for SimpleCube {
+    fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
+        CadShellsBuilders::new(self.clone())?
+            .add_shell_builder(CadShellName("SimpleCube".into()), cube_shell_builder)
+    }
+}
+```
+
+- `CadShellsBuilders` lets us add multiple `CadShell` builders per parametric model. Each builder is added as a callback function.
+- Since we only have a single kind of geometry/mesh we just need to add one shell builder for our cube: `cube_shell_builder`. This will need to return a `CadShell` for our cube. We give it a name `"SimpleCube"` which we can reference later.
+- If we need another kind of geometry/mesh (eg. cylinder, rectangle etc) we can add more such builders which will generate their equivalent shells. NB: We can only use the parameters of our `SimpleCube` _struct_ to generate all the `CadShell`(s).
+
+Here is the code for `cube_shell_builder`:
+
+```rs
+fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
+    let SimpleCube { side_length, .. } = &params;
+    let mut tagged_elements = CadTaggedElements::default();
+    let vertex = Vertex::new(Point3::new(-side_length / 2., 0., side_length / 2.));
+    let edge = builder::tsweep(&vertex, Vector3::unit_x() * *side_length);
+    let face = builder::tsweep(&edge, -Vector3::unit_z() * *side_length);
+    tagged_elements.insert(
+        CadElementTag("ProfileFace".into()),
+        CadElement::Face(face.clone()),
+    );
+    let solid = builder::tsweep(&face, Vector3::unit_y() * *side_length);
+    let shell = Shell::try_from_solid(&solid)?;
+
+    Ok(CadShell {
+        shell,
+        tagged_elements,
+    })
+}
+```
+
+- We model the cube using Truck's APIs. Refer [Truck Cube Modelling Tutorial](https://ricos.gitlab.io/truck-tutorial/v0.1/modeling.html#cube).
+- We additionally _tag_ the `"ProfileFace"`. This helps with positioning/orienting things like `CadSliders` with respect to the tagged element, as we will see later.
+- We can tag Truck's primitives like `Vertex`, `Edge`, `Wire`, `Face` etc.
+
+
 
 ## Bevy Compatibility
 
