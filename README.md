@@ -234,6 +234,35 @@ fn build_side_length_slider(
 - We used the `"ProfileFace"` tag (we added earlier) to calculate the slider's `Transform` and also set the normal of the _drag plane_.
 - 2 types of sliders supported: `Linear` and `Planer`. `Linear` also allows setting the drag _limits_ of the slider along the given _direction_.
 
+### Pmetra Plugins
+
+Now you can add the Pmetra Plugins to your Bevy App:
+
+```rs
+App::new() // app
+    .add_plugins((
+        PmetraBasePlugin::default(), // Base plugin
+        PmetraModellingPlugin::<SimpleCube>::default(),
+        PmetraInteractionsPlugin::<SimpleCube>::default(), // Optional
+    ))
+```
+
+- `PmetraBasePlugin` is required and needs to be added only once per app.
+- `PmetraModellingPlugin` is required to be added for each parametric `struct`. `SimpleCube` in this case.
+- `PmetraInteractionsPlugin` can be optionally added for the _interactive sliders_.
+
+### Generate Model
+
+Now you can spawn the `SimpleCube` model by firing an `Event`:
+
+```rs
+fn spawn_simple_cube_model(mut spawn_simple_cube: EventWriter<GenerateCadModel<SimpleCube>>) {
+    spawn_simple_cube.send(GenerateCadModel::default());
+}
+```
+
+Thats it! Now you can see the magic!
+
 ## Bevy Compatibility
 
 | bevy | bevy_pmetra       |
