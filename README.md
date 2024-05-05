@@ -261,7 +261,7 @@ fn spawn_simple_cube_model(mut spawn_simple_cube: EventWriter<GenerateCadModel<S
 }
 ```
 
-Thats it! Now you can see the magic!
+Thats it! You can now see the magic!
 
 ## Bevy Compatibility
 
