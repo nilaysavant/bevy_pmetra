@@ -132,7 +132,6 @@ impl PmetraModelling for SimpleCube {
     ) -> Result<CadMeshesBuildersByCadShell<Self>> {
         let mut meshes_builders_by_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?;
-
         let shell_name = CadShellName("SimpleCube".into());
         for i in 0..self.array_count {
             meshes_builders_by_shell.add_mesh_builder_with_outlines(
