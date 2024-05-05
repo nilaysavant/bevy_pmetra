@@ -1,11 +1,11 @@
-use bevy::{math::DVec3, prelude::*};
+use bevy::prelude::*;
 use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
     re_exports::{
         anyhow::{anyhow, Result},
-        truck_modeling::{builder, EuclideanSpace, ParametricSurface3D, Shell, Vector3, Vertex},
+        truck_modeling::{builder, ParametricSurface3D, Point3, Shell, Vector3, Vertex},
     },
 };
 use smooth_bevy_cameras::{
@@ -109,23 +109,14 @@ impl PmetraCad for SimpleCube {
 fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
     let SimpleCube { side_length, .. } = &params;
     let mut tagged_elements = CadTaggedElements::default();
-    let v0 = Vertex::new(
-        (DVec3::new(-side_length / 2., 0., side_length / 2.))
-            .to_array()
-            .into(),
-    );
-    let v1 = Vertex::new(
-        (DVec3::new(side_length / 2., 0., side_length / 2.))
-            .to_array()
-            .into(),
-    );
-    let edge = builder::tsweep(&v0, v1.point().to_vec() - v0.point().to_vec());
+    let vertex = Vertex::new(Point3::new(-side_length / 2., 0., side_length / 2.));
+    let edge = builder::tsweep(&vertex, Vector3::unit_x() * *side_length);
     let face = builder::tsweep(&edge, -Vector3::unit_z() * *side_length);
     tagged_elements.insert(
         CadElementTag("ProfileFace".into()),
         CadElement::Face(face.clone()),
     );
-    let solid = builder::tsweep(&face, (DVec3::Y * *side_length).to_array().into());
+    let solid = builder::tsweep(&face, Vector3::unit_y() * *side_length);
     let shell = Shell::try_from_solid(&solid)?;
 
     Ok(CadShell {
