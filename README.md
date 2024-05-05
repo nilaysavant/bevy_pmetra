@@ -58,7 +58,7 @@ impl Default for SimpleCube {
 
 Implement a few `traits` on our `SimpleCube` _struct_ for _parametric_ behavior:
 
-- [`PmetraCad`](#implement-pmetracad): For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
+- [`PmetraCad`](#pmetracad): For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
 - `PmetraModelling`: For parametrically generating `Mesh`(s) from struct.
 - `PmetraInteractions`: (Optional) Setup interactions for live manipulations on models using `CadSlider`(s).
 
@@ -103,8 +103,6 @@ fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
 - We model the cube using Truck's APIs. Refer [Truck Cube Modelling Tutorial](https://ricos.gitlab.io/truck-tutorial/v0.1/modeling.html#cube).
 - We additionally _tag_ the `"ProfileFace"`. This helps with positioning/orienting things like `CadSliders` with respect to the tagged element, as we will see later.
 - We can tag Truck's primitives like `Vertex`, `Edge`, `Wire`, `Face` etc.
-
-
 
 ## Bevy Compatibility
 
