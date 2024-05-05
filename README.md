@@ -59,7 +59,7 @@ impl Default for SimpleCube {
 Implement a few `traits` on our `SimpleCube` _struct_ for _parametric_ behavior:
 
 - [`PmetraCad`](#pmetracad): For generating multiple `CadShell`(s) using this struct via Truck's modelling APIs. `CadShell` is a wrapper around Truck's [`Shell`](https://docs.rs/truck-topology/0.1.1/truck_topology/struct.Shell.html).
-- `PmetraModelling`: For parametrically generating `Mesh`(s) from struct.
+- `PmetraModelling`: For parametrically generating `Mesh`(s) from `CadShell`(s).
 - `PmetraInteractions`: (Optional) Setup interactions for live manipulations on models using `CadSlider`(s).
 
 #### PmetraCad
@@ -103,6 +103,41 @@ fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
 - We model the cube using Truck's APIs. Refer [Truck Cube Modelling Tutorial](https://ricos.gitlab.io/truck-tutorial/v0.1/modeling.html#cube).
 - We additionally _tag_ the `"ProfileFace"`. This helps with positioning/orienting things like `CadSliders` with respect to the tagged element, as we will see later.
 - We can tag Truck's primitives like `Vertex`, `Edge`, `Wire`, `Face` etc.
+
+#### PmetraModelling
+
+```rs
+impl PmetraModelling for SimpleCube {
+    fn meshes_builders_by_shell(
+        &self,
+        shells_by_name: &CadShellsByName,
+    ) -> Result<CadMeshesBuildersByCadShell<Self>> {
+        let mut meshes_builders_by_shell =
+            CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?;
+        let shell_name = CadShellName("SimpleCube".into());
+        for i in 0..self.array_count {
+            meshes_builders_by_shell.add_mesh_builder_with_outlines(
+                shell_name.clone(),
+                "SimpleCube".to_string() + &i.to_string(),
+                CadMeshBuilder::new(self.clone(), shell_name.clone())? // builder
+                    .set_transform(Transform::from_translation(
+                        Vec3::X * (i as f32 * (self.side_length as f32 * 1.5)),
+                    ))?
+                    .set_base_material(Color::RED.into())?,
+            )?;
+        }
+
+        Ok(meshes_builders_by_shell)
+    }
+}
+```
+
+- `CadShellsByName` holds the `CadShell`(s) by the given name. In our case we will have a shell for `"SimpleCube"` name.
+- `CadMeshesBuildersByCadShell` is used generate multiple `Mesh`(s) for each defined `CadShell` via a `CadMeshBuilder`.
+- We add a new mesh builder for our cube using `add_mesh_builder_with_outlines()`, which includes adding outlines for the generated meshes. We can use `add_mesh_builder()` for no outlines (**more performance**!).
+- To the above we pass the `shell_name`, a name for the mesh we will be generating, along with the builder for the same.
+- The `CadMeshBuilder` takes the parameter struct and the `shell_name`. We can set the `Transform` and the `Material` of our mesh here.
+- Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop and pass down the index (for naming) and also calculate and pass the **transform** for each cube.
 
 ## Bevy Compatibility
 
