@@ -61,7 +61,6 @@ fn scene_setup(
             ),
             CadCamera, // Mark the camera to be used for CAD.
         ));
-
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             illuminance: 4000.,
@@ -118,7 +117,6 @@ fn cube_shell_builder(params: &SimpleCube) -> Result<CadShell> {
     );
     let solid = builder::tsweep(&face, Vector3::unit_y() * *side_length);
     let shell = Shell::try_from_solid(&solid)?;
-
     Ok(CadShell {
         shell,
         tagged_elements,
@@ -144,7 +142,6 @@ impl PmetraModelling for SimpleCube {
                     .set_base_material(Color::RED.into())?,
             )?;
         }
-
         Ok(meshes_builders_by_shell)
     }
 }
@@ -160,7 +157,6 @@ impl PmetraInteractions for SimpleCube {
                 CadSliderName("ArrayCountSlider".into()),
                 build_array_count_slider(self, shells_by_name)?,
             )?;
-
         Ok(sliders)
     }
 
@@ -216,7 +212,6 @@ fn build_side_length_slider(
     let slider_pos = face_centroid.as_vec3() + Vec3::Z * (*side_length as f32 / 2. + 0.1);
     let slider_transform = Transform::from_translation(slider_pos)
         .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
-
     Ok(CadSlider {
         drag_plane_normal: face_normal,
         transform: slider_transform,
@@ -254,7 +249,6 @@ fn build_array_count_slider(
         + Vec3::Y * *side_length as f32;
     let slider_transform = Transform::from_translation(slider_pos)
         .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
-
     Ok(CadSlider {
         drag_plane_normal: face_normal,
         transform: slider_transform,
