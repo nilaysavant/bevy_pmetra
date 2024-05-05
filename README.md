@@ -13,7 +13,7 @@ Parametric Modelling for [Bevy Engine][bevy-website] using [Truck][truck-github]
 
 | bevy | bevy_pmetra        |
 | ---- | ------------------ |
-| 0.13 | `master`, `v0.1.0` |
+| 0.13 | `master` `v0.1.0` |
 
 [bevy-website]: https://bevyengine.org/
 [truck-github]: https://github.com/ricosjp/truck
