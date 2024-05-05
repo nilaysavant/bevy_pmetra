@@ -3,9 +3,8 @@ name = "pmetra_internal"
 version = "0.1.0"
 edition = "2021"
 authors = ["Nilay Savant"]
-description = "Internal crate for bevy_pmetra: Interactive Parametric Modelling for Bevy using Truck CAD kernel."
+description = "Internal crate for bevy_pmetra."
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 bevy = { version = "0.13", default-features = false, features = [

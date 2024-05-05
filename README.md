@@ -2,7 +2,7 @@
 
 # Bevy Pmetra
 
-Interactive Parametric Modelling for [Bevy Engine][bevy-website] using [Truck][truck-github] CAD kernel.
+Parametric Modelling for [Bevy Engine][bevy-website] using [Truck][truck-github] CAD kernel.
 
 </div>
 

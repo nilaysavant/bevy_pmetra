@@ -1,6 +1,6 @@
 [package]
 name = "bevy_pmetra"
-description = "Interactive Parametric Modelling for Bevy using Truck CAD kernel."
+description = "Parametric Modelling for Bevy using Truck CAD kernel."
 version = "0.1.0"
 edition = "2021"
 authors = ["Nilay Savant"]
