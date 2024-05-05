@@ -266,6 +266,10 @@ fn spawn_simple_cube_model(mut spawn_simple_cube: EventWriter<GenerateCadModel<S
 
 Thats it! You can now see the magic!
 
+> [!TIP]
+> For more sophisticated examples, checkout the models in the demo:
+> [`pmetra_demo/src/utils/cad_models`](https://github.com/nilaysavant/bevy_pmetra/tree/master/pmetra_demo/src/utils/cad_models)
+
 ## Bevy Compatibility
 
 | bevy | bevy_pmetra       |
