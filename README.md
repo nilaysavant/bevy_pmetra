@@ -195,6 +195,45 @@ impl PmetraInteractions for SimpleCube {
 - `on_slider_transform` is called by the plugin whenever a slider's _transform_ is changed. We receive the `prev_transform` and the `new_transform` using which can change the parameters of our `SimpleCube` struct. The name of the slider is useful to distinguish and apply changes from the correct slider.
 - `on_slider_tooltip` is used to (optionally) set the tooltip text for the _active_ slider.
 
+Here is the code for `build_side_length_slider`:
+
+```rs
+fn build_side_length_slider(
+    params: &SimpleCube,
+    shells_by_name: &CadShellsByName,
+) -> Result<CadSlider> {
+    let SimpleCube { side_length, .. } = &params;
+    let cad_shell = shells_by_name
+        .get(&CadShellName("SimpleCube".to_string()))
+        .ok_or_else(|| anyhow!("Could not get cube shell!"))?;
+    let Some(CadElement::Face(face)) =
+        cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
+    else {
+        return Err(anyhow!("Could not find face!"));
+    };
+    let face_normal = face.oriented_surface().normal(0.5, 0.5).as_bevy_vec3();
+    let face_boundaries = face.boundaries();
+    let face_wire = face_boundaries.last().expect("No wire found!");
+    let face_centroid = face_wire.get_centroid();
+    let slider_pos = face_centroid.as_vec3() + Vec3::Z * (*side_length as f32 / 2. + 0.1);
+    let slider_transform = Transform::from_translation(slider_pos)
+        .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
+    Ok(CadSlider {
+        drag_plane_normal: face_normal,
+        transform: slider_transform,
+        slider_type: CadSliderType::Linear {
+            direction: Vec3::Z,
+            limit_min: Some(Vec3::Z * 0.2),
+            limit_max: Some(Vec3::INFINITY),
+        },
+        ..default()
+    })
+}
+```
+
+- As you may see we used the `"ProfileFace"` tag we added earlier to calculate the slider's `Transform` and also set the normal of the _drag plane_.
+- We support 2 types of sliders: `Linear` and `Planer`. `Linear` also allows setting the drag _limits_ of the slider along the given _direction_.
+
 ## Bevy Compatibility
 
 | bevy | bevy_pmetra       |
