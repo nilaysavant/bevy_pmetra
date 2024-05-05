@@ -135,7 +135,65 @@ impl PmetraModelling for SimpleCube {
 - We add a new mesh builder for our cube using `add_mesh_builder_with_outlines()`, which includes adding outlines for the generated meshes. We can use `add_mesh_builder()` for no outlines (**more performance**!).
 - To the above we pass the `shell_name`, a name for the mesh we will be generating, along with the builder for the same.
 - The `CadMeshBuilder` takes the parameter struct and the `shell_name`. We can set the `Transform` and the `Material` of our mesh here.
-- Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop and pass down the index (for naming) and also calculate and set the **transform** for each cube.
+- Since we want to _array_ the cubes (using `array_count`), we run this inside a for loop passing down the index (for naming) and also set the **transform** for each cube.
+
+#### PmetraInteractions
+
+Optionally you can implement this `trait` for _interactive_ _sliders_ that can manipulate parameters of the `SimpleCube`:
+
+```rs
+impl PmetraInteractions for SimpleCube {
+    fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+        let sliders = CadSliders::default() // sliders
+            .add_slider(
+                CadSliderName("SideLengthSlider".into()),
+                build_side_length_slider(self, shells_by_name)?,
+            )?
+            .add_slider(
+                CadSliderName("ArrayCountSlider".into()),
+                build_array_count_slider(self, shells_by_name)?,
+            )?;
+        Ok(sliders)
+    }
+
+    fn on_slider_transform(
+        &mut self,
+        name: CadSliderName,
+        prev_transform: Transform,
+        new_transform: Transform,
+    ) {
+        if name.0 == "SideLengthSlider" {
+            let delta = new_transform.translation - prev_transform.translation;
+            if delta.length() > 0. {
+                self.side_length += delta.z as f64;
+            }
+        } else if name.0 == "ArrayCountSlider" {
+            let delta = new_transform.translation - prev_transform.translation;
+            if delta.length() > 0. {
+                self.array_count = (new_transform.translation.x / (self.side_length as f32 * 1.5))
+                    .floor() as u32
+                    + 1;
+            }
+        }
+    }
+
+    fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
+        if name.0 == "SideLengthSlider" {
+            Ok(Some(format!("side_length: {:.2}", self.side_length)))
+        } else if name.0 == "ArrayCountSlider" {
+            Ok(Some(format!("array_count: {}", self.array_count)))
+        } else {
+            Ok(None)
+        }
+    }
+}
+```
+
+- We configure the sliders using the `CadSliders` builder in `sliders()` using the received `shells_by_name`.
+- Each slider can be added using `add_slider()` which accepts the name of the slider (for future reference/ID) and the `CadSlider` struct itself.
+- Here we use utility functions to create the `CadSlider` struct like `build_side_length_slider` for `"SideLengthSlider"`.
+- `on_slider_transform` is called by the plugin whenever a slider's _transform_ is changed. We receive the `prev_transform` and the `new_transform` using which can change the parameters of our `SimpleCube` struct. The name of the slider is useful to distinguish and apply changes from the correct slider.
+- `on_slider_tooltip` is used to (optionally) set the tooltip text for the _active_ slider.
 
 ## Bevy Compatibility
 
