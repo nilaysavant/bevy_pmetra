@@ -133,34 +133,21 @@ impl PmetraModelling for SimpleCube {
         let mut meshes_builders_by_shell =
             CadMeshesBuildersByCadShell::new(self.clone(), shells_by_name.clone())?;
 
+        let shell_name = CadShellName("SimpleCube".into());
         for i in 0..self.array_count {
             meshes_builders_by_shell.add_mesh_builder_with_outlines(
-                CadShellName("SimpleCube".into()),
+                shell_name.clone(),
                 "SimpleCube".to_string() + &i.to_string(),
-                cube_mesh_builder(
-                    self,
-                    CadShellName("SimpleCube".into()),
-                    Transform::from_translation(
+                CadMeshBuilder::new(self.clone(), shell_name.clone())? // builder
+                    .set_transform(Transform::from_translation(
                         Vec3::X * (i as f32 * (self.side_length as f32 * 1.5)),
-                    ),
-                )?,
+                    ))?
+                    .set_base_material(Color::RED.into())?,
             )?;
         }
 
         Ok(meshes_builders_by_shell)
     }
-}
-
-fn cube_mesh_builder(
-    params: &SimpleCube,
-    shell_name: CadShellName,
-    transform: Transform,
-) -> Result<CadMeshBuilder<SimpleCube>> {
-    let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
-        .set_transform(transform)?
-        .set_base_material(Color::RED.into())?;
-
-    Ok(mesh_builder)
 }
 
 impl PmetraInteractions for SimpleCube {
