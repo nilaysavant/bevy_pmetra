@@ -264,7 +264,10 @@ fn spawn_simple_cube_model(mut spawn_simple_cube: EventWriter<GenerateCadModel<S
 }
 ```
 
-Thats it! You can now see the magic!
+Thats it! You can now see the magic:
+
+![simple_cube_example_1](https://github.com/nilaysavant/bevy_pmetra/assets/47603308/babf4647-ab9b-4da4-a1f2-0254b0e30bf3)
+
 
 > [!TIP]
 > For more sophisticated examples, checkout the models in the demo:
