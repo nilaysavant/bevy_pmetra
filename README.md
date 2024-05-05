@@ -231,8 +231,8 @@ fn build_side_length_slider(
 }
 ```
 
-- As you may see we used the `"ProfileFace"` tag we added earlier to calculate the slider's `Transform` and also set the normal of the _drag plane_.
-- We support 2 types of sliders: `Linear` and `Planer`. `Linear` also allows setting the drag _limits_ of the slider along the given _direction_.
+- We used the `"ProfileFace"` tag (we added earlier) to calculate the slider's `Transform` and also set the normal of the _drag plane_.
+- 2 types of sliders supported: `Linear` and `Planer`. `Linear` also allows setting the drag _limits_ of the slider along the given _direction_.
 
 ## Bevy Compatibility
 
