@@ -5,3 +5,4 @@ Cargo.lock
 exports/
 dist/
 .vercel
+.DS_Store
