@@ -1,18 +1,18 @@
 [package]
 name = "pmetra_internal"
-version = "0.1.0"
+version = "0.2.0-dev"
 edition = "2021"
 authors = ["Nilay Savant"]
 description = "Internal crate for bevy_pmetra."
 
 
 [dependencies]
-bevy = { version = "0.13", default-features = false, features = [
+bevy = { version = "0.14", default-features = false, features = [
     "bevy_pbr",
     "bevy_render",
     "bevy_text",
     "bevy_ui",
-    "multi-threaded",
+    "multi_threaded",
     "bevy_gizmos",
     "default_font",
 ] }
@@ -20,7 +20,7 @@ anyhow = "1.0"
 strum = { version = "0.25", features = ["derive"] }
 lazy_static = "1.4"
 # picking
-bevy_mod_picking = "0.18"
+bevy_mod_picking = "0.20"
 # truck stuff
 truck-modeling = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
 truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
@@ -30,4 +30,4 @@ truck-base = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async
-bevy_async_task = "0.1.0"
+bevy_async_task = "0.2.0"

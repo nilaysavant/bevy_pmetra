@@ -1,6 +1,6 @@
 [package]
 name = "pmetra_demo"
-version = "0.1.0"
+version = "0.2.0-dev"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,9 +10,11 @@ default = []
 dev = ["bevy/dynamic_linking", "bevy/trace", "bevy/file_watcher"]
 
 [dependencies]
-bevy = { version = "0.13", default-features = false, features = [
+bevy = { version = "0.14", default-features = false, features = [
     "animation",
     "bevy_asset",
+    "bevy_state",
+    "bevy_color",
     "bevy_gilrs",
     "bevy_scene",
     "bevy_winit",
@@ -23,26 +25,24 @@ bevy = { version = "0.13", default-features = false, features = [
     "bevy_sprite",
     "bevy_text",
     "bevy_ui",
-    "multi-threaded",
+    "multi_threaded",
     "png",
     "hdr",
     "x11",
     "bevy_gizmos",
     "tonemapping_luts",
+    "smaa_luts",
     "default_font",
     "webgl2",
+    "sysinfo_plugin",
 ] }
-bevy_asset_loader = { version = "0.20", features = ["3d", "progress_tracking"] }
-iyes_progress = "0.11"
-bevy_rapier3d = { version = "0.25", features = [
-    "debug-render",
-    "serde-serialize",
-    "dim3",
-] }
+bevy_asset_loader = { version = "0.21", features = ["3d", "progress_tracking"] }
+iyes_progress = "0.12"
+bevy_rapier3d = "0.27"
 anyhow = "1.0"
 smooth-bevy-cameras = "0.11"
-bevy_egui = "0.25"
-bevy-inspector-egui = "0.23"
+bevy_egui = "0.28"
+bevy-inspector-egui = "0.25"
 strum = { version = "0.25", features = ["derive"] }
 itertools = "0.12"
 noise = "0.8"

@@ -1,7 +1,7 @@
 [package]
 name = "bevy_pmetra"
 description = "Parametric Modelling for Bevy using Truck CAD kernel."
-version = "0.1.0"
+version = "0.2.0-dev"
 edition = "2021"
 authors = ["Nilay Savant"]
 categories = [
@@ -35,10 +35,10 @@ members = ["crates/*", "pmetra_demo"]
 pmetra_internal = { path = "crates/pmetra_internal" }
 
 [dev-dependencies]
-bevy = "0.13"
+bevy = "0.14"
 smooth-bevy-cameras = "0.11"
-bevy_egui = "0.25"
-bevy-inspector-egui = "0.23"
+bevy_egui = "0.28"
+bevy-inspector-egui = "0.25"
 
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
