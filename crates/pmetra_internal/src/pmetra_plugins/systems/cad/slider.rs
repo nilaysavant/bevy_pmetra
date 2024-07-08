@@ -1,4 +1,5 @@
 use bevy::{
+    color::palettes::css,
     pbr::{NotShadowCaster, NotShadowReceiver},
     prelude::*,
 };
@@ -93,13 +94,12 @@ pub fn slider_drag_start(
     let drag_plane = commands
         .spawn((
             PbrBundle {
-                mesh: meshes.add(shape::Plane::from_size(slider_drag_plane_size)),
+                mesh: meshes
+                    .add(Plane3d::new(Vec3::Y, Vec2::splat(slider_drag_plane_size / 2.)).mesh()),
                 material: materials.add(StandardMaterial {
-                    base_color: Color::GREEN.with_a(if slider_drag_plane_debug {
-                        0.75
-                    } else {
-                        0.0
-                    }),
+                    base_color: css::GREEN
+                        .with_alpha(if slider_drag_plane_debug { 0.75 } else { 0.0 })
+                        .into(),
                     alpha_mode: AlphaMode::Blend,
                     double_sided: true,
                     cull_mode: None,

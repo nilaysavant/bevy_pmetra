@@ -84,7 +84,7 @@ pub fn fire_balls_at_look_point(
     // Spawn bullet ball...
     commands.spawn((
         PbrBundle {
-            mesh: meshes.add(shape::UVSphere {
+            mesh: meshes.add(Sphere {
                 radius: BULLET_SPHERE_RADIUS,
                 ..default()
             }),

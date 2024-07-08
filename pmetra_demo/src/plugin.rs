@@ -1,9 +1,12 @@
-use bevy::{pbr::DirectionalLightShadowMap, prelude::*, window::close_on_esc};
+use bevy::{pbr::DirectionalLightShadowMap, prelude::*};
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, ResourceInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
-use bevy_pmetra::{pmetra_plugins::resources::MeshesBuilderQueueInspector, prelude::*};
+use bevy_pmetra::{
+    pmetra_plugins::{resources::MeshesBuilderQueueInspector, systems::cad::window::close_on_esc},
+    prelude::*,
+};
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
 use crate::{
@@ -70,7 +73,6 @@ impl Plugin for PmetraDemoPlugin {
                 brightness: 400.,
             })
             // physics
-            .insert_resource(RapierConfiguration::default())
             .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
             .add_plugins(RapierDebugRenderPlugin::default())
             .add_systems(Startup, setup_debug_render)

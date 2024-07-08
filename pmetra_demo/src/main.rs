@@ -1,9 +1,8 @@
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::prelude::*;
 use pmetra_demo::PmetraDemoPlugin;
 
 fn main() {
-    App::new()
-        .insert_resource(AssetMetaCheck::Never)
+    App::new() // App
         .add_plugins(PmetraDemoPlugin)
         .run();
 }

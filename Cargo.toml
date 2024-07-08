@@ -36,7 +36,8 @@ pmetra_internal = { path = "crates/pmetra_internal" }
 
 [dev-dependencies]
 bevy = "0.14"
-smooth-bevy-cameras = "0.11"
+# smooth-bevy-cameras = "0.11" // Use the git version for now as crate is not updated. As below.
+smooth-bevy-cameras = { git = "https://github.com/bonsairobo/smooth-bevy-cameras", rev = "414fa90d1f0c4a95efbaa5f5cf5839b5c904966d" }
 bevy_egui = "0.28"
 bevy-inspector-egui = "0.25"
 

@@ -41,7 +41,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
                 position_type: PositionType::Absolute,
                 ..default()
             },
-            background_color: BackgroundColor(Color::BLACK.with_a(0.8)),
+            background_color: BackgroundColor(Color::BLACK.with_alpha(0.8)),
             visibility: Visibility::Hidden,
             ..default()
         },

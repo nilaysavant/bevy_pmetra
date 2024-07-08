@@ -1,8 +1,8 @@
 use anyhow::{anyhow, Result};
-use bevy::{math::DVec3, prelude::*};
+use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
-    pmetra_core::extensions::shell::ShellCadExtension,
     math::get_rotation_from_normals,
+    pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
     re_exports::truck_modeling::{
         builder, control_point::ControlPoint, ParametricSurface3D, Shell, Vector3, Vertex,
@@ -90,7 +90,7 @@ pub fn cube_mesh_builder(
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
-        .set_base_material(Color::BLUE.into())?;
+        .set_base_material(Color::from(css::BLUE).into())?;
 
     Ok(mesh_builder)
 }

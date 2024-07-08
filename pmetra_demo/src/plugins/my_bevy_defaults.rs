@@ -1,13 +1,8 @@
 use bevy::{
-    app::PluginGroupBuilder,
-    log::{Level, LogPlugin},
-    prelude::*,
-    render::{
+    app::PluginGroupBuilder, asset::AssetMetaCheck, log::{Level, LogPlugin}, prelude::*, render::{
         settings::{RenderCreation, WgpuFeatures, WgpuSettings},
         RenderPlugin,
-    },
-    utils::HashMap,
-    window::PresentMode,
+    }, utils::HashMap, window::PresentMode
 };
 
 /// Html Canvas selector
@@ -48,6 +43,10 @@ impl MyBevyDefaultPluginsConfig {
                     present_mode: self.present_mode,
                     ..default()
                 }),
+                ..default()
+            })
+            .set(AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
                 ..default()
             })
             .disable::<LogPlugin>();

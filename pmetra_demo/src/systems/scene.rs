@@ -1,4 +1,4 @@
-use bevy::{math::DVec3, pbr::wireframe::Wireframe, prelude::*};
+use bevy::{color::palettes::css, math::DVec3, pbr::wireframe::Wireframe, prelude::*};
 use bevy_pmetra::{
     prelude::*,
     re_exports::{
@@ -77,7 +77,7 @@ pub fn test_manual_mesh_gen(
     commands.spawn((
         PbrBundle {
             mesh: meshes.add(mesh),
-            material: materials.add(Color::GREEN),
+            material: materials.add(Color::from(css::GREEN)),
             transform: Transform::from_translation(Vec3::X * 3.),
             ..default()
         },

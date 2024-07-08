@@ -125,7 +125,7 @@ pub fn cuboid_enclosure_mesh_builder(
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
-        .set_base_material(Color::WHITE.with_a(0.0).into())?;
+        .set_base_material(Color::WHITE.with_alpha(0.0).into())?;
 
     Ok(mesh_builder)
 }

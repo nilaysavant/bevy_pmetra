@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use bevy::{
+    color::palettes::css,
     pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
 };
@@ -83,7 +84,7 @@ impl Plugin for PmetraBasePlugin {
                     global: false,
                     // Controls the default color of all wireframes. Used as the default color for global wireframes.
                     // Can be changed per mesh using the `WireframeColor` component.
-                    default_color: Color::YELLOW,
+                    default_color: css::YELLOW.into(),
                 });
             }
         }

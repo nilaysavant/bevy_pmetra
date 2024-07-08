@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use bevy::{pbr::NotShadowCaster, prelude::*, render::primitives::Aabb};
+use bevy::{color::palettes::css, pbr::NotShadowCaster, prelude::*, render::primitives::Aabb};
 use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
 use bevy_mod_picking::{
     backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
@@ -224,14 +224,14 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                     .spawn((
                         PbrBundle {
                             material: materials.add(StandardMaterial {
-                                base_color: Color::WHITE.with_a(0.4),
+                                base_color: css::WHITE.with_alpha(0.4).into(),
                                 alpha_mode: AlphaMode::Blend,
                                 unlit: true,
                                 double_sided: true,
                                 cull_mode: None,
                                 ..default()
                             }),
-                            mesh: meshes.add(shape::Circle::new(*thumb_radius)),
+                            mesh: meshes.add(Circle::new(*thumb_radius)),
                             transform: *transform,
                             // visibility: Visibility::Hidden,
                             ..default()
@@ -253,11 +253,11 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                         // Disable highlight slider...
                         Highlight::<StandardMaterial> {
                             hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                                base_color: mat.base_color.with_a(0.6),
+                                base_color: mat.base_color.with_alpha(0.6),
                                 ..mat.to_owned()
                             })),
                             pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                                base_color: mat.base_color.with_a(0.8),
+                                base_color: mat.base_color.with_alpha(0.8),
                                 ..mat.to_owned()
                             })),
                             selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {

@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Context, Error, Result};
-use bevy::{math::DVec3, prelude::*};
+use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
@@ -125,7 +125,7 @@ pub fn straight_beam_mesh_builder(
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
-        .set_base_material(Color::RED.into())?;
+        .set_base_material(Color::from(css::RED).into())?;
 
     Ok(mesh_builder)
 }
@@ -144,7 +144,7 @@ pub fn cross_beam_mesh_builder(
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
-        .set_base_material(Color::YELLOW.into())?;
+        .set_base_material(Color::from(css::YELLOW).into())?;
 
     Ok(mesh_builder)
 }

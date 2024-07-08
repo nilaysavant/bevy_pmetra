@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 
 pub struct OriginAxisGizmoPlugin;
 
@@ -31,9 +31,9 @@ pub fn show_origin_gizmo(settings: Res<OriginAxisGizmoSettings>, mut gizmos: Giz
         return;
     }
     // x
-    gizmos.line(Vec3::ZERO, Vec3::X * settings.axis_length, Color::RED);
+    gizmos.line(Vec3::ZERO, Vec3::X * settings.axis_length, css::RED);
     // y
-    gizmos.line(Vec3::ZERO, Vec3::Y * settings.axis_length, Color::GREEN);
+    gizmos.line(Vec3::ZERO, Vec3::Y * settings.axis_length, css::GREEN);
     // z
-    gizmos.line(Vec3::ZERO, Vec3::Z * settings.axis_length, Color::BLUE);
+    gizmos.line(Vec3::ZERO, Vec3::Z * settings.axis_length, css::BLUE);
 }

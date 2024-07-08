@@ -1,4 +1,4 @@
-use bevy::{input::mouse::MouseWheel, prelude::*};
+use bevy::{color::palettes::css, input::mouse::MouseWheel, prelude::*};
 use bevy_pmetra::{
     pmetra_plugins::components::camera::CadCamera,
     re_exports::bevy_mod_picking::picking_core::Pickable,
@@ -69,7 +69,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                     padding: UiRect::all(Val::Px(2.5)),
                     ..Default::default()
                 },
-                background_color: BackgroundColor(Color::BLACK.with_a(0.8)),
+                background_color: BackgroundColor(Color::BLACK.with_alpha(0.8)),
                 ..Default::default()
             },
             Pickable::IGNORE, // Ignore picking events on the UI.
@@ -166,9 +166,9 @@ pub fn update_info_ui(
             continue;
         };
         if *is_pressed {
-            text.sections[0].style.color = Color::YELLOW;
+            text.sections[0].style.color = css::YELLOW.into();
         } else {
-            text.sections[0].style.color = Color::WHITE;
+            text.sections[0].style.color = css::WHITE.into();
         }
     }
 }

@@ -37,7 +37,7 @@ pub fn render_mesh_outlines(
             }
             let color = match root_selection_state {
                 CadGeneratedRootSelectionState::None => Color::NONE,
-                CadGeneratedRootSelectionState::Hovered => Color::WHITE.with_a(0.6),
+                CadGeneratedRootSelectionState::Hovered => Color::WHITE.with_alpha(0.6),
                 CadGeneratedRootSelectionState::Selected => Color::WHITE,
             };
 

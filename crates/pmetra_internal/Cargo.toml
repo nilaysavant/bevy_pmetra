@@ -14,6 +14,7 @@ bevy = { version = "0.14", default-features = false, features = [
     "bevy_ui",
     "multi_threaded",
     "bevy_gizmos",
+    "bevy_color",
     "default_font",
 ] }
 anyhow = "1.0"

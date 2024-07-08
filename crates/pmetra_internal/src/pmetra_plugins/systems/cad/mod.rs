@@ -5,3 +5,4 @@ pub mod params_ui;
 pub mod root;
 pub mod settings;
 pub mod slider;
+pub mod window;

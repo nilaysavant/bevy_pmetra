@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 use bevy_mod_picking::prelude::*;
 
 use crate::pmetra_plugins::components::cad::CadGeneratedMesh;
@@ -15,19 +15,19 @@ pub fn show_mesh_local_debug_axis(
         gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_x(),
-            Color::RED,
+            css::RED,
         );
         // y
         gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_y(),
-            Color::GREEN,
+            css::GREEN,
         );
         // z
         gizmos.arrow(
             transform.translation,
             transform.translation + *transform.local_z(),
-            Color::BLUE,
+            css::BLUE,
         );
     }
 }

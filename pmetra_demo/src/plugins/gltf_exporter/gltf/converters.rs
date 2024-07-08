@@ -1,8 +1,9 @@
 use anyhow::Result;
 use bevy::{
     asset::{Assets, Handle},
+    color::{Color, ColorToComponents},
     prelude::StandardMaterial,
-    render::{color::Color, texture::Image},
+    render::texture::Image,
 };
 use gltf::{
     json::{
@@ -24,16 +25,16 @@ impl ToGltfMaterial for StandardMaterialWithImages {
         let mut material = Material::default();
 
         material.alpha_mode = match self.alpha_mode {
-            bevy::pbr::AlphaMode::Opaque => Valid(AlphaMode::Opaque),
-            bevy::pbr::AlphaMode::Mask(_) => Valid(AlphaMode::Mask),
-            bevy::pbr::AlphaMode::Blend => Valid(AlphaMode::Blend),
+            bevy::render::alpha::AlphaMode::Opaque => Valid(AlphaMode::Opaque),
+            bevy::render::alpha::AlphaMode::Mask(_) => Valid(AlphaMode::Mask),
+            bevy::render::alpha::AlphaMode::Blend => Valid(AlphaMode::Blend),
             _ => Valid(AlphaMode::default()),
         };
         material.double_sided = self.double_sided;
-        let emissive = self.emissive.as_rgba_f32();
+        let emissive = self.emissive.to_srgba().to_f32_array();
         material.emissive_factor = EmissiveFactor([emissive[0], emissive[1], emissive[2]]);
         material.pbr_metallic_roughness = PbrMetallicRoughness {
-            base_color_factor: PbrBaseColorFactor(self.base_color.as_rgba_f32()),
+            base_color_factor: PbrBaseColorFactor(self.base_color.to_srgba().to_f32_array()),
             metallic_factor: StrengthFactor(self.metallic),
             roughness_factor: StrengthFactor(self.perceptual_roughness),
             ..Default::default()
@@ -59,7 +60,7 @@ pub struct StandardMaterialWithImages {
     pub occlusion_texture: Option<Image>,
     pub double_sided: bool,
     pub unlit: bool,
-    pub alpha_mode: bevy::pbr::AlphaMode,
+    pub alpha_mode: bevy::render::alpha::AlphaMode,
 }
 
 impl StandardMaterialWithImages {
@@ -89,7 +90,7 @@ impl StandardMaterialWithImages {
         Self {
             base_color,
             base_color_texture: get_image_from_opt_hdl(&base_color_texture, images),
-            emissive,
+            emissive: emissive.into(),
             emissive_texture: get_image_from_opt_hdl(&emissive_texture, images),
             perceptual_roughness,
             metallic,
@@ -111,7 +112,7 @@ fn get_image_from_opt_hdl(
     images: &Assets<Image>,
 ) -> Option<Image> {
     let image = match optional_image_hdl.clone() {
-        Some(image_hdl) => images.get(image_hdl).cloned(),
+        Some(image_hdl) => images.get(&image_hdl).cloned(),
         None => None,
     };
     image

@@ -1,10 +1,10 @@
 use std::f64::consts::FRAC_PI_2;
 
 use anyhow::{anyhow, Context, Result};
-use bevy::{math::DVec3, prelude::*};
+use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
-    pmetra_core::extensions::face::FaceCadExtension,
     math::get_rotation_from_normals,
+    pmetra_core::extensions::face::FaceCadExtension,
     prelude::*,
     re_exports::truck_modeling::{
         builder, cgmath::AbsDiffEq, Face, ParametricSurface3D, Point3, Rad, Shell, Tolerance,
@@ -293,7 +293,7 @@ pub fn build_cabin_mesh(
     let main_mesh_transform: Transform = Transform::from_translation(Vec3::ZERO);
     // Init cad mesh from mesh stuff...
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name)? // builder
-        .set_base_material(Color::RED.into())?
+        .set_base_material(Color::from(css::RED).into())?
         .set_transform(main_mesh_transform)?;
 
     Ok(mesh_builder)

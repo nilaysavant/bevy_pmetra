@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css, prelude::*};
 use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
@@ -75,9 +75,9 @@ fn scene_setup(
 }
 
 fn render_origin_gizmo(mut gizmos: Gizmos) {
-    gizmos.arrow(Vec3::ZERO, Vec3::X, Color::RED);
-    gizmos.arrow(Vec3::ZERO, Vec3::Y, Color::GREEN);
-    gizmos.arrow(Vec3::ZERO, Vec3::Z, Color::BLUE);
+    gizmos.arrow(Vec3::ZERO, Vec3::X, css::RED);
+    gizmos.arrow(Vec3::ZERO, Vec3::Y, css::GREEN);
+    gizmos.arrow(Vec3::ZERO, Vec3::Z, css::BLUE);
 }
 
 /// Create struct for the simple parametric cube.
@@ -139,7 +139,7 @@ impl PmetraModelling for SimpleCube {
                     .set_transform(Transform::from_translation(
                         Vec3::X * (i as f32 * (self.side_length as f32 * 1.5)),
                     ))?
-                    .set_base_material(Color::RED.into())?,
+                    .set_base_material(Color::from(css::RED).into())?,
             )?;
         }
         Ok(meshes_builders_by_shell)
