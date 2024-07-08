@@ -276,9 +276,10 @@ Thats it! You can now see the magic:
 
 ## Bevy Compatibility
 
-| bevy | bevy_pmetra       |
-| ---- | ----------------- |
-| 0.13 | `master` `v0.1.0` |
+| bevy | bevy_pmetra |
+| ---- | ----------- |
+| 0.14 | `master`    |
+| 0.13 | `v0.1.0`    |
 
 [bevy-website]: https://bevyengine.org/
 [truck-github]: https://github.com/ricosjp/truck
