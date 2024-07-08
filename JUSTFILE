@@ -25,7 +25,7 @@ build-pmetra-demo-web:
   #!/bin/bash
 
   echo "trunk build in release mode..."
-  trunk build --release --no-default-features
+  RUSTFLAGS="--cfg=web_sys_unstable_apis" trunk build --release --no-default-features
   echo "trunk build in release mode... done!"
 
   echo "cd into dist..."
