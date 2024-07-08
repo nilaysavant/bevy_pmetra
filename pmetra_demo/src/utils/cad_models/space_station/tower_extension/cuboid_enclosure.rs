@@ -16,7 +16,7 @@ use super::{CadShellIds, TowerExtension};
 ///
 /// The beam has a L-shaped cross section.
 ///
-/// ```
+/// ```ignore
 /// O -> x
 /// |
 /// z
