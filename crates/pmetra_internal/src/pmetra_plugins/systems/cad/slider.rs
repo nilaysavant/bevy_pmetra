@@ -345,7 +345,7 @@ pub fn scale_sliders_based_on_zoom_level(
     cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
     cad_meshes: Query<(Entity, &PickSelection), (With<CadGeneratedMesh>, Without<CadCamera>)>,
     mut sliders: Query<
-        &mut Transform,
+        (&mut Transform, &GlobalTransform),
         (
             With<CadGeneratedSlider>,
             Without<CadCamera>,
@@ -356,14 +356,16 @@ pub fn scale_sliders_based_on_zoom_level(
     let Some((_, camera_transform)) = cameras.iter().find(|(cam, ..)| cam.is_active) else {
         return;
     };
-    let Some((selected_cad_mesh, ..)) = cad_meshes
+    let Some((_selected_cad_mesh, ..)) = cad_meshes
         .iter()
         .find(|(_, selection, ..)| selection.is_selected)
     else {
         return;
     };
-    for mut transform in sliders.iter_mut() {
-        let camera_to_slider_dist = camera_transform.translation.distance(transform.translation);
+    for (mut transform, glob_transform) in sliders.iter_mut() {
+        let camera_to_slider_dist = camera_transform
+            .translation
+            .distance(glob_transform.translation());
         transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
     }
 }
