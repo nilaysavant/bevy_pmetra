@@ -119,7 +119,6 @@ pub fn show_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions 
         return;
     };
     let slider = trigger.target;
-    let hit = trigger.hit.clone();
     let Ok((slider_glob_transform, slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) =
         sliders.get(slider)
     else {
@@ -133,10 +132,6 @@ pub fn show_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions 
         return;
     };
     text.0 = tooltip;
-    // Update UI position...
-    let Some(slider_pos) = hit.position else {
-        return;
-    };
     // Get view translation to set the UI pos from world slider pos.
     let Ok(viewport_pos) =
         camera.world_to_viewport(cam_glob_transform, slider_glob_transform.translation())
