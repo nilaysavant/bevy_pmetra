@@ -1,12 +1,11 @@
-use anyhow::{anyhow, Result};
 use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::truck_modeling::{
+    re_exports::{anyhow::{anyhow, Result}, truck_modeling::{
         builder, control_point::ControlPoint, ParametricSurface3D, Shell, Vector3, Vertex,
-    },
+    }},
 };
 
 use super::{CadShellIds, SimpleCubeAtCylinder};

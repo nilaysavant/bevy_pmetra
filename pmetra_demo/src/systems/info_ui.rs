@@ -1,8 +1,5 @@
 use bevy::{color::palettes::css, input::mouse::MouseWheel, prelude::*};
-use bevy_pmetra::{
-    pmetra_plugins::components::camera::CadCamera,
-    re_exports::bevy_mod_picking::picking_core::Pickable,
-};
+use bevy_pmetra::pmetra_plugins::components::camera::CadCamera;
 use itertools::Itertools;
 
 #[derive(Debug, Clone, Reflect)]
@@ -58,21 +55,18 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
     debug!("Spawning Info UI...");
     let root = commands
         .spawn((
-            NodeBundle {
-                style: Style {
-                    // fill the entire window
-                    width: Val::Percent(100.),
-                    flex_direction: FlexDirection::Row,
-                    justify_content: JustifyContent::Center,
-                    position_type: PositionType::Absolute,
-                    bottom: Val::Px(0.), // place at the bottom of the window
-                    padding: UiRect::all(Val::Px(2.5)),
-                    ..Default::default()
-                },
-                background_color: BackgroundColor(Color::BLACK.with_alpha(0.8)),
+            Node {
+                // fill the entire window
+                width: Val::Percent(100.),
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::Center,
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(0.), // place at the bottom of the window
+                padding: UiRect::all(Val::Px(2.5)),
                 ..Default::default()
             },
-            Pickable::IGNORE, // Ignore picking events on the UI.
+            BackgroundColor(Color::BLACK.with_alpha(0.8)),
+            PickingBehavior::IGNORE, // Ignore picking events on the UI.
         ))
         .id();
 
@@ -96,31 +90,26 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
             .join(" + ");
         let shortcut_info = commands
             .spawn((
-                TextBundle {
-                    text: Text::from_section(
-                        format!("[{}: {}]", description, shortcut_label),
-                        TextStyle {
-                            font_size: 16.,
-                            color: Color::WHITE,
-                            ..default()
-                        },
-                    )
-                    // Set the alignment of the Text
-                    .with_justify(JustifyText::Center)
-                    .with_no_wrap(),
-                    // Set the style of the TextBundle itself.
-                    style: Style {
-                        flex_direction: FlexDirection::Column,
-                        align_items: AlignItems::Start,
-                        justify_content: JustifyContent::Center,
-                        margin: UiRect::all(Val::Px(5.)),
-                        ..default()
-                    },
-                    background_color: BackgroundColor(Color::NONE),
+                TextColor(Color::WHITE),
+                TextFont {
+                    font_size: 16.,
                     ..default()
                 },
+                Text::new(format!("[{}: {}]", description, shortcut_label)),
+                TextLayout {
+                    justify: JustifyText::Center,
+                    linebreak: LineBreak::NoWrap,
+                },
+                Node {
+                    flex_direction: FlexDirection::Column,
+                    align_items: AlignItems::Start,
+                    justify_content: JustifyContent::Center,
+                    margin: UiRect::all(Val::Px(5.)),
+                    ..default()
+                },
+                BackgroundColor(Color::NONE),
                 shortcut_info,
-                Pickable::IGNORE, // Ignore picking events on the UI.
+                PickingBehavior::IGNORE, // Ignore picking events on the UI.
             ))
             .id();
         commands.entity(root).add_child(shortcut_info);
@@ -128,7 +117,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
 }
 
 pub fn update_info_ui(
-    mut shortcuts_info: Query<(Entity, &ShortcutInfo, &mut Text)>,
+    mut shortcuts_info: Query<(Entity, &ShortcutInfo, &mut TextColor)>,
     key_input: Res<ButtonInput<KeyCode>>,
     mouse_input: Res<ButtonInput<MouseButton>>,
     mouse_wheel: EventReader<MouseWheel>,
@@ -162,13 +151,13 @@ pub fn update_info_ui(
     }
     // Update the color of the shortcut text based on the pressed state...
     for (entity, _, is_pressed) in shortcuts_pressed_info.iter() {
-        let Ok((_, _, mut text)) = shortcuts_info.get_mut(*entity) else {
+        let Ok((_, _, mut text_color)) = shortcuts_info.get_mut(*entity) else {
             continue;
         };
         if *is_pressed {
-            text.sections[0].style.color = css::YELLOW.into();
+            text_color.0 = css::YELLOW.into();
         } else {
-            text.sections[0].style.color = css::WHITE.into();
+            text_color.0 = css::WHITE.into();
         }
     }
 }

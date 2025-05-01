@@ -111,7 +111,7 @@ pub fn slider_drag_start(
             BelongsToCadGeneratedSlider(slider),
             BelongsToCadGeneratedRoot(*cad_root),
             // picking
-            RayCastBackfaces::default(),
+            RayCastBackfaces,
         ))
         .observe(transform_slider_on_pointer_move)
         .id();

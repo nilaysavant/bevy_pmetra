@@ -1,11 +1,13 @@
-use anyhow::{anyhow, Context, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
-    pmetra_core::extensions::shell::ShellCadExtension,
     math::get_rotation_from_normals,
+    pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::truck_modeling::{
-        builder, cgmath::AbsDiffEq, ParametricSurface3D, Point3, Shell, Vector3, Vertex, Wire,
+    re_exports::{
+        anyhow::{anyhow, Context, Result},
+        truck_modeling::{
+            builder, cgmath::AbsDiffEq, ParametricSurface3D, Point3, Shell, Vector3, Vertex, Wire,
+        },
     },
 };
 use itertools::Itertools;

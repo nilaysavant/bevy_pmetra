@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 use bevy_egui::{
-    egui::{self, epaint::Shadow, Color32, Margin, RichText, Rounding, Stroke},
+    egui::{self, epaint::Shadow, Color32, CornerRadius, Margin, RichText, Rounding, Stroke},
     EguiContexts,
 };
 
@@ -40,12 +40,12 @@ pub fn fps_text_update_system(
 
 pub fn get_default_egui_frame() -> egui::Frame {
     let frame = egui::Frame {
-        rounding: Rounding::ZERO,
+        corner_radius: CornerRadius::ZERO,
         shadow: Shadow::NONE,
         fill: Color32::from_rgba_unmultiplied(0, 0, 0, 200),
         stroke: Stroke::NONE,
-        inner_margin: Margin::symmetric(3.0, 3.0),
-        outer_margin: Margin::symmetric(3.0, 3.0),
+        inner_margin: Margin::symmetric(3, 3),
+        outer_margin: Margin::symmetric(3, 3),
     };
     frame
 }

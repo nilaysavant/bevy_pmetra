@@ -83,15 +83,12 @@ pub fn fire_balls_at_look_point(
     debug!("Spawning bullet ball...");
     // Spawn bullet ball...
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Sphere {
-                radius: BULLET_SPHERE_RADIUS,
-                ..default()
-            }),
-            material: materials.add(Color::WHITE),
-            transform: Transform::from_translation(*eye),
+        Mesh3d(meshes.add(Sphere {
+            radius: BULLET_SPHERE_RADIUS,
             ..default()
-        },
+        })),
+        MeshMaterial3d(materials.add(Color::WHITE)),
+        Transform::from_translation(*eye),
         RigidBody::Dynamic,
         Collider::ball(BULLET_SPHERE_RADIUS),
         Ccd::enabled(),

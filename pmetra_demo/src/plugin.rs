@@ -3,10 +3,7 @@ use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, ResourceInspectorPlugin};
 use bevy_rapier3d::prelude::*;
 
-use bevy_pmetra::{
-    pmetra_plugins::{resources::MeshesBuilderQueueInspector, systems::cad::window::close_on_esc},
-    prelude::*,
-};
+use bevy_pmetra::{pmetra_plugins::resources::MeshesBuilderQueueInspector, prelude::*};
 use smooth_bevy_cameras::{controllers::orbit::OrbitCameraPlugin, LookTransformPlugin};
 
 use crate::{
@@ -23,7 +20,7 @@ use crate::{
         inspector::toggle_inspector_is_active,
         orbit_cam::{fire_balls_at_look_point, orbit_cam_custom_input_map_controller},
         rapier::{control_debug_render, setup_debug_render},
-        scene::{scene_setup, test_manual_mesh_gen},
+        scene::{scene_setup, test_manual_mesh_gen}, window::close_on_esc,
     },
     utils::cad_models::{
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,

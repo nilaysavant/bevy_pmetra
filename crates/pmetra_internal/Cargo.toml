@@ -16,6 +16,9 @@ bevy = { version = "0.15", default-features = false, features = [
     "bevy_gizmos",
     "bevy_color",
     "default_font",
+    # Picking features...
+    "bevy_picking",
+    "bevy_mesh_picking_backend",
 ] }
 anyhow = "1.0"
 strum = { version = "0.25", features = ["derive"] }

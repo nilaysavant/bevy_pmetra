@@ -1,12 +1,11 @@
 use std::f64::consts::FRAC_PI_2;
 
-use anyhow::{Context, Error, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::truck_modeling::{builder, Shell, Vector3},
+    re_exports::{anyhow::{Context, Error, Result}, truck_modeling::{builder, Shell, Vector3}},
 };
 
 use super::common::{get_corner_arcs_for_corner_vertices, get_profile_from_corner_arcs};

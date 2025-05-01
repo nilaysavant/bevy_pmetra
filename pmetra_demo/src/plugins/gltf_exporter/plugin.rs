@@ -22,7 +22,7 @@ impl Plugin for GltfExporterPlugin {
 pub fn save_mesh(
     key_input: Res<ButtonInput<KeyCode>>,
     selected_meshes: Query<
-        (&CadMeshName, &Handle<Mesh>, &Handle<StandardMaterial>),
+        (&CadMeshName, &Mesh3d, &MeshMaterial3d<StandardMaterial>),
         With<CadGeneratedMesh>,
     >,
     meshes: Res<Assets<Mesh>>,

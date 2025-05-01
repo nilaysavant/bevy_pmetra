@@ -61,13 +61,8 @@ pub fn add_collider_to_generated_cad_model(
     mut commands: Commands,
     meshes: Res<Assets<Mesh>>,
     cad_meshes: Query<
-        (
-            Entity,
-            &BelongsToCadGeneratedRoot,
-            &CadMeshName,
-            &Handle<Mesh>,
-        ),
-        (With<CadGeneratedMesh>, Changed<Handle<Mesh>>),
+        (Entity, &BelongsToCadGeneratedRoot, &CadMeshName, &Mesh3d),
+        (With<CadGeneratedMesh>, Changed<Mesh3d>),
     >,
 ) {
     for (cad_mesh_ent, BelongsToCadGeneratedRoot(cad_root_ent_cur), cad_mesh_name, mesh_hdl) in
@@ -76,7 +71,10 @@ pub fn add_collider_to_generated_cad_model(
         let Some(mesh) = meshes.get(mesh_hdl) else {
             continue;
         };
-        let Some(collider) = Collider::from_bevy_mesh(mesh, &ComputedColliderShape::TriMesh) else {
+        let Some(collider) = Collider::from_bevy_mesh(
+            mesh,
+            &ComputedColliderShape::TriMesh(TriMeshFlags::default()),
+        ) else {
             error!("Could not generated collider for {}!", **cad_mesh_name);
             continue;
         };

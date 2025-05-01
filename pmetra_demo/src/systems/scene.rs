@@ -17,13 +17,13 @@ use crate::utils::cad_models::space_station::common::{
 
 pub fn scene_setup(mut commands: Commands) {
     commands
-        .spawn(Camera3dBundle {
-            projection: Projection::Perspective(PerspectiveProjection {
+        .spawn((
+            Camera3d::default(),
+            Projection::Perspective(PerspectiveProjection {
                 near: 0.001,
                 ..Default::default()
             }),
-            ..Default::default()
-        })
+        ))
         .insert((
             OrbitCameraBundle::new(
                 OrbitCameraController {
@@ -40,15 +40,14 @@ pub fn scene_setup(mut commands: Commands) {
             CadCamera, // Mark the camera to be used for CAD.
         ));
 
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
+    commands.spawn((
+        DirectionalLight {
             illuminance: 4000.,
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+        Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 }
 
 pub fn test_manual_mesh_gen(
@@ -75,12 +74,9 @@ pub fn test_manual_mesh_gen(
 
     // spawn mesh...
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(mesh),
-            material: materials.add(Color::from(css::GREEN)),
-            transform: Transform::from_translation(Vec3::X * 3.),
-            ..default()
-        },
+        Mesh3d(meshes.add(mesh)),
+        MeshMaterial3d(materials.add(Color::from(css::GREEN))),
+        Transform::from_translation(Vec3::X * 3.),
         Wireframe,
     ));
 }

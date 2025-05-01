@@ -1,15 +1,14 @@
 use std::f64::consts::TAU;
 
-use anyhow::{anyhow, Context, Result};
 use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::truck_modeling::{
+    re_exports::{anyhow::{anyhow, Context, Result}, truck_modeling::{
         builder, control_point::ControlPoint, ParametricSurface3D, Point3, Rad, Shell, Vector3,
         Vertex,
-    },
+    }},
 };
 
 use super::{CadShellIds, SimpleCubeAtCylinder};

@@ -1,10 +1,12 @@
 use std::f64::consts::FRAC_PI_2;
 
-use anyhow::{anyhow, Context, Result};
 use bevy::{math::DVec3, prelude::*};
 use bevy_pmetra::{
     prelude::*,
-    re_exports::truck_modeling::{builder, cgmath::AbsDiffEq, Edge, Point3, Rad, Vector3, Wire},
+    re_exports::{
+        anyhow::{anyhow, Context, Result},
+        truck_modeling::{builder, cgmath::AbsDiffEq, Edge, Point3, Rad, Vector3, Wire},
+    },
 };
 
 /// Get the rounded corner arcs for rectangular profile corner points given.

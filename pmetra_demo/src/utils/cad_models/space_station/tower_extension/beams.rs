@@ -1,9 +1,8 @@
-use anyhow::{anyhow, Context, Error, Result};
 use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire},
+    re_exports::{anyhow::{Context, Result}, truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire}},
 };
 use itertools::Itertools;
 

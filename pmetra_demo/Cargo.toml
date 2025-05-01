@@ -11,7 +11,7 @@ dev = ["bevy/dynamic_linking", "bevy/trace", "bevy/file_watcher"]
 
 [dependencies]
 bevy = "0.15"
-bevy_rapier3d = "0.27"
+bevy_rapier3d = "0.29"
 smooth-bevy-cameras = "0.13"
 bevy_egui = "0.33"
 bevy-inspector-egui = "0.30"

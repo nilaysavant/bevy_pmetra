@@ -242,7 +242,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                         BelongsToCadGeneratedRoot(root_ent),
                         NotShadowCaster,
                         // picking...
-                        RayCastBackfaces::default(),
+                        RayCastBackfaces,
                     ))
                     .observe(move_params_display_ui_on_pointer_move_slider::<Params>)
                     .observe(hide_params_display_ui_on_pointer_out_slider)

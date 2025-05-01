@@ -1,6 +1,6 @@
 use std::io::Cursor;
+use bevy_pmetra::re_exports::anyhow::{anyhow, Result};
 
-use anyhow::{anyhow, Result};
 use base64::{engine::general_purpose::STANDARD, Engine};
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 use gltf::json;
@@ -31,7 +31,6 @@ impl GltfExporter {
         use std::str::FromStr;
         use std::{fs, mem};
 
-        use bevy::render::texture::ImageSampler;
         use gltf::json::buffer::Stride;
         use gltf::json::material::{NormalTexture, OcclusionTexture, StrengthFactor};
         use gltf::json::texture::{Info, Sampler};
