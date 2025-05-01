@@ -25,6 +25,8 @@ use crate::{
     },
 };
 
+use super::params_ui::show_params_display_ui_on_pointer_move_drag_plane;
+
 pub fn update_slider_visibility_based_on_root_selection(
     cad_generated: Query<(Entity, &CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     mut cad_sliders: Query<(&BelongsToCadGeneratedRoot, &mut Visibility), With<CadGeneratedSlider>>,
@@ -44,7 +46,7 @@ pub fn update_slider_visibility_based_on_root_selection(
     }
 }
 
-pub fn slider_drag_start(
+pub fn slider_drag_start<Params: PmetraInteractions + Component>(
     drag_event: Trigger<Pointer<DragStart>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -114,6 +116,7 @@ pub fn slider_drag_start(
             RayCastBackfaces,
         ))
         .observe(transform_slider_on_pointer_move)
+        .observe(show_params_display_ui_on_pointer_move_drag_plane::<Params>)
         .id();
     // Add drag plane as child of root for proper transform...
     commands.entity(*cad_root).add_child(drag_plane);

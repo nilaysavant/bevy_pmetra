@@ -247,7 +247,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                     .observe(show_params_display_ui_on_pointer_over_slider::<Params>)
                     .observe(hide_params_display_ui_on_pointer_out_slider)
                     // Add drag plane on drag start...
-                    .observe(slider_drag_start)
+                    .observe(slider_drag_start::<Params>)
                     .observe(slider_drag_end)
                     // TODO: Re-implement de-select prevention when selection is implemented...
                     // Prevent de-select other ent when slider is interacted with.
