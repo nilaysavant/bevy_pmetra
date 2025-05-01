@@ -102,7 +102,7 @@ pub fn hide_params_display_ui_on_pointer_out_slider(
     *visibility = Visibility::Hidden;
 }
 
-pub fn move_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions + Component>(
+pub fn show_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions + Component>(
     trigger: Trigger<Pointer<Move>>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Node, &mut Visibility), With<ParamDisplayUi>>,

@@ -34,7 +34,7 @@ use super::{
             outlines::render_mesh_outlines,
             params_ui::{
                 hide_params_display_ui_on_pointer_out_slider,
-                move_params_display_ui_on_pointer_move_slider, setup_param_display_ui,
+                show_params_display_ui_on_pointer_move_slider, setup_param_display_ui,
                 show_params_display_ui_on_hover_slider,
             },
             root::deselect_all_root_if_clicked_outside,
