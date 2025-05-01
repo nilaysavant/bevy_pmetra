@@ -10,45 +10,13 @@ default = []
 dev = ["bevy/dynamic_linking", "bevy/trace", "bevy/file_watcher"]
 
 [dependencies]
-bevy = { version = "0.14", default-features = false, features = [
-    "animation",
-    "bevy_asset",
-    "bevy_state",
-    "bevy_color",
-    "bevy_gilrs",
-    "bevy_scene",
-    "bevy_winit",
-    "bevy_core_pipeline",
-    "bevy_pbr",
-    "bevy_gltf",
-    "bevy_render",
-    "bevy_sprite",
-    "bevy_text",
-    "bevy_ui",
-    "multi_threaded",
-    "png",
-    "hdr",
-    "x11",
-    "bevy_gizmos",
-    "tonemapping_luts",
-    "smaa_luts",
-    "default_font",
-    "webgl2",
-    "sysinfo_plugin",
-] }
-bevy_asset_loader = { version = "0.21", features = ["3d", "progress_tracking"] }
-iyes_progress = "0.12"
+bevy = "0.15"
 bevy_rapier3d = "0.27"
-anyhow = "1.0"
-# smooth-bevy-cameras = "0.11" // Use the git version for now as crate is not updated. As below.
-smooth-bevy-cameras = { git = "https://github.com/bonsairobo/smooth-bevy-cameras", rev = "414fa90d1f0c4a95efbaa5f5cf5839b5c904966d" }
-bevy_egui = "0.28"
-bevy-inspector-egui = "0.25"
+smooth-bevy-cameras = "0.13"
+bevy_egui = "0.33"
+bevy-inspector-egui = "0.30"
 strum = { version = "0.25", features = ["derive"] }
 itertools = "0.12"
-noise = "0.8"
-futures-lite = "2.1"
-lazy_static = "1.4"
 # gltf exporter
 gltf = { version = "1.3", features = [
     "extras",
