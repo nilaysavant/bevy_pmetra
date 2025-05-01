@@ -278,7 +278,7 @@ Thats it! You can now see the magic:
 
 | bevy | bevy_pmetra        |
 | ---- | ------------------ |
-| 0.14 | `master`, `v0.2.0` |
+| 0.14 | `master`, `v0.2.x` |
 | 0.13 | `v0.1.0`           |
 
 [bevy-website]: https://bevyengine.org/
