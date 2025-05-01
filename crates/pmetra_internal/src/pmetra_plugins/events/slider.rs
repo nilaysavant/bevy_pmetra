@@ -1,9 +1,4 @@
-use bevy::prelude::*;
-use bevy_mod_picking::{
-    backend::HitData,
-    events::{Move, Pointer},
-    prelude::*,
-};
+use bevy::{picking::backend::HitData, prelude::*};
 
 /// Used to Move slider on **drag plane** [`Pointer<Move>`].
 #[derive(Event)]
@@ -12,10 +7,10 @@ pub struct TransformSliderEvent {
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Move>>> for TransformSliderEvent {
-    fn from(event: ListenerInput<Pointer<Move>>) -> Self {
+impl From<Pointer<Move>> for TransformSliderEvent {
+    fn from(event: Pointer<Move>) -> Self {
         TransformSliderEvent {
-            target: event.target(),
+            target: event.target,
             hit: event.hit.clone(),
         }
     }
@@ -28,10 +23,10 @@ pub struct SliderPointerMoveEvent {
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Move>>> for SliderPointerMoveEvent {
-    fn from(event: ListenerInput<Pointer<Move>>) -> Self {
+impl From<Pointer<Move>> for SliderPointerMoveEvent {
+    fn from(event: Pointer<Move>) -> Self {
         SliderPointerMoveEvent {
-            target: event.target(),
+            target: event.target,
             hit: event.hit.clone(),
         }
     }
@@ -44,10 +39,10 @@ pub struct SliderPointerOutEvent {
     pub hit: HitData,
 }
 
-impl From<ListenerInput<Pointer<Out>>> for SliderPointerOutEvent {
-    fn from(event: ListenerInput<Pointer<Out>>) -> Self {
+impl From<Pointer<Out>> for SliderPointerOutEvent {
+    fn from(event: Pointer<Out>) -> Self {
         SliderPointerOutEvent {
-            target: event.target(),
+            target: event.target,
             hit: event.hit.clone(),
         }
     }

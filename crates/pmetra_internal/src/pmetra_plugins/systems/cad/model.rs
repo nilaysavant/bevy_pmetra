@@ -1,9 +1,8 @@
+use std::task::Poll;
+
 use anyhow::{anyhow, Result};
 use bevy::{color::palettes::css, pbr::NotShadowCaster, prelude::*, render::primitives::Aabb};
-use bevy_async_task::{AsyncTaskPool, AsyncTaskStatus};
-use bevy_mod_picking::{
-    backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*, PickableBundle,
-};
+use bevy_async_task::TaskPool;
 
 use crate::{
     pmetra_core::builders::{
@@ -32,8 +31,7 @@ use crate::{
 };
 
 use super::{
-    root::{root_on_click, root_pointer_move, root_pointer_out},
-    slider::{slider_drag_end, slider_drag_start},
+    params_ui::{hide_params_display_ui_on_pointer_out_slider, move_params_display_ui_on_pointer_move_slider}, root::{root_on_click, root_pointer_move, root_pointer_out}, slider::{slider_drag_end, slider_drag_start}
 };
 
 pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Clone>(
@@ -65,11 +63,11 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
                 CadGeneratedRoot,
                 CadGeneratedRootSelectionState::default(),
                 params.clone(),
-                // picking...
-                On::<Pointer<Move>>::run(root_pointer_move),
-                On::<Pointer<Out>>::run(root_pointer_out),
-                On::<Pointer<Click>>::run(root_on_click),
             ))
+            // picking observers...
+            .observe(root_pointer_move)
+            .observe(root_pointer_out)
+            .observe(root_on_click)
             .id();
 
         // Get the shell builders from params...
@@ -222,20 +220,16 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                 // Spawn new slider...
                 let slider = commands
                     .spawn((
-                        PbrBundle {
-                            material: materials.add(StandardMaterial {
-                                base_color: css::WHITE.with_alpha(0.4).into(),
-                                alpha_mode: AlphaMode::Blend,
-                                unlit: true,
-                                double_sided: true,
-                                cull_mode: None,
-                                ..default()
-                            }),
-                            mesh: meshes.add(Circle::new(*thumb_radius)),
-                            transform: *transform,
-                            // visibility: Visibility::Hidden,
+                        MeshMaterial3d(materials.add(StandardMaterial {
+                            base_color: css::WHITE.with_alpha(0.4).into(),
+                            alpha_mode: AlphaMode::Blend,
+                            unlit: true,
+                            double_sided: true,
+                            cull_mode: None,
                             ..default()
-                        },
+                        })),
+                        Mesh3d(meshes.add(Circle::new(*thumb_radius))),
+                        *transform,
                         slider_name.clone(),
                         CadGeneratedSlider,
                         CadGeneratedSliderConfig {
@@ -248,33 +242,16 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                         BelongsToCadGeneratedRoot(root_ent),
                         NotShadowCaster,
                         // picking...
-                        PickableBundle::default(), // <- Makes the mesh pickable.
-                        NoBackfaceCulling,
-                        // Disable highlight slider...
-                        Highlight::<StandardMaterial> {
-                            hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                                base_color: mat.base_color.with_alpha(0.6),
-                                ..mat.to_owned()
-                            })),
-                            pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                                base_color: mat.base_color.with_alpha(0.8),
-                                ..mat.to_owned()
-                            })),
-                            selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                                ..mat.to_owned()
-                            })),
-                        },
+                        RayCastBackfaces::default(),
                     ))
-                    .insert((
-                        // events...
-                        On::<Pointer<Move>>::send_event::<SliderPointerMoveEvent>(),
-                        On::<Pointer<Out>>::send_event::<SliderPointerOutEvent>(),
-                        // Add drag plane on drag start...
-                        On::<Pointer<DragStart>>::run(slider_drag_start),
-                        On::<Pointer<DragEnd>>::run(slider_drag_end),
-                    ))
+                    .observe(move_params_display_ui_on_pointer_move_slider::<Params>)
+                    .observe(hide_params_display_ui_on_pointer_out_slider)
+                    // Add drag plane on drag start...
+                    .observe(slider_drag_start)
+                    .observe(slider_drag_end)
+                    // TODO: Re-implement de-select prevention when selection is implemented...
                     // Prevent de-select other ent when slider is interacted with.
-                    .insert(NoDeselect)
+                    // .insert(NoDeselect)
                     .id();
                 // Add slider to root...
                 commands.entity(root_ent).add_child(slider);
@@ -337,7 +314,7 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
     >,
     mut meshes: ResMut<Assets<Mesh>>,
     mut events: EventReader<SpawnMeshesBuilder<Params>>,
-    mut task_pool: AsyncTaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
+    mut task_pool: TaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
     mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
     mut builder_queue_inspector: ResMut<MeshesBuilderQueueInspector>,
     mut meshes_builder_task_results_map: ResMut<MeshesBuilderFinishedResultsMap<Params>>,
@@ -374,7 +351,7 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
     let finished_task_results = task_pool
         .iter_poll()
         .filter_map(|status| {
-            if let AsyncTaskStatus::Finished(Ok(result)) = status {
+            if let Poll::Ready(Ok(result)) = status {
                 Some(result)
             } else {
                 None
@@ -522,12 +499,9 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
             // If mesh already exists, update it...
             ent_commands
                 .insert((
-                    MaterialMeshBundle {
-                        material: material_hdl.clone(),
-                        mesh: mesh_hdl,
-                        transform,
-                        ..Default::default()
-                    },
+                    MeshMaterial3d(material_hdl.clone()),
+                    Mesh3d(mesh_hdl),
+                    transform,
                     CadGeneratedMeshOutlines(outlines.clone()),
                 ))
                 // Remove AABB for Bevy to recompute as it wont recompute by itself...
@@ -537,12 +511,9 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
             // Insert a new mesh comp if does not exist...
             ent_commands
                 .insert((
-                    MaterialMeshBundle {
-                        material: material_hdl.clone(),
-                        mesh: mesh_hdl,
-                        transform,
-                        ..Default::default()
-                    },
+                    MeshMaterial3d(material_hdl.clone()),
+                    Mesh3d(mesh_hdl),
+                    transform,
                     CadGeneratedMeshOutlines(outlines.clone()),
                 ))
                 .insert((
@@ -550,15 +521,6 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
                     CadGeneratedMesh,
                     BelongsToCadGeneratedRoot(*root_ent),
                     WireFrameDisplaySettings::default(),
-                    // picking...
-                    PickableBundle::default(), // <- Makes the mesh pickable.
-                    // Pickable::IGNORE,
-                    // Disable highlight...
-                    Highlight::<StandardMaterial> {
-                        hovered: Some(HighlightKind::Fixed(material_hdl.clone())),
-                        pressed: Some(HighlightKind::Fixed(material_hdl.clone())),
-                        selected: Some(HighlightKind::Fixed(material_hdl.clone())),
-                    },
                 ));
         }
     }

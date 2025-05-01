@@ -1,13 +1,12 @@
-use bevy::{prelude::*, utils::HashSet};
-use bevy_mod_picking::{pointer::InputPress, prelude::*};
+use bevy::{picking::pointer::PointerInput, prelude::*, utils::HashSet};
 
 use crate::pmetra_plugins::components::cad::{CadGeneratedRoot, CadGeneratedRootSelectionState};
 
 pub fn root_pointer_move(
-    pointer_event: Listener<Pointer<Move>>,
+    pointer_event: Trigger<Pointer<Move>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
 ) {
-    let root_ent = pointer_event.listener();
+    let root_ent = pointer_event.entity();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
@@ -17,10 +16,10 @@ pub fn root_pointer_move(
 }
 
 pub fn root_pointer_out(
-    pointer_event: Listener<Pointer<Out>>,
+    pointer_event: Trigger<Pointer<Out>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
 ) {
-    let root_ent = pointer_event.listener();
+    let root_ent = pointer_event.entity();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
@@ -30,13 +29,13 @@ pub fn root_pointer_out(
 }
 
 pub fn root_on_click(
+    click_event: Trigger<Pointer<Click>>,
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    click_event: Listener<Pointer<Click>>,
 ) {
     if click_event.button != PointerButton::Primary {
         return;
     }
-    let selected_root_ent = click_event.listener();
+    let selected_root_ent = click_event.entity();
     for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
         if root_ent == selected_root_ent {
             *root_selection_state = CadGeneratedRootSelectionState::Selected;
@@ -52,7 +51,7 @@ pub fn root_on_click(
 pub fn deselect_all_root_if_clicked_outside(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     mut pointer_down: EventReader<Pointer<Down>>,
-    mut presses: EventReader<InputPress>,
+    mut presses: EventReader<PointerInput>,
 ) {
     // Following is borrowed from `bevy_mod_picking`: https://github.com/aevyrie/bevy_mod_picking/blob/0af5d0c80cd027c74373e74bbfe143119f791c06/crates/bevy_picking_selection/src/lib.rs#L155-L214
     // Used to de-select all root entities if a pointer has clicked on nothing...
@@ -75,7 +74,7 @@ pub fn deselect_all_root_if_clicked_outside(
     // so, and the setting is enabled, deselect everything.
     for press in presses
         .read()
-        .filter(|p| p.is_just_down(PointerButton::Primary))
+        .filter(|p| p.button_just_pressed(PointerButton::Primary))
     {
         let id = press.pointer_id;
         if !pointer_down_list.contains(&id) {

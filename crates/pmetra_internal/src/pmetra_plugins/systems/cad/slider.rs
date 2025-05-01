@@ -3,9 +3,6 @@ use bevy::{
     pbr::{NotShadowCaster, NotShadowReceiver},
     prelude::*,
 };
-use bevy_mod_picking::{
-    backends::raycast::bevy_mod_raycast::markers::NoBackfaceCulling, prelude::*,
-};
 
 use crate::{
     math::get_rotation_from_normals,
@@ -48,10 +45,10 @@ pub fn update_slider_visibility_based_on_root_selection(
 }
 
 pub fn slider_drag_start(
+    drag_event: Trigger<Pointer<DragStart>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    drag_event: Listener<Pointer<DragStart>>,
     cad_meshes: Query<(Entity, &BelongsToCadGeneratedRoot), With<CadGeneratedMesh>>,
     mut cad_sliders: Query<
         (
@@ -64,7 +61,7 @@ pub fn slider_drag_start(
     >,
     global_settings: Res<PmetraGlobalSettings>,
 ) {
-    let slider = drag_event.target();
+    let slider = drag_event.target;
     let Ok((
         CadGeneratedSliderConfig {
             thumb_radius,
@@ -93,10 +90,11 @@ pub fn slider_drag_start(
         .with_rotation(rotation);
     let drag_plane = commands
         .spawn((
-            PbrBundle {
-                mesh: meshes
-                    .add(Plane3d::new(Vec3::Y, Vec2::splat(slider_drag_plane_size / 2.)).mesh()),
-                material: materials.add(StandardMaterial {
+            Mesh3d(
+                meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(slider_drag_plane_size / 2.)).mesh()),
+            ),
+            MeshMaterial3d(
+                materials.add(StandardMaterial {
                     base_color: css::GREEN
                         .with_alpha(if slider_drag_plane_debug { 0.75 } else { 0.0 })
                         .into(),
@@ -105,49 +103,35 @@ pub fn slider_drag_start(
                     cull_mode: None,
                     ..default()
                 }),
-                transform,
-                ..default()
-            },
+            ),
+            transform,
             NotShadowCaster,
             NotShadowReceiver,
             CadGeneratedSliderDragPlane,
             BelongsToCadGeneratedSlider(slider),
             BelongsToCadGeneratedRoot(*cad_root),
             // picking
-            PickableBundle::default(), // <- Makes the mesh pickable.
-            NoBackfaceCulling,
-            // Disable highlighting...
-            Highlight::<StandardMaterial> {
-                hovered: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                    ..mat.to_owned()
-                })),
-                pressed: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                    ..mat.to_owned()
-                })),
-                selected: Some(HighlightKind::new_dynamic(|mat| StandardMaterial {
-                    ..mat.to_owned()
-                })),
-            },
-            On::<Pointer<Move>>::send_event::<TransformSliderEvent>(),
+            RayCastBackfaces::default(),
         ))
+        .observe(transform_slider_on_pointer_move)
         .id();
     // Add drag plane as child of root for proper transform...
     commands.entity(*cad_root).add_child(drag_plane);
     // Disable picking on slider, etc...
-    commands.entity(slider).insert(Pickable::IGNORE);
+    commands.entity(slider).insert(PickingBehavior::IGNORE);
     // Disable picking on all meshes belonging to current root...
     for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
             continue;
         }
-        commands.entity(entity).insert(Pickable::IGNORE);
+        commands.entity(entity).insert(PickingBehavior::IGNORE);
     }
-    commands.entity(*cad_root).insert(Pickable::IGNORE);
+    commands.entity(*cad_root).insert(PickingBehavior::IGNORE);
 }
 
 pub fn slider_drag_end(
+    drag_event: Trigger<Pointer<DragEnd>>,
     mut commands: Commands,
-    drag_event: Listener<Pointer<DragEnd>>,
     cad_slider_drag_planes: Query<
         (Entity, &BelongsToCadGeneratedSlider),
         With<CadGeneratedSliderDragPlane>,
@@ -165,7 +149,7 @@ pub fn slider_drag_end(
     >,
     mut ui_nodes: Query<&mut Visibility, With<ParamDisplayUi>>,
 ) {
-    let slider = drag_event.target();
+    let slider = drag_event.target;
     // Remove drag planes...
     for (entity, BelongsToCadGeneratedSlider(cur_slider_entity)) in cad_slider_drag_planes.iter() {
         if *cur_slider_entity != slider {
@@ -191,15 +175,17 @@ pub fn slider_drag_end(
     *slider_state = CadGeneratedSliderState::default();
 
     // Make slider, etc pick-able again...
-    commands.entity(slider).insert(Pickable::default());
+    commands.entity(slider).insert(PickingBehavior::default());
     // Enable picking on all meshes belonging to current root...
     for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
         if cad_root_ent_cur != cad_root {
             continue;
         }
-        commands.entity(entity).insert(Pickable::default());
+        commands.entity(entity).insert(PickingBehavior::default());
     }
-    commands.entity(*cad_root).insert(Pickable::default());
+    commands
+        .entity(*cad_root)
+        .insert(PickingBehavior::default());
     // Make params ui visible...
     let Ok(mut params_ui_visibility) = ui_nodes.get_single_mut() else {
         return;
@@ -207,8 +193,8 @@ pub fn slider_drag_end(
     *params_ui_visibility = Visibility::Hidden;
 }
 
-pub fn transform_slider(
-    mut events: EventReader<TransformSliderEvent>,
+pub fn transform_slider_on_pointer_move(
+    trigger: Trigger<Pointer<Move>>,
     cad_generated: Query<(Entity, &Transform), (With<CadGeneratedRoot>, Without<Cleanup>)>,
     slider_drag_planes: Query<
         (&BelongsToCadGeneratedRoot, &BelongsToCadGeneratedSlider),
@@ -219,53 +205,53 @@ pub fn transform_slider(
         (With<CadGeneratedSlider>, Without<CadGeneratedRoot>),
     >,
 ) {
-    for TransformSliderEvent { target, hit } in events.read() {
-        let drag_plane = *target;
-        let Some(hit_point) = hit.position else {
-            error!("No hit point found!");
-            return;
-        };
-        let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedSlider(slider))) =
-            slider_drag_planes.get(drag_plane)
-        else {
-            warn!("drag plane not found!");
-            return;
-        };
-        let Ok((_, root_transform)) = cad_generated.get(root_ent) else {
-            continue;
-        };
-        let root_transform_inverse_affine = root_transform.compute_affine().inverse();
-        let hit_point_local_space = root_transform_inverse_affine.transform_point3(hit_point);
-        let Ok((
-            mut transform,
-            CadGeneratedSliderConfig {
-                thumb_radius,
-                drag_plane_normal,
-                slider_type,
-            },
-        )) = sliders.get_mut(*slider)
-        else {
-            error!("Slider not found!");
-            return;
-        };
-        match slider_type {
-            CadSliderType::Planer => {
-                transform.translation = hit_point_local_space;
-            }
-            CadSliderType::Linear {
-                direction,
-                limit_min,
-                limit_max,
-            } => {
-                let original_translation = transform.translation;
-                let new_local_translation = (hit_point_local_space - original_translation)
-                    .project_onto_normalized(*direction);
-                if let (Some(limit_min), Some(limit_max)) = (limit_min, limit_max) {
-                    transform.translation = (transform.translation + new_local_translation)
-                        .clamp(*limit_min, *limit_max);
-                } else {
-                    transform.translation += new_local_translation;
-                }
+    let target = trigger.target;
+    let hit = trigger.hit.clone();
+    let drag_plane = target;
+    let Some(hit_point) = hit.position else {
+        error!("No hit point found!");
+        return;
+    };
+    let Ok((&BelongsToCadGeneratedRoot(root_ent), BelongsToCadGeneratedSlider(slider))) =
+        slider_drag_planes.get(drag_plane)
+    else {
+        warn!("drag plane not found!");
+        return;
+    };
+    let Ok((_, root_transform)) = cad_generated.get(root_ent) else {
+        return;
+    };
+    let root_transform_inverse_affine = root_transform.compute_affine().inverse();
+    let hit_point_local_space = root_transform_inverse_affine.transform_point3(hit_point);
+    let Ok((
+        mut transform,
+        CadGeneratedSliderConfig {
+            thumb_radius,
+            drag_plane_normal,
+            slider_type,
+        },
+    )) = sliders.get_mut(*slider)
+    else {
+        error!("Slider not found!");
+        return;
+    };
+    match slider_type {
+        CadSliderType::Planer => {
+            transform.translation = hit_point_local_space;
+        }
+        CadSliderType::Linear {
+            direction,
+            limit_min,
+            limit_max,
+        } => {
+            let original_translation = transform.translation;
+            let new_local_translation =
+                (hit_point_local_space - original_translation).project_onto_normalized(*direction);
+            if let (Some(limit_min), Some(limit_max)) = (limit_min, limit_max) {
+                transform.translation =
+                    (transform.translation + new_local_translation).clamp(*limit_min, *limit_max);
+            } else {
+                transform.translation += new_local_translation;
             }
         }
     }
@@ -332,8 +318,10 @@ pub fn draw_slider_gizmo(
             let transform = glob_transform.compute_transform();
             // draw outline circle...
             gizmos.circle(
-                transform.translation,
-                transform.local_z(),
+                Isometry3d::new(
+                    transform.translation,
+                    get_rotation_from_normals(Vec3::Y, *transform.local_z()),
+                ),
                 config.thumb_radius * transform.scale.x,
                 Color::WHITE,
             );
@@ -341,31 +329,32 @@ pub fn draw_slider_gizmo(
     }
 }
 
-pub fn scale_sliders_based_on_zoom_level(
-    cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
-    cad_meshes: Query<(Entity, &PickSelection), (With<CadGeneratedMesh>, Without<CadCamera>)>,
-    mut sliders: Query<
-        (&mut Transform, &GlobalTransform),
-        (
-            With<CadGeneratedSlider>,
-            Without<CadCamera>,
-            Without<CadGeneratedMesh>,
-        ),
-    >,
-) {
-    let Some((_, camera_transform)) = cameras.iter().find(|(cam, ..)| cam.is_active) else {
-        return;
-    };
-    let Some((_selected_cad_mesh, ..)) = cad_meshes
-        .iter()
-        .find(|(_, selection, ..)| selection.is_selected)
-    else {
-        return;
-    };
-    for (mut transform, glob_transform) in sliders.iter_mut() {
-        let camera_to_slider_dist = camera_transform
-            .translation
-            .distance(glob_transform.translation());
-        transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
-    }
-}
+// TODO: Selection seems to be not available atm, implement this vis custom logic later.
+// pub fn scale_sliders_based_on_zoom_level(
+//     cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
+//     cad_meshes: Query<(Entity, &PickSelection), (With<CadGeneratedMesh>, Without<CadCamera>)>,
+//     mut sliders: Query<
+//         (&mut Transform, &GlobalTransform),
+//         (
+//             With<CadGeneratedSlider>,
+//             Without<CadCamera>,
+//             Without<CadGeneratedMesh>,
+//         ),
+//     >,
+// ) {
+//     let Some((_, camera_transform)) = cameras.iter().find(|(cam, ..)| cam.is_active) else {
+//         return;
+//     };
+//     let Some((_selected_cad_mesh, ..)) = cad_meshes
+//         .iter()
+//         .find(|(_, selection, ..)| selection.is_selected)
+//     else {
+//         return;
+//     };
+//     for (mut transform, glob_transform) in sliders.iter_mut() {
+//         let camera_to_slider_dist = camera_transform
+//             .translation
+//             .distance(glob_transform.translation());
+//         transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
+//     }
+// }

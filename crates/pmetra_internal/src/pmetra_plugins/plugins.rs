@@ -6,8 +6,6 @@ use bevy::{
     prelude::*,
 };
 
-use bevy_mod_picking::{debug::DebugPickingMode, picking_core, DefaultPickingPlugins};
-
 use crate::{
     pmetra_core::builders::{PmetraInteractions, PmetraModelling},
     pmetra_plugins::components::{
@@ -27,7 +25,7 @@ use super::{
     },
     systems::{
         cad::{
-            mesh::show_mesh_local_debug_axis,
+            // mesh::show_mesh_local_debug_axis,
             model::{
                 handle_spawn_meshes_builder_events, mesh_builder_to_bundle,
                 shells_to_mesh_builder_events, shells_to_sliders, spawn_shells_by_name_on_generate,
@@ -35,14 +33,18 @@ use super::{
             },
             outlines::render_mesh_outlines,
             params_ui::{
-                hide_params_display_ui_on_out_slider, move_params_display_ui_on_transform_slider,
-                setup_param_display_ui, show_params_display_ui_on_hover_slider,
+                hide_params_display_ui_on_pointer_out_slider,
+                move_params_display_ui_on_pointer_move_slider, setup_param_display_ui,
+                show_params_display_ui_on_hover_slider,
             },
             root::deselect_all_root_if_clicked_outside,
             settings::{show_selected_mesh_local_debug_axis, show_selected_mesh_outlines},
             slider::{
-                draw_slider_gizmo, scale_sliders_based_on_zoom_level, transform_slider,
-                update_params_from_sliders, update_slider_visibility_based_on_root_selection,
+                draw_slider_gizmo,
+                // scale_sliders_based_on_zoom_level,
+                transform_slider_on_pointer_move,
+                update_params_from_sliders,
+                update_slider_visibility_based_on_root_selection,
             },
         },
         gizmos::{configure_custom_gizmos, PmetraMeshOutlineGizmos, PmetraSliderOutlineGizmos},
@@ -89,10 +91,9 @@ impl Plugin for PmetraBasePlugin {
             }
         }
 
-        if !app.is_plugin_added::<picking_core::CorePlugin>() {
+        if !app.is_plugin_added::<MeshPickingPlugin>() {
             app // picking
-                .add_plugins(DefaultPickingPlugins.build())
-                .insert_resource(DebugPickingMode::Disabled); // to disable debug overlay
+                .add_plugins(MeshPickingPlugin); // to disable debug overlay
         }
 
         // Add all the plugins/systems/resources/events that are not specific to params...
@@ -108,17 +109,14 @@ impl Plugin for PmetraBasePlugin {
             .add_event::<SliderPointerMoveEvent>()
             .add_event::<SliderPointerOutEvent>()
             // UI for params and dimensions...
-            .add_systems(
-                Update,
-                (setup_param_display_ui, hide_params_display_ui_on_out_slider),
-            )
+            .add_systems(Update, setup_param_display_ui)
             // mesh systems...
             .add_systems(
                 Update,
                 (
                     render_mesh_outlines.run_if(show_selected_mesh_outlines),
                     deselect_all_root_if_clicked_outside,
-                    show_mesh_local_debug_axis.run_if(show_selected_mesh_local_debug_axis),
+                    // show_mesh_local_debug_axis.run_if(show_selected_mesh_local_debug_axis),
                 ),
             )
             // slider systems...
@@ -127,8 +125,7 @@ impl Plugin for PmetraBasePlugin {
                 (
                     (
                         update_slider_visibility_based_on_root_selection,
-                        transform_slider,
-                        scale_sliders_based_on_zoom_level,
+                        // scale_sliders_based_on_zoom_level, // TODO: Selection is not available atm, implement this vis custom logic later.
                     )
                         .chain(),
                     draw_slider_gizmo,
@@ -221,7 +218,7 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraInteractio
                 Update,
                 (
                     show_params_display_ui_on_hover_slider::<Params>,
-                    move_params_display_ui_on_transform_slider::<Params>,
+                    // move_params_display_ui_on_pointer_move_slider::<Params>,
                 ),
             )
             .add_systems(Startup, || info!("PmetraInteractionsPlugin started!"));
