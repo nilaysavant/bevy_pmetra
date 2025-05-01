@@ -104,7 +104,6 @@ pub fn hide_params_display_ui_on_pointer_out_slider(
 
 pub fn move_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions + Component>(
     trigger: Trigger<Pointer<Move>>,
-    slider_drag_planes: Query<&BelongsToCadGeneratedSlider, With<CadGeneratedSliderDragPlane>>,
     cameras: Query<(&Camera, &GlobalTransform), With<CadCamera>>,
     mut ui_nodes: Query<(&mut Text, &mut Node, &mut Visibility), With<ParamDisplayUi>>,
     generated_roots: Query<&Params, With<CadGeneratedRoot>>,
@@ -119,15 +118,10 @@ pub fn move_params_display_ui_on_pointer_move_slider<Params: PmetraInteractions 
     let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.get_single_mut() else {
         return;
     };
-    let target = trigger.target;
+    let slider = trigger.target;
     let hit = trigger.hit.clone();
-    let drag_plane = target;
-    let Ok(BelongsToCadGeneratedSlider(slider)) = slider_drag_planes.get(drag_plane) else {
-        warn!("drag plane not found!");
-        return;
-    };
     let Ok((slider_glob_transform, slider_name, BelongsToCadGeneratedRoot(cad_root_ent))) =
-        sliders.get(*slider)
+        sliders.get(slider)
     else {
         return;
     };
