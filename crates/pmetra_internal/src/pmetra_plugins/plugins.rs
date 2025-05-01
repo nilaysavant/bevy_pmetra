@@ -33,9 +33,7 @@ use super::{
             root::deselect_all_root_if_clicked_outside,
             settings::show_selected_mesh_outlines,
             slider::{
-                draw_slider_gizmo,
-                // scale_sliders_based_on_zoom_level,
-                update_params_from_sliders,
+                draw_slider_gizmo, scale_sliders_based_on_zoom_level, update_params_from_sliders,
                 update_slider_visibility_based_on_root_selection,
             },
         },
@@ -113,7 +111,7 @@ impl Plugin for PmetraBasePlugin {
                 (
                     (
                         update_slider_visibility_based_on_root_selection,
-                        // scale_sliders_based_on_zoom_level, // TODO: Selection is not available atm, implement this vis custom logic later.
+                        scale_sliders_based_on_zoom_level,
                     )
                         .chain(),
                     draw_slider_gizmo,

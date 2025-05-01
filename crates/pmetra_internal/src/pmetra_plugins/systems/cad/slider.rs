@@ -21,6 +21,7 @@ use crate::{
         resources::PmetraGlobalSettings,
         systems::gizmos::PmetraSliderOutlineGizmos,
     },
+    prelude::CadCamera,
 };
 
 use super::params_ui::show_params_display_ui_on_pointer_move_drag_plane;
@@ -330,32 +331,34 @@ pub fn draw_slider_gizmo(
     }
 }
 
-// TODO: Selection seems to be not available atm, implement this vis custom logic later.
-// pub fn scale_sliders_based_on_zoom_level(
-//     cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
-//     cad_meshes: Query<(Entity, &PickSelection), (With<CadGeneratedMesh>, Without<CadCamera>)>,
-//     mut sliders: Query<
-//         (&mut Transform, &GlobalTransform),
-//         (
-//             With<CadGeneratedSlider>,
-//             Without<CadCamera>,
-//             Without<CadGeneratedMesh>,
-//         ),
-//     >,
-// ) {
-//     let Some((_, camera_transform)) = cameras.iter().find(|(cam, ..)| cam.is_active) else {
-//         return;
-//     };
-//     let Some((_selected_cad_mesh, ..)) = cad_meshes
-//         .iter()
-//         .find(|(_, selection, ..)| selection.is_selected)
-//     else {
-//         return;
-//     };
-//     for (mut transform, glob_transform) in sliders.iter_mut() {
-//         let camera_to_slider_dist = camera_transform
-//             .translation
-//             .distance(glob_transform.translation());
-//         transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
-//     }
-// }
+pub fn scale_sliders_based_on_zoom_level(
+    cameras: Query<(&Camera, &Transform), (With<CadCamera>, Changed<Transform>)>,
+    cad_gen_root: Query<
+        (Entity, &CadGeneratedRootSelectionState),
+        (With<CadGeneratedRoot>, Without<CadCamera>),
+    >,
+    mut sliders: Query<
+        (&mut Transform, &GlobalTransform),
+        (
+            With<CadGeneratedSlider>,
+            Without<CadCamera>,
+            Without<CadGeneratedMesh>,
+        ),
+    >,
+) {
+    let Some((_, camera_transform)) = cameras.iter().find(|(cam, ..)| cam.is_active) else {
+        return;
+    };
+    let Some((_selected_cad_mesh, ..)) = cad_gen_root
+        .iter()
+        .find(|(_, selection, ..)| matches!(selection, CadGeneratedRootSelectionState::Selected))
+    else {
+        return;
+    };
+    for (mut transform, glob_transform) in sliders.iter_mut() {
+        let camera_to_slider_dist = camera_transform
+            .translation
+            .distance(glob_transform.translation());
+        transform.scale = Vec3::ONE * camera_to_slider_dist.clamp(0., 5.) / 5.;
+    }
+}
