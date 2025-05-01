@@ -19,7 +19,6 @@ bevy = { version = "0.14", default-features = false, features = [
 ] }
 anyhow = "1.0"
 strum = { version = "0.25", features = ["derive"] }
-lazy_static = "1.4"
 # picking
 bevy_mod_picking = "0.20"
 # truck stuff
