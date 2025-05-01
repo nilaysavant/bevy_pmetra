@@ -31,7 +31,7 @@ use crate::{
 };
 
 use super::{
-    params_ui::{hide_params_display_ui_on_pointer_out_slider, show_params_display_ui_on_pointer_move_slider}, root::{root_on_click, root_pointer_move, root_pointer_out}, slider::{slider_drag_end, slider_drag_start}
+    params_ui::{hide_params_display_ui_on_pointer_out_slider, show_params_display_ui_on_pointer_over_slider}, root::{root_on_click, root_pointer_move, root_pointer_out}, slider::{slider_drag_end, slider_drag_start}
 };
 
 pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Clone>(
@@ -244,7 +244,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
                         // picking...
                         RayCastBackfaces,
                     ))
-                    .observe(show_params_display_ui_on_pointer_move_slider::<Params>)
+                    .observe(show_params_display_ui_on_pointer_over_slider::<Params>)
                     .observe(hide_params_display_ui_on_pointer_out_slider)
                     // Add drag plane on drag start...
                     .observe(slider_drag_start)
