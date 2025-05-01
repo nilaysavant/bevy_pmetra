@@ -320,7 +320,7 @@ pub fn draw_slider_gizmo(
             gizmos.circle(
                 Isometry3d::new(
                     transform.translation,
-                    get_rotation_from_normals(Vec3::Y, *transform.local_z()),
+                    get_rotation_from_normals(Vec3::Z, *transform.local_z()),
                 ),
                 config.thumb_radius * transform.scale.x,
                 Color::WHITE,
