@@ -6,7 +6,7 @@ use bevy::{
 
 use crate::{
     math::get_rotation_from_normals,
-    pmetra_core::builders::{CadSliderName, CadSliderType, PmetraInteractions, PmetraModelling},
+    pmetra_core::builders::{CadSliderName, CadSliderType, PmetraInteractions},
     pmetra_plugins::{
         cleanup_manager::Cleanup,
         components::{
@@ -16,10 +16,8 @@ use crate::{
                 CadGeneratedSliderConfig, CadGeneratedSliderDragPlane,
                 CadGeneratedSliderPreviousTransform, CadGeneratedSliderState,
             },
-            camera::CadCamera,
             params_ui::ParamDisplayUi,
         },
-        events::slider::TransformSliderEvent,
         resources::PmetraGlobalSettings,
         systems::gizmos::PmetraSliderOutlineGizmos,
     },

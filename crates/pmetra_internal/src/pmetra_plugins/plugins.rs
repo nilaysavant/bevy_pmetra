@@ -15,10 +15,7 @@ use crate::{
 
 use super::{
     cleanup_manager::CleanupManagerPlugin,
-    events::{
-        cad::{GenerateCadModel, SpawnMeshesBuilder},
-        slider::{SliderPointerMoveEvent, SliderPointerOutEvent, TransformSliderEvent},
-    },
+    events::cad::{GenerateCadModel, SpawnMeshesBuilder},
     resources::{
         MeshesBuilderFinishedResultsMap, MeshesBuilderQueue, MeshesBuilderQueueInspector,
         PmetraGlobalSettings,
@@ -32,17 +29,12 @@ use super::{
                 update_shells_by_name_on_params_change,
             },
             outlines::render_mesh_outlines,
-            params_ui::{
-                hide_params_display_ui_on_pointer_out_slider,
-                show_params_display_ui_on_pointer_over_slider, setup_param_display_ui,
-                show_params_display_ui_on_hover_slider,
-            },
+            params_ui::setup_param_display_ui,
             root::deselect_all_root_if_clicked_outside,
-            settings::{show_selected_mesh_local_debug_axis, show_selected_mesh_outlines},
+            settings::show_selected_mesh_outlines,
             slider::{
                 draw_slider_gizmo,
                 // scale_sliders_based_on_zoom_level,
-                transform_slider_on_pointer_move,
                 update_params_from_sliders,
                 update_slider_visibility_based_on_root_selection,
             },
@@ -104,10 +96,6 @@ impl Plugin for PmetraBasePlugin {
             .init_gizmo_group::<PmetraMeshOutlineGizmos>()
             .init_gizmo_group::<PmetraSliderOutlineGizmos>()
             .add_systems(Update, configure_custom_gizmos)
-            // picking events...
-            .add_event::<TransformSliderEvent>()
-            .add_event::<SliderPointerMoveEvent>()
-            .add_event::<SliderPointerOutEvent>()
             // UI for params and dimensions...
             .add_systems(Update, setup_param_display_ui)
             // mesh systems...
@@ -211,14 +199,6 @@ impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraInteractio
                         .after(update_shells_by_name_on_params_change::<Params>)
                         .before(shells_to_mesh_builder_events::<Params>),
                     update_params_from_sliders::<Params>,
-                ),
-            )
-            // Params UI...
-            .add_systems(
-                Update,
-                (
-                    show_params_display_ui_on_hover_slider::<Params>,
-                    // move_params_display_ui_on_pointer_move_slider::<Params>,
                 ),
             )
             .add_systems(Startup, || info!("PmetraInteractionsPlugin started!"));
