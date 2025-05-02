@@ -121,11 +121,9 @@ pub fn slider_drag_start<Params: PmetraInteractions + Component>(
     commands.entity(*cad_root).add_child(drag_plane);
     // Disable picking on slider, etc...
     commands.entity(slider).insert(PickingBehavior::IGNORE);
-    // Disable picking on all meshes belonging to current root...
-    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
-        if cad_root_ent_cur != cad_root {
-            continue;
-        }
+    // Disable picking on all meshes (not just belonging to current root)...
+    // This makes sure that the drag plane picking is not occluded by any other meshes.
+    for (entity, BelongsToCadGeneratedRoot(_cad_root_ent_cur)) in cad_meshes.iter() {
         commands.entity(entity).insert(PickingBehavior::IGNORE);
     }
     commands.entity(*cad_root).insert(PickingBehavior::IGNORE);
@@ -178,11 +176,9 @@ pub fn slider_drag_end(
 
     // Make slider, etc pick-able again...
     commands.entity(slider).insert(PickingBehavior::default());
-    // Enable picking on all meshes belonging to current root...
-    for (entity, BelongsToCadGeneratedRoot(cad_root_ent_cur)) in cad_meshes.iter() {
-        if cad_root_ent_cur != cad_root {
-            continue;
-        }
+    // Enable picking on all meshes (not just belonging to current root)...
+    // Since previously (on drag) all were set to ignore picking.
+    for (entity, BelongsToCadGeneratedRoot(_cad_root_ent_cur)) in cad_meshes.iter() {
         commands.entity(entity).insert(PickingBehavior::default());
     }
     commands
