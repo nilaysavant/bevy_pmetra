@@ -3,8 +3,8 @@ use truck_meshalgo::{rexport_polymesh::PolygonMesh, tessellation::MeshedShape};
 use truck_modeling::{Face, Shell, Wire};
 
 use crate::{
-    pmetra_core::{meshing::BuildPolygon, tessellation::CustomMeshableShape},
     constants::CUSTOM_TRUCK_TOLERANCE_1,
+    pmetra_core::{meshing::BuildPolygon, tessellation::CustomMeshableShape},
 };
 
 /// Extensions to [`Face`] primitive.

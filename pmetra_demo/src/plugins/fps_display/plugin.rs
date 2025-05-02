@@ -16,7 +16,7 @@ impl Plugin for FpsDisplayPlugin {
         if !app.is_plugin_added::<EguiPlugin>() {
             app.add_plugins(EguiPlugin);
         }
-        
+
         app // app
             .insert_resource(FpsDisplayPluginSettings::default())
             .add_systems(Update, fps_text_update_system)

@@ -34,8 +34,8 @@ pub struct PmetraGlobalSettings {
     pub selected_mesh_outlines_width: f32,
     /// Width of the slider outlines.
     pub slider_outlines_width: f32,
-    /// Size of the slider drag plane. 
-    /// 
+    /// Size of the slider drag plane.
+    ///
     /// This limits the slider drag distance.
     pub slider_drag_plane_size: f32,
     /// Show slider drag plane for debugging.

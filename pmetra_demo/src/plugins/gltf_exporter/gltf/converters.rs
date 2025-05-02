@@ -1,5 +1,8 @@
 use bevy::{
-    asset::{Assets, Handle}, color::{Color, ColorToComponents}, image::Image, prelude::StandardMaterial
+    asset::{Assets, Handle},
+    color::{Color, ColorToComponents},
+    image::Image,
+    prelude::StandardMaterial,
 };
 use bevy_pmetra::re_exports::anyhow::Result;
 use gltf::{

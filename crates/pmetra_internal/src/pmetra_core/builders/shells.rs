@@ -7,12 +7,12 @@ use truck_meshalgo::{
 use truck_modeling::{Shell, Surface};
 
 use crate::{
+    constants::CUSTOM_TRUCK_TOLERANCE_1,
     pmetra_core::{
         builders::{CadElement, CadElementTag, CadTaggedElements},
         meshing::{BuildCadMeshedShell, BuildPolygon},
         tessellation::{CadMeshedShell, CustomMeshableShape},
     },
-    constants::CUSTOM_TRUCK_TOLERANCE_1,
 };
 
 /// Holds multiple [`CadShellBuilder`]s.

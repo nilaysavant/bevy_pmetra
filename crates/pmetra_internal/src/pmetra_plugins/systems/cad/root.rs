@@ -59,10 +59,7 @@ pub fn deselect_all_root_if_clicked_outside(
     // Pointers that have clicked on something.
     let mut pointer_down_list = HashSet::new();
 
-    for Pointer {
-        pointer_id,
-        ..
-    } in pointer_down
+    for Pointer { pointer_id, .. } in pointer_down
         .read()
         .filter(|pointer| pointer.event.button == PointerButton::Primary)
     {

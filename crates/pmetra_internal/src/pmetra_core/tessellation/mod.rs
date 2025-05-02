@@ -25,7 +25,7 @@ pub trait CustomMeshableShape<S: MeshableSurface> {
     /// # Remarks
     ///
     /// - The tessellated mesh is not necessarily closed even if `self` is `Solid`.
-    /// 
+    ///
     /// If you want to get closed mesh, use [`OptimizingFilter::put_together_same_attrs`].
     /// - This method requires that the curve ride strictly on a surface. If not, try [`RobustMeshableShape`].
     ///

@@ -56,10 +56,10 @@ mod test {
 
         impl PmetraCad for Cube {
             fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
-                CadShellsBuilders::default().add_shell_builder(
-                    CadShellName("s1".into()),
-                    |_p: &Self| Ok(CadShell::default()),
-                )
+                CadShellsBuilders::default()
+                    .add_shell_builder(CadShellName("s1".into()), |_p: &Self| {
+                        Ok(CadShell::default())
+                    })
             }
         }
 

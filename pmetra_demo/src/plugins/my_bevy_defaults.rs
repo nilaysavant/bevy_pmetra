@@ -1,8 +1,14 @@
 use bevy::{
-    app::PluginGroupBuilder, asset::AssetMetaCheck, log::{Level, LogPlugin}, prelude::*, render::{
+    app::PluginGroupBuilder,
+    asset::AssetMetaCheck,
+    log::{Level, LogPlugin},
+    prelude::*,
+    render::{
         settings::{RenderCreation, WgpuFeatures, WgpuSettings},
         RenderPlugin,
-    }, utils::HashMap, window::PresentMode
+    },
+    utils::HashMap,
+    window::PresentMode,
 };
 
 /// Html Canvas selector
