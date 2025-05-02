@@ -39,13 +39,13 @@ fn scene_setup(
     mut spawn_simple_cube: EventWriter<GenerateCadModel<SimpleCube>>,
 ) {
     commands
-        .spawn(Camera3dBundle {
-            projection: Projection::Perspective(PerspectiveProjection {
+        .spawn((
+            Camera3d::default(),
+            PerspectiveProjection {
                 near: 0.001,
                 ..Default::default()
-            }),
-            ..Default::default()
-        })
+            },
+        ))
         .insert((
             OrbitCameraBundle::new(
                 OrbitCameraController {
@@ -61,15 +61,14 @@ fn scene_setup(
             ),
             CadCamera, // Mark the camera to be used for CAD.
         ));
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
+    commands.spawn((
+        DirectionalLight {
             illuminance: 4000.,
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+        Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
     // Spawn the simple cube...
     spawn_simple_cube.send(GenerateCadModel::default());
 }
