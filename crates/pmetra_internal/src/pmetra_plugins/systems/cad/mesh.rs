@@ -1,7 +1,3 @@
-use bevy::{color::palettes::css, prelude::*};
-
-use crate::pmetra_plugins::components::cad::CadGeneratedMesh;
-
 // TODO: Selection seems to be not available atm, implement this vis custom logic later.
 // pub fn show_mesh_local_debug_axis(
 //     cad_meshes: Query<(&PickSelection, &Transform), With<CadGeneratedMesh>>,

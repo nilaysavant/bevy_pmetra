@@ -51,7 +51,7 @@ pub fn build_cuboid_enclosure_shell(params: &TowerExtension) -> Result<CadShell>
     // Create the L-Shaped Cross section of beam...
 
     // Create points...
-    let o = DVec3::ZERO;
+    let _o = DVec3::ZERO;
     let a = DVec3::new(
         -enclosure_profile_width / 2.,
         0.,
@@ -116,12 +116,6 @@ pub fn cuboid_enclosure_mesh_builder(
     params: &TowerExtension,
     shell_name: CadShellName,
 ) -> Result<CadMeshBuilder<TowerExtension>> {
-    let TowerExtension {
-        tower_length,
-        enclosure_profile_depth,
-        enclosure_profile_width,
-        ..
-    } = &params;
     // spawn entity with generated mesh...
     let transform = Transform::default();
 
@@ -133,11 +127,9 @@ pub fn cuboid_enclosure_mesh_builder(
 }
 
 pub fn build_tower_length_slider(
-    params: &TowerExtension,
+    _params: &TowerExtension,
     cad_shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let &TowerExtension { tower_length, .. } = params;
-
     let cad_shell = cad_shells_by_name
         .get(&CadShellName(CadShellIds::CuboidEnclosure.to_string()))
         .ok_or_else(|| anyhow!("Could not get CuboidEnclosure shell!"))?;

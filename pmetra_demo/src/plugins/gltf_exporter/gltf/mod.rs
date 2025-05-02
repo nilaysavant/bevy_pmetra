@@ -451,11 +451,13 @@ impl From<&[GltfExporterVertex]> for GltfExporterVertexBounds {
         let mut bounds = GltfExporterVertexBounds::default();
 
         for GltfExporterVertex { position, uv } in vertices {
+            #[allow(clippy::needless_range_loop)]
             for i in 0..3 {
                 // pos
                 bounds.min.position[i] = f32::min(bounds.min.position[i], position[i]);
                 bounds.max.position[i] = f32::max(bounds.max.position[i], position[i]);
             }
+            #[allow(clippy::needless_range_loop)]
             for i in 0..2 {
                 // uvs
                 bounds.min.uv[i] = f32::min(bounds.min.uv[i], uv[i]);

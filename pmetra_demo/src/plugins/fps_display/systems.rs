@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 use bevy_egui::{
-    egui::{self, epaint::Shadow, Color32, CornerRadius, Margin, RichText, Rounding, Stroke},
+    egui::{self, epaint::Shadow, Color32, CornerRadius, Margin, RichText, Stroke},
     EguiContexts,
 };
 

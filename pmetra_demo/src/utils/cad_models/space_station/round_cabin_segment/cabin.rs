@@ -5,10 +5,13 @@ use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::face::FaceCadExtension,
     prelude::*,
-    re_exports::{anyhow::{anyhow, Context, Result}, truck_modeling::{
-        builder, cgmath::AbsDiffEq, Face, ParametricSurface3D, Point3, Rad, Shell, Tolerance,
-        Vector3,
-    }},
+    re_exports::{
+        anyhow::{anyhow, Context, Result},
+        truck_modeling::{
+            builder, cgmath::AbsDiffEq, Face, ParametricSurface3D, Point3, Rad, Shell, Tolerance,
+            Vector3,
+        },
+    },
 };
 
 use crate::utils::cad_models::space_station::common::{
@@ -286,8 +289,6 @@ pub fn build_cabin_mesh(
     params: &RoundCabinSegment,
     shell_name: CadShellName,
 ) -> Result<CadMeshBuilder<RoundCabinSegment>> {
-    let RoundCabinSegment { profile_width, .. } = params;
-
     // spawn entity with generated mesh...
     let main_mesh_transform: Transform = Transform::from_translation(Vec3::ZERO);
     // Init cad mesh from mesh stuff...
@@ -301,7 +302,7 @@ pub fn build_cabin_mesh(
 // Sliders...
 
 pub fn build_extrude_slider(
-    params: &RoundCabinSegment,
+    _params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
     let cad_shell = shells_by_name
@@ -331,17 +332,6 @@ pub fn build_extrude_slider(
     )
     .with_rotation(get_rotation_from_normals(Vec3::Z, slider_normal));
 
-    let Some(CadElement::Face(profile_face)) =
-        cad_shell.get_element_by_tag(CadElementTag::new("ProfileFace"))
-    else {
-        return Err(anyhow!("Could not find face!"));
-    };
-    let profile_face_centroid = profile_face
-        .boundaries()
-        .last()
-        .expect("No wire found!")
-        .get_centroid();
-
     Ok(CadSlider {
         drag_plane_normal: slider_normal,
         transform: slider_transform,
@@ -359,13 +349,7 @@ pub fn build_corner_radius_slider(
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
     let RoundCabinSegment {
-        profile_width,
-        profile_height,
-        profile_corner_radius,
-        profile_thickness,
         profile_extrude_length,
-        window,
-        window_translation,
         ..
     } = &params;
 
@@ -399,9 +383,6 @@ pub fn build_corner_radius_slider(
                 extruded_profile_face_normal,
             ));
 
-    let min_corner_radius = std::f64::MIN_POSITIVE;
-    let max_corner_radius = (profile_width / 2.).min(profile_height / 2.);
-
     Ok(CadSlider {
         drag_plane_normal: extruded_profile_face_normal,
         transform: slider_transform,
@@ -415,20 +396,9 @@ pub fn build_corner_radius_slider(
 }
 
 pub fn build_profile_width_slider(
-    params: &RoundCabinSegment,
+    _params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let RoundCabinSegment {
-        profile_width,
-        profile_height,
-        profile_corner_radius,
-        profile_thickness,
-        profile_extrude_length,
-        window,
-        window_translation,
-        ..
-    } = &params;
-
     let cad_shell = shells_by_name
         .get(&CadShellName(CadShellIds::CabinShell.to_string()))
         .ok_or_else(|| anyhow!("Could not find shell!"))?;
@@ -467,20 +437,9 @@ pub fn build_profile_width_slider(
 }
 
 pub fn build_profile_height_slider(
-    params: &RoundCabinSegment,
+    _params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let RoundCabinSegment {
-        profile_width,
-        profile_height,
-        profile_corner_radius,
-        profile_thickness,
-        profile_extrude_length,
-        window,
-        window_translation,
-        ..
-    } = &params;
-
     let cad_shell = shells_by_name
         .get(&CadShellName(CadShellIds::CabinShell.to_string()))
         .ok_or_else(|| anyhow!("Could not find shell!"))?;
@@ -524,20 +483,9 @@ pub fn build_profile_height_slider(
 }
 
 pub fn build_profile_thickness_slider(
-    params: &RoundCabinSegment,
+    _params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let RoundCabinSegment {
-        profile_width,
-        profile_height,
-        profile_corner_radius,
-        profile_thickness,
-        profile_extrude_length,
-        window,
-        window_translation,
-        ..
-    } = &params;
-
     let cad_shell = shells_by_name
         .get(&CadShellName(CadShellIds::CabinShell.to_string()))
         .ok_or_else(|| anyhow!("Could not find shell!"))?;
@@ -592,20 +540,9 @@ pub fn build_profile_thickness_slider(
 }
 
 pub fn build_window_translation_slider(
-    params: &RoundCabinSegment,
+    _params: &RoundCabinSegment,
     shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
-    let RoundCabinSegment {
-        profile_width,
-        profile_height,
-        profile_corner_radius,
-        profile_thickness,
-        profile_extrude_length,
-        window,
-        window_translation,
-        ..
-    } = &params;
-
     let cad_shell = shells_by_name
         .get(&CadShellName(CadShellIds::CabinShell.to_string()))
         .ok_or_else(|| anyhow!("Could not find shell!"))?;
@@ -624,7 +561,6 @@ pub fn build_window_translation_slider(
     let face_wire = boundaries.last().expect("No wire found!");
     let wire_centroid = face_wire.get_centroid();
 
-    let ref_edge_direction = ref_edge_direction_for_wire(face_wire.clone())?;
     let slider_translation = wire_centroid;
     let slider_transform =
         Transform::from_translation(slider_translation.as_vec3() + face_normal * 0.01)

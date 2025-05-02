@@ -26,7 +26,7 @@ pub fn render_mesh_outlines(
 ) {
     for (cur_root_ent, root_selection_state) in cad_generated.iter() {
         for (
-            cad_mesh_ent,
+            _cad_mesh_ent,
             &BelongsToCadGeneratedRoot(root_ent),
             glob_transform,
             CadGeneratedMeshOutlines(line_strip_positions),

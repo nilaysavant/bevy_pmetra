@@ -223,9 +223,7 @@ impl BuildCadMeshOutlines for Shell {
                     .boundaries()
                     .iter()
                     .filter_map(|wire| {
-                        let Some(face) = builder::try_attach_plane(&[wire.clone()]).ok() else {
-                            return None;
-                        };
+                        let face = builder::try_attach_plane(&[wire.clone()]).ok()?;
                         let shell = Shell::from(vec![face]);
                         let polygon_mesh = shell
                             .compress()

@@ -61,9 +61,7 @@ pub fn deselect_all_root_if_clicked_outside(
 
     for Pointer {
         pointer_id,
-        pointer_location,
-        target,
-        event: _,
+        ..
     } in pointer_down
         .read()
         .filter(|pointer| pointer.event.button == PointerButton::Primary)
@@ -78,7 +76,7 @@ pub fn deselect_all_root_if_clicked_outside(
     {
         let id = press.pointer_id;
         if !pointer_down_list.contains(&id) {
-            for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
+            for (_root_ent, mut root_selection_state) in cad_generated.iter_mut() {
                 *root_selection_state = CadGeneratedRootSelectionState::None;
             }
         }

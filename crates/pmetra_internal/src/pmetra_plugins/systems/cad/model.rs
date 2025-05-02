@@ -60,7 +60,8 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
         // Spawn root...
         let root_ent = commands
             .spawn((
-                SpatialBundle::from_transform(*transform),
+                *transform,
+                Visibility::default(),
                 CadGeneratedRoot,
                 CadGeneratedRootSelectionState::default(),
                 params.clone(),
@@ -111,7 +112,7 @@ pub fn update_shells_by_name_on_params_change<Params: PmetraModelling + Componen
     mut shells_by_name_entities: Query<(Entity, &BelongsToCadGeneratedRoot, &mut CadShellsByName)>,
 ) {
     for (root_ent, params) in cad_generated.iter() {
-        for (entity, &BelongsToCadGeneratedRoot(cur_root), mut shells_by_name) in
+        for (_entity, &BelongsToCadGeneratedRoot(cur_root), mut shells_by_name) in
             shells_by_name_entities.iter_mut()
         {
             if cur_root != root_ent {
@@ -166,7 +167,7 @@ pub fn shells_to_sliders<Params: PmetraInteractions + Component + Clone>(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+    for (_entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
     {
         // Get params from root...
@@ -267,11 +268,10 @@ pub fn shells_to_mesh_builder_events<Params: PmetraModelling + Component + Clone
         (Entity, &CadShellsByName, &BelongsToCadGeneratedRoot),
         Changed<CadShellsByName>,
     >,
-    mut spawn_meshes_builder_evt: EventWriter<SpawnMeshesBuilder<Params>>,
     mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
     mut builder_creation_index: Local<usize>,
 ) {
-    for (entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
+    for (_entity, shells_by_name, &BelongsToCadGeneratedRoot(root_ent)) in
         shells_by_name_entities.iter()
     {
         // Get params from root...
@@ -284,11 +284,6 @@ pub fn shells_to_mesh_builder_events<Params: PmetraModelling + Component + Clone
             continue;
         };
         for (shell_name, meshes_builder) in meshes_builders_by_shell.meshes_builders.iter() {
-            // spawn_meshes_builder_evt.send(SpawnMeshesBuilder {
-            //     shell_name: shell_name.clone(),
-            //     meshes_builder: meshes_builder.clone(),
-            //     belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
-            // });
             *builder_creation_index += 1;
             builder_queue.push_back(SpawnMeshesBuilder {
                 shell_name: shell_name.clone(),
@@ -314,7 +309,6 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
         Without<Cleanup>,
     >,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut events: EventReader<SpawnMeshesBuilder<Params>>,
     mut task_pool: TaskPool<Result<(Mesh, SpawnMeshesBuilder<Params>)>>,
     mut builder_queue: ResMut<MeshesBuilderQueue<Params>>,
     mut builder_queue_inspector: ResMut<MeshesBuilderQueueInspector>,
@@ -331,10 +325,9 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
         let spawn_meshes_builder = spawn_meshes_builder.clone();
         task_pool.spawn(async move {
             let SpawnMeshesBuilder {
-                belongs_to_root,
                 shell_name,
                 meshes_builder,
-                created_at_idx,
+                ..
             } = spawn_meshes_builder.clone();
             let Ok(bevy_mesh) = meshes_builder.build_bevy_mesh() else {
                 warn!("Could not build bevy_mesh for shell_name: {:?}", shell_name);
@@ -396,7 +389,7 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
             belongs_to_root: BelongsToCadGeneratedRoot(root_ent),
             shell_name,
             meshes_builder,
-            created_at_idx,
+            ..
         },
     ) in meshes_builder_task_results_map.values()
     {
@@ -465,7 +458,7 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
     for (
         entity,
         cad_generated_mesh,
-        shell_name,
+        _shell_name,
         mesh_name,
         mesh_builder,
         BelongsToCadGeneratedRoot(root_ent),

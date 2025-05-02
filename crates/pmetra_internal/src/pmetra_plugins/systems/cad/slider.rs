@@ -65,9 +65,7 @@ pub fn slider_drag_start<Params: PmetraInteractions + Component>(
     let slider = drag_event.target;
     let Ok((
         CadGeneratedSliderConfig {
-            thumb_radius,
-            drag_plane_normal,
-            slider_type,
+            drag_plane_normal, ..
         },
         mut slider_state,
         slider_transform,
@@ -161,7 +159,7 @@ pub fn slider_drag_end(
     let Ok((
         mut slider_transform,
         prev_transform,
-        config,
+        _config,
         mut slider_state,
         BelongsToCadGeneratedRoot(cad_root),
     )) = sliders.get_mut(slider)
@@ -221,14 +219,8 @@ pub fn transform_slider_on_pointer_move(
     };
     let root_transform_inverse_affine = root_transform.compute_affine().inverse();
     let hit_point_local_space = root_transform_inverse_affine.transform_point3(hit_point);
-    let Ok((
-        mut transform,
-        CadGeneratedSliderConfig {
-            thumb_radius,
-            drag_plane_normal,
-            slider_type,
-        },
-    )) = sliders.get_mut(*slider)
+    let Ok((mut transform, CadGeneratedSliderConfig { slider_type, .. })) =
+        sliders.get_mut(*slider)
     else {
         error!("Slider not found!");
         return;
@@ -273,12 +265,12 @@ pub fn update_params_from_sliders<Params: PmetraInteractions + Component>(
         slider_name,
         BelongsToCadGeneratedRoot(cad_generated_root),
         transform,
-        mut previous_transform,
-        config,
+        previous_transform,
+        _config,
         state,
     ) in sliders.iter()
     {
-        let Ok((cad_generated_ent, mut params)) = generated_roots.get_mut(*cad_generated_root)
+        let Ok((_cad_generated_ent, mut params)) = generated_roots.get_mut(*cad_generated_root)
         else {
             continue;
         };

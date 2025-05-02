@@ -65,7 +65,7 @@ pub fn add_collider_to_generated_cad_model(
         (With<CadGeneratedMesh>, Changed<Mesh3d>),
     >,
 ) {
-    for (cad_mesh_ent, BelongsToCadGeneratedRoot(cad_root_ent_cur), cad_mesh_name, mesh_hdl) in
+    for (cad_mesh_ent, BelongsToCadGeneratedRoot(_cad_root_ent_cur), cad_mesh_name, mesh_hdl) in
         cad_meshes.iter()
     {
         let Some(mesh) = meshes.get(mesh_hdl) else {

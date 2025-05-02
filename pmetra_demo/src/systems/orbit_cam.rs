@@ -70,7 +70,7 @@ pub fn fire_balls_at_look_point(
     if !keyboard_input.just_pressed(KeyCode::Space) {
         return;
     }
-    let Ok(LookTransform { eye, target, up }) = query_orbit_cam.get_single() else {
+    let Ok(LookTransform { eye, target, .. }) = query_orbit_cam.get_single() else {
         return;
     };
 
@@ -85,7 +85,6 @@ pub fn fire_balls_at_look_point(
     commands.spawn((
         Mesh3d(meshes.add(Sphere {
             radius: BULLET_SPHERE_RADIUS,
-            ..default()
         })),
         MeshMaterial3d(materials.add(Color::WHITE)),
         Transform::from_translation(*eye),

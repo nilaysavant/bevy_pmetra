@@ -42,12 +42,13 @@ pub trait PmetraInteractions: PmetraModelling {
 }
 
 mod test {
-    use crate::pmetra_core::builders::CadSlider;
 
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
     pub fn test_basic_parametric_modelling_trait() {
+        #[allow(dead_code)]
         #[derive(Debug, Clone, Default)]
         pub struct Cube {
             pub width: f64,
@@ -57,7 +58,7 @@ mod test {
             fn shells_builders(&self) -> Result<CadShellsBuilders<Self>> {
                 CadShellsBuilders::default().add_shell_builder(
                     CadShellName("s1".into()),
-                    |p: &Self| Ok(CadShell::default()),
+                    |_p: &Self| Ok(CadShell::default()),
                 )
             }
         }
@@ -79,7 +80,7 @@ mod test {
         }
 
         impl PmetraInteractions for Cube {
-            fn sliders(&self, shells_by_name: &CadShellsByName) -> Result<CadSliders> {
+            fn sliders(&self, _shells_by_name: &CadShellsByName) -> Result<CadSliders> {
                 let mut sliders = CadSliders::default();
                 sliders.insert(CadSliderName("c1".into()), CadSlider::default());
 
@@ -88,28 +89,28 @@ mod test {
 
             fn on_slider_transform(
                 &mut self,
-                name: CadSliderName,
-                prev_transform: Transform,
-                new_transform: Transform,
+                _name: CadSliderName,
+                _prev_transform: Transform,
+                _new_transform: Transform,
             ) {
                 // TODO
             }
 
-            fn on_slider_tooltip(&self, name: CadSliderName) -> Result<Option<String>> {
+            fn on_slider_tooltip(&self, _name: CadSliderName) -> Result<Option<String>> {
                 Ok(None)
             }
         }
 
-        pub fn build_slider_c1(
-            builder: &CadMeshBuilder<Cube>,
-            shell: &CadShell,
+        pub fn _build_slider_c1(
+            _builder: &CadMeshBuilder<Cube>,
+            _shell: &CadShell,
         ) -> Result<CadSlider> {
             Ok(CadSlider::default())
         }
 
         let cube = Cube { width: 1. };
         let cube_shell_builders = cube.shells_builders().unwrap();
-        let build_result = (cube_shell_builders
+        let _build_result = (cube_shell_builders
             .builders
             .get(&CadShellName("s1".into()))
             .unwrap()

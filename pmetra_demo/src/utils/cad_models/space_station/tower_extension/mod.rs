@@ -273,7 +273,7 @@ impl PmetraInteractions for TowerExtension {
                 if delta.length() > 0. {
                     let sensitivity = 1.;
                     let new_value = self.tower_length + delta.y as f64 * sensitivity;
-                    self.tower_length = new_value.clamp(0.01, std::f64::MAX);
+                    self.tower_length = new_value.clamp(0.01, f64::MAX);
                 }
             }
         }

@@ -7,6 +7,7 @@ use bevy::prelude::*;
 #[derive(Debug, Component, Reflect)]
 pub struct WireFrameDisplaySettings(pub bool);
 
+#[allow(clippy::derivable_impls)]
 impl Default for WireFrameDisplaySettings {
     fn default() -> Self {
         Self(false)

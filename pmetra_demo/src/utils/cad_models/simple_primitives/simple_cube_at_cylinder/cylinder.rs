@@ -5,10 +5,13 @@ use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::{anyhow::{anyhow, Context, Result}, truck_modeling::{
-        builder, control_point::ControlPoint, ParametricSurface3D, Point3, Rad, Shell, Vector3,
-        Vertex,
-    }},
+    re_exports::{
+        anyhow::{anyhow, Context, Result},
+        truck_modeling::{
+            builder, control_point::ControlPoint, ParametricSurface3D, Point3, Rad, Shell, Vector3,
+            Vertex,
+        },
+    },
 };
 
 use super::{CadShellIds, SimpleCubeAtCylinder};
@@ -17,8 +20,7 @@ pub fn build_cylinder_shell(params: &SimpleCubeAtCylinder) -> Result<CadShell> {
     let SimpleCubeAtCylinder {
         cylinder_radius,
         cylinder_height,
-        cube_attach_angle,
-        cube_side_length,
+        ..
     } = params.clone();
 
     let mut tagged_elements = CadTaggedElements::default();
@@ -50,12 +52,6 @@ pub fn cylinder_mesh_builder(
     params: &SimpleCubeAtCylinder,
     shell_name: CadShellName,
 ) -> Result<CadMeshBuilder<SimpleCubeAtCylinder>> {
-    let SimpleCubeAtCylinder {
-        cylinder_radius,
-        cylinder_height,
-        cube_attach_angle,
-        cube_side_length,
-    } = &params;
     // spawn entity with generated mesh...
     let transform = Transform::default();
 
@@ -71,10 +67,7 @@ pub fn build_radius_slider(
     cad_shells_by_name: &CadShellsByName,
 ) -> Result<CadSlider> {
     let SimpleCubeAtCylinder {
-        cylinder_radius,
-        cylinder_height,
-        cube_attach_angle,
-        cube_side_length,
+        cylinder_radius, ..
     } = params;
 
     let cad_shell = cad_shells_by_name

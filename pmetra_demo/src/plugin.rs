@@ -20,7 +20,8 @@ use crate::{
         inspector::toggle_inspector_is_active,
         orbit_cam::{fire_balls_at_look_point, orbit_cam_custom_input_map_controller},
         rapier::{control_debug_render, setup_debug_render},
-        scene::{scene_setup, test_manual_mesh_gen}, window::close_on_esc,
+        scene::scene_setup,
+        window::close_on_esc,
     },
     utils::cad_models::{
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,

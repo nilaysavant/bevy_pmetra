@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use bevy::{math::DVec3, prelude::*, transform};
+use bevy::{math::DVec3, prelude::*};
 use bevy_inspector_egui::{inspector_options::ReflectInspectorOptions, InspectorOptions};
 use bevy_pmetra::{prelude::*, re_exports::anyhow::Result};
 use strum::{Display, EnumString};
@@ -153,7 +153,7 @@ impl PmetraInteractions for RoundCabinSegment {
                 if delta.length() > 0. {
                     let sensitivity = 1.0;
                     let new_value = self.profile_extrude_length + delta.z as f64 * sensitivity;
-                    self.profile_extrude_length = new_value.clamp(0.001, std::f64::MAX);
+                    self.profile_extrude_length = new_value.clamp(0.001, f64::MAX);
                 }
             }
             CadSliderIds::CornerRadiusSlider => {
@@ -174,7 +174,7 @@ impl PmetraInteractions for RoundCabinSegment {
                     let new_value = self.profile_width + delta.x as f64 * sensitivity;
                     self.profile_width = new_value.clamp(
                         (self.profile_corner_radius * 2.).max(self.profile_thickness * 2.) + 0.1,
-                        std::f64::MAX,
+                        f64::MAX,
                     );
                 }
             }
@@ -197,7 +197,7 @@ impl PmetraInteractions for RoundCabinSegment {
                     let sensitivity = 1.0;
                     let new_value = self.profile_height + delta.y as f64 * sensitivity;
                     self.profile_height =
-                        new_value.clamp(self.profile_corner_radius * 2. + 0.01, std::f64::MAX);
+                        new_value.clamp(self.profile_corner_radius * 2. + 0.01, f64::MAX);
                 }
             }
             CadSliderIds::WindowTranslationSlider => {
@@ -207,7 +207,6 @@ impl PmetraInteractions for RoundCabinSegment {
                     self.window_translation += delta.as_dvec3() * sensitivity;
                 }
             }
-            _ => {}
         }
     }
 
@@ -234,7 +233,6 @@ impl PmetraInteractions for RoundCabinSegment {
                 "window_translation : [{:.3}, {:.3}, {:.3}]",
                 self.window_translation.x, self.window_translation.y, self.window_translation.z
             )),
-            _ => None,
         };
 
         Ok(tooltip)

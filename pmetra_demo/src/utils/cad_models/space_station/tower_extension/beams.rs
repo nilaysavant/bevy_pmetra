@@ -2,7 +2,10 @@ use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     pmetra_core::extensions::shell::ShellCadExtension,
     prelude::*,
-    re_exports::{anyhow::{Context, Result}, truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire}},
+    re_exports::{
+        anyhow::{Context, Result},
+        truck_modeling::{builder, Point3, Shell, Vector3, Vertex, Wire},
+    },
 };
 use itertools::Itertools;
 
@@ -17,7 +20,7 @@ pub fn build_straight_beam_shell(params: &TowerExtension) -> Result<CadShell> {
         ..
     } = params.clone();
 
-    let mut tagged_elements = CadTaggedElements::default();
+    let tagged_elements = CadTaggedElements::default();
 
     let shell = l_beam_shell(
         straight_beam_l_sect_side_len,
@@ -36,11 +39,10 @@ pub fn build_cross_beam_shell(params: &TowerExtension) -> Result<CadShell> {
     let TowerExtension {
         cross_beam_l_sect_side_len,
         cross_beam_l_sect_thickness,
-        enclosure_profile_width,
         ..
     } = params.clone();
 
-    let mut tagged_elements = CadTaggedElements::default();
+    let tagged_elements = CadTaggedElements::default();
 
     let shell = l_beam_shell(
         cross_beam_l_sect_side_len,
@@ -114,14 +116,7 @@ pub fn straight_beam_mesh_builder(
     shell_name: CadShellName,
     transform: Transform,
 ) -> Result<CadMeshBuilder<TowerExtension>> {
-    let TowerExtension {
-        tower_length,
-        straight_beam_l_sect_side_len,
-        straight_beam_l_sect_thickness,
-        ..
-    } = &params;
     // spawn entity with generated mesh...
-
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
         .set_base_material(Color::from(css::RED).into())?;
@@ -134,11 +129,6 @@ pub fn cross_beam_mesh_builder(
     shell_name: CadShellName,
     transform: Transform,
 ) -> Result<CadMeshBuilder<TowerExtension>> {
-    let TowerExtension {
-        cross_beam_l_sect_side_len,
-        cross_beam_l_sect_thickness,
-        ..
-    } = &params;
     // spawn entity with generated mesh...
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
@@ -149,6 +139,7 @@ pub fn cross_beam_mesh_builder(
 }
 
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
@@ -160,6 +151,6 @@ mod tests {
             ..Default::default()
         };
 
-        let shell = build_straight_beam_shell(&params).unwrap();
+        let _shell = build_straight_beam_shell(&params).unwrap();
     }
 }
