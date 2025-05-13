@@ -37,11 +37,11 @@ pub fn orbit_cam_custom_input_map_controller(
 
     if mouse_buttons.pressed(MouseButton::Right) {
         if keyboard.pressed(KeyCode::ShiftLeft) {
-            events.send(ControlEvent::TranslateTarget(
+            events.write(ControlEvent::TranslateTarget(
                 mouse_translate_sensitivity * cursor_delta,
             ));
         } else {
-            events.send(ControlEvent::Orbit(mouse_rotate_sensitivity * cursor_delta));
+            events.write(ControlEvent::Orbit(mouse_rotate_sensitivity * cursor_delta));
         }
     }
 
@@ -54,7 +54,7 @@ pub fn orbit_cam_custom_input_map_controller(
         };
         scalar *= 1.0 - scroll_amount * mouse_wheel_zoom_sensitivity;
     }
-    events.send(ControlEvent::Zoom(scalar));
+    events.write(ControlEvent::Zoom(scalar));
 }
 
 const IMPULSE_MAG: f32 = 0.0007;
@@ -70,7 +70,7 @@ pub fn fire_balls_at_look_point(
     if !keyboard_input.just_pressed(KeyCode::Space) {
         return;
     }
-    let Ok(LookTransform { eye, target, .. }) = query_orbit_cam.get_single() else {
+    let Ok(LookTransform { eye, target, .. }) = query_orbit_cam.single() else {
         return;
     };
 

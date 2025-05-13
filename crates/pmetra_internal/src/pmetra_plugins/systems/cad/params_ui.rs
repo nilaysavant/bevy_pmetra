@@ -53,10 +53,10 @@ pub fn show_params_display_ui_on_pointer_over_slider<Params: PmetraInteractions 
         With<CadGeneratedSlider>,
     >,
 ) {
-    let Ok((camera, cam_glob_transform)) = cameras.get_single() else {
+    let Ok((camera, cam_glob_transform)) = cameras.single() else {
         return;
     };
-    let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.get_single_mut() else {
+    let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.single_mut() else {
         return;
     };
     let slider = trigger.target;
@@ -89,7 +89,7 @@ pub fn hide_params_display_ui_on_pointer_out_slider(
     _trigger: Trigger<Pointer<Out>>,
     mut ui_nodes: Query<&mut Visibility, With<ParamDisplayUi>>,
 ) {
-    let Ok(mut visibility) = ui_nodes.get_single_mut() else {
+    let Ok(mut visibility) = ui_nodes.single_mut() else {
         return;
     };
     *visibility = Visibility::Hidden;
@@ -106,10 +106,10 @@ pub fn show_params_display_ui_on_pointer_move_drag_plane<Params: PmetraInteracti
         With<CadGeneratedSlider>,
     >,
 ) {
-    let Ok((camera, cam_glob_transform)) = cameras.get_single() else {
+    let Ok((camera, cam_glob_transform)) = cameras.single() else {
         return;
     };
-    let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.get_single_mut() else {
+    let Ok((mut text, mut ui_node_style, mut visibility)) = ui_nodes.single_mut() else {
         return;
     };
     let drag_plane = trigger.target;

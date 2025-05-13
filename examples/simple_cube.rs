@@ -70,7 +70,7 @@ fn scene_setup(
         Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
     ));
     // Spawn the simple cube...
-    spawn_simple_cube.send(GenerateCadModel::default());
+    spawn_simple_cube.write(GenerateCadModel::default());
 }
 
 fn render_origin_gizmo(mut gizmos: Gizmos) {

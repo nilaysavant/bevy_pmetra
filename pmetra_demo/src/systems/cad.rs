@@ -31,24 +31,24 @@ pub fn spawn_cad_model(
     // fire event to spawn new model...
     match cad_model_spawner.selected_params {
         CadGeneratedModelParamsId::SimplCubeAtCylinder => {
-            spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
+            spawn_simple_cube_at_cylinder.write(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::TowerExtension => {
-            tower_extension.send(GenerateCadModel::default());
+            tower_extension.write(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::RoundCabinSegment => {
-            round_cabin_segment.send(GenerateCadModel::default());
+            round_cabin_segment.write(GenerateCadModel::default());
         }
         CadGeneratedModelParamsId::MultiModelsSimplCubeAtCylinderAndTowerExtension => {
-            spawn_simple_cube_at_cylinder.send(GenerateCadModel::default());
-            tower_extension.send(GenerateCadModel {
+            spawn_simple_cube_at_cylinder.write(GenerateCadModel::default());
+            tower_extension.write(GenerateCadModel {
                 remove_existing_models: false,
                 ..Default::default()
             });
         }
         CadGeneratedModelParamsId::MultiModels2TowerExtensions => {
-            tower_extension.send(GenerateCadModel::default());
-            tower_extension.send(GenerateCadModel {
+            tower_extension.write(GenerateCadModel::default());
+            tower_extension.write(GenerateCadModel {
                 transform: Transform::from_translation(Vec3::X * 1.),
                 remove_existing_models: false,
                 ..Default::default()

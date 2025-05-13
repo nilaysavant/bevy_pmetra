@@ -1,4 +1,4 @@
-use bevy::{picking::pointer::PointerInput, platform::collections::HashSet, prelude::*};
+use bevy::{platform::collections::HashSet, prelude::*};
 
 use crate::pmetra_plugins::components::cad::{CadGeneratedRoot, CadGeneratedRootSelectionState};
 
@@ -49,7 +49,7 @@ pub fn root_on_click(
 }
 
 /// Used to de-select all root entities if a pointer has clicked on nothing.
-/// 
+///
 /// Checks if the pointer is down on a window, and if so, de-selects all root entities.
 /// Since this means that pointer did not click on any entity.
 pub fn deselect_all_root_if_clicked_outside(
@@ -57,7 +57,6 @@ pub fn deselect_all_root_if_clicked_outside(
     mut pointer_down: EventReader<Pointer<Pressed>>,
     windows: Query<Entity, With<Window>>,
 ) {
-
     // Pointers that have clicked on something.
     let mut pointer_down_targets = HashSet::new();
 

@@ -1,5 +1,8 @@
 use bevy::{
-    color::palettes::css, ecs::component::Mutable, pbr::{NotShadowCaster, NotShadowReceiver}, prelude::*
+    color::palettes::css,
+    ecs::component::Mutable,
+    pbr::{NotShadowCaster, NotShadowReceiver},
+    prelude::*,
 };
 
 use crate::{
@@ -151,7 +154,7 @@ pub fn slider_drag_end(
         if *cur_slider_entity != slider {
             continue;
         }
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
     // Update prev transform with new transform...
     let Ok((
@@ -177,11 +180,9 @@ pub fn slider_drag_end(
     for (entity, BelongsToCadGeneratedRoot(_cad_root_ent_cur)) in cad_meshes.iter() {
         commands.entity(entity).insert(Pickable::default());
     }
-    commands
-        .entity(*cad_root)
-        .insert(Pickable::default());
+    commands.entity(*cad_root).insert(Pickable::default());
     // Make params ui visible...
-    let Ok(mut params_ui_visibility) = ui_nodes.get_single_mut() else {
+    let Ok(mut params_ui_visibility) = ui_nodes.single_mut() else {
         return;
     };
     *params_ui_visibility = Visibility::Hidden;
