@@ -48,34 +48,34 @@ pub fn root_on_click(
     }
 }
 
+/// Used to de-select all root entities if a pointer has clicked on nothing.
+/// 
+/// Checks if the pointer is down on a window, and if so, de-selects all root entities.
+/// Since this means that pointer did not click on any entity.
 pub fn deselect_all_root_if_clicked_outside(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
     mut pointer_down: EventReader<Pointer<Pressed>>,
-    mut presses: EventReader<PointerInput>,
+    windows: Query<Entity, With<Window>>,
 ) {
-    // Following is borrowed from `bevy_mod_picking`: https://github.com/aevyrie/bevy_mod_picking/blob/0af5d0c80cd027c74373e74bbfe143119f791c06/crates/bevy_picking_selection/src/lib.rs#L155-L214
-    // Used to de-select all root entities if a pointer has clicked on nothing...
 
     // Pointers that have clicked on something.
-    let mut pointer_down_list = HashSet::new();
+    let mut pointer_down_targets = HashSet::new();
 
-    for Pointer { pointer_id, .. } in pointer_down
+    for Pointer { target, .. } in pointer_down
         .read()
         .filter(|pointer| pointer.event.button == PointerButton::Primary)
     {
-        pointer_down_list.insert(pointer_id);
+        pointer_down_targets.insert(target);
     }
-    // If a pointer has pressed, but did not press on anything, this means it clicked on nothing. If
-    // so, and the setting is enabled, deselect everything.
-    for press in presses
-        .read()
-        .filter(|p| p.button_just_pressed(PointerButton::Primary))
-    {
-        let id = press.pointer_id;
-        if !pointer_down_list.contains(&id) {
-            for (_root_ent, mut root_selection_state) in cad_generated.iter_mut() {
-                *root_selection_state = CadGeneratedRootSelectionState::None;
-            }
+
+    for window in windows {
+        if !pointer_down_targets.contains(&window) {
+            // If the pointer is not down on a window, continue since it is down on a valid entity.
+            continue;
+        }
+        // If the pointer is down on a window, then deselect all root entities.
+        for (_root_ent, mut root_selection_state) in cad_generated.iter_mut() {
+            *root_selection_state = CadGeneratedRootSelectionState::None;
         }
     }
 }
