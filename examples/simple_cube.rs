@@ -41,10 +41,10 @@ fn scene_setup(
     commands
         .spawn((
             Camera3d::default(),
-            PerspectiveProjection {
+            Projection::Perspective(PerspectiveProjection {
                 near: 0.001,
-                ..Default::default()
-            },
+                ..default()
+            }),
         ))
         .insert((
             OrbitCameraBundle::new(

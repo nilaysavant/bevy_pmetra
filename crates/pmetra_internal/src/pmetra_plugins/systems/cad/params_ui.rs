@@ -39,7 +39,7 @@ pub fn setup_param_display_ui(mut commands: Commands, cameras: Query<Entity, Add
         BackgroundColor(Color::BLACK.with_alpha(0.8)),
         Visibility::Hidden,
         ParamDisplayUi,
-        PickingBehavior::IGNORE,
+        Pickable::IGNORE,
     ));
 }
 

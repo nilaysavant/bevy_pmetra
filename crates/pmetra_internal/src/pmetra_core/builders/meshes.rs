@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 use truck_meshalgo::tessellation::{MeshableShape, MeshedShape};
 use truck_modeling::{builder, Shell};
 

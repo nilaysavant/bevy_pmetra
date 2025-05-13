@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 
 use bevy::{
     color::palettes::css,
+    ecs::component::Mutable,
     pbr::wireframe::{WireframeConfig, WireframePlugin},
     prelude::*,
 };
@@ -66,7 +67,7 @@ impl Plugin for PmetraBasePlugin {
             if !app.is_plugin_added::<WireframePlugin>() {
                 app.add_plugins(
                     // You need to add this plugin to enable wireframe rendering
-                    WireframePlugin,
+                    WireframePlugin::default(),
                 )
                 // Wireframes can be configured with this resource. This can be changed at runtime.
                 .insert_resource(WireframeConfig {
@@ -185,7 +186,9 @@ pub struct PmetraInteractionsPlugin<Params: PmetraInteractions + Component> {
     _params_type: PhantomData<Params>,
 }
 
-impl<Params: PmetraInteractions + Component + Clone> Plugin for PmetraInteractionsPlugin<Params> {
+impl<Params: PmetraInteractions + Component<Mutability = Mutable> + Clone> Plugin
+    for PmetraInteractionsPlugin<Params>
+{
     fn build(&self, app: &mut App) {
         app // App
             // Sliders...

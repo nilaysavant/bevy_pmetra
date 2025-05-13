@@ -35,10 +35,10 @@ members = ["crates/*", "pmetra_demo"]
 pmetra_internal = { path = "crates/pmetra_internal" }
 
 [dev-dependencies]
-bevy = "0.15"
-smooth-bevy-cameras = "0.13"
-bevy_egui = "0.33"
-bevy-inspector-egui = "0.30"
+bevy = "0.16"
+smooth-bevy-cameras = "0.14"
+bevy_egui = "0.34"
+bevy-inspector-egui = "0.31"
 
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:

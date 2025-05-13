@@ -1,4 +1,4 @@
-use bevy::{picking::pointer::PointerInput, prelude::*, utils::HashSet};
+use bevy::{picking::pointer::PointerInput, platform::collections::HashSet, prelude::*};
 
 use crate::pmetra_plugins::components::cad::{CadGeneratedRoot, CadGeneratedRootSelectionState};
 
@@ -6,7 +6,7 @@ pub fn root_pointer_move(
     pointer_event: Trigger<Pointer<Move>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
 ) {
-    let root_ent = pointer_event.entity();
+    let root_ent = pointer_event.target();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
@@ -19,7 +19,7 @@ pub fn root_pointer_out(
     pointer_event: Trigger<Pointer<Out>>,
     mut cad_generated: Query<&mut CadGeneratedRootSelectionState, With<CadGeneratedRoot>>,
 ) {
-    let root_ent = pointer_event.entity();
+    let root_ent = pointer_event.target();
     let Ok(mut root_selection_state) = cad_generated.get_mut(root_ent) else {
         return;
     };
@@ -35,7 +35,7 @@ pub fn root_on_click(
     if click_event.button != PointerButton::Primary {
         return;
     }
-    let selected_root_ent = click_event.entity();
+    let selected_root_ent = click_event.target();
     for (root_ent, mut root_selection_state) in cad_generated.iter_mut() {
         if root_ent == selected_root_ent {
             *root_selection_state = CadGeneratedRootSelectionState::Selected;
@@ -50,7 +50,7 @@ pub fn root_on_click(
 
 pub fn deselect_all_root_if_clicked_outside(
     mut cad_generated: Query<(Entity, &mut CadGeneratedRootSelectionState), With<CadGeneratedRoot>>,
-    mut pointer_down: EventReader<Pointer<Down>>,
+    mut pointer_down: EventReader<Pointer<Pressed>>,
     mut presses: EventReader<PointerInput>,
 ) {
     // Following is borrowed from `bevy_mod_picking`: https://github.com/aevyrie/bevy_mod_picking/blob/0af5d0c80cd027c74373e74bbfe143119f791c06/crates/bevy_picking_selection/src/lib.rs#L155-L214

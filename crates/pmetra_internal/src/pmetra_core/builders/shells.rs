@@ -1,4 +1,4 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 
 use anyhow::{anyhow, Result};
 use truck_meshalgo::{

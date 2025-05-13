@@ -16,8 +16,8 @@ pub fn configure_custom_gizmos(
 ) {
     // Apply mesh outline width...
     let (gizmo_config, _) = config_store.config_mut::<PmetraMeshOutlineGizmos>();
-    gizmo_config.line_width = global_settings.selected_mesh_outlines_width;
+    gizmo_config.line.width = global_settings.selected_mesh_outlines_width;
     // Apply slider outline width...
     let (gizmo_config, _) = config_store.config_mut::<PmetraSliderOutlineGizmos>();
-    gizmo_config.line_width = global_settings.slider_outlines_width;
+    gizmo_config.line.width = global_settings.slider_outlines_width;
 }

@@ -1,7 +1,5 @@
 use bevy::{
-    color::palettes::css,
-    pbr::{NotShadowCaster, NotShadowReceiver},
-    prelude::*,
+    color::palettes::css, ecs::component::Mutable, pbr::{NotShadowCaster, NotShadowReceiver}, prelude::*
 };
 
 use crate::{
@@ -118,13 +116,13 @@ pub fn slider_drag_start<Params: PmetraInteractions + Component>(
     // Add drag plane as child of root for proper transform...
     commands.entity(*cad_root).add_child(drag_plane);
     // Disable picking on slider, etc...
-    commands.entity(slider).insert(PickingBehavior::IGNORE);
+    commands.entity(slider).insert(Pickable::IGNORE);
     // Disable picking on all meshes (not just belonging to current root)...
     // This makes sure that the drag plane picking is not occluded by any other meshes.
     for (entity, BelongsToCadGeneratedRoot(_cad_root_ent_cur)) in cad_meshes.iter() {
-        commands.entity(entity).insert(PickingBehavior::IGNORE);
+        commands.entity(entity).insert(Pickable::IGNORE);
     }
-    commands.entity(*cad_root).insert(PickingBehavior::IGNORE);
+    commands.entity(*cad_root).insert(Pickable::IGNORE);
 }
 
 pub fn slider_drag_end(
@@ -173,15 +171,15 @@ pub fn slider_drag_end(
     *slider_state = CadGeneratedSliderState::default();
 
     // Make slider, etc pick-able again...
-    commands.entity(slider).insert(PickingBehavior::default());
+    commands.entity(slider).insert(Pickable::default());
     // Enable picking on all meshes (not just belonging to current root)...
     // Since previously (on drag) all were set to ignore picking.
     for (entity, BelongsToCadGeneratedRoot(_cad_root_ent_cur)) in cad_meshes.iter() {
-        commands.entity(entity).insert(PickingBehavior::default());
+        commands.entity(entity).insert(Pickable::default());
     }
     commands
         .entity(*cad_root)
-        .insert(PickingBehavior::default());
+        .insert(Pickable::default());
     // Make params ui visible...
     let Ok(mut params_ui_visibility) = ui_nodes.get_single_mut() else {
         return;
@@ -247,7 +245,7 @@ pub fn transform_slider_on_pointer_move(
     }
 }
 
-pub fn update_params_from_sliders<Params: PmetraInteractions + Component>(
+pub fn update_params_from_sliders<Params: PmetraInteractions + Component<Mutability = Mutable>>(
     mut generated_roots: Query<(Entity, &mut Params), With<CadGeneratedRoot>>,
     sliders: Query<
         (

@@ -1,4 +1,3 @@
-use bevy::utils::HashMap;
 use rustc_hash::FxHashMap;
 #[cfg(not(target_arch = "wasm32"))]
 use truck_meshalgo::tessellation::triangulation::rayon::iter::{
@@ -25,6 +24,8 @@ where
     S: PreMeshableSurface + 'a,
     F: Fn(&S, Point3, Option<(f64, f64)>) -> Option<(f64, f64)> + Parallelizable,
 {
+    use bevy::platform::collections::HashMap;
+
     let vmap: FxHashMap<_, _> = shell
         .vertex_par_iter()
         .map(|v| (v.id(), v.mapped(Point3::clone)))
@@ -87,6 +88,7 @@ where
     S: PreMeshableSurface + 'a,
     F: Fn(&S, Point3, Option<(f64, f64)>) -> Option<(f64, f64)>,
 {
+    use bevy::platform::collections::HashMap;
     use truck_base::entry_map::FxEntryMap as EntryMap;
     use truck_topology::Vertex as TVertex;
 

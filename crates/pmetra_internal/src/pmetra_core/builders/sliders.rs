@@ -1,5 +1,5 @@
 use anyhow::Result;
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 
 #[derive(Debug, Clone, Deref, DerefMut, Default)]
 pub struct CadSliders(pub HashMap<CadSliderName, CadSlider>);

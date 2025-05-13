@@ -49,7 +49,7 @@ pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Cl
         if *remove_existing_models {
             for root_ent in cad_generated.iter() {
                 // Remove root and its descendants...
-                let Some(mut ent_commands) = commands.get_entity(root_ent) else {
+                let Ok(mut ent_commands) = commands.get_entity(root_ent) else {
                     continue;
                 };
                 // Using try_insert to prevent panic...
@@ -423,7 +423,7 @@ pub fn handle_spawn_meshes_builder_events<Params: PmetraModelling + Component + 
                 *cur_mesh_builder = mesh_builder;
             } else {
                 // Spawn new mesh_builder and add to root(if exists)...
-                let Some(mut root_ent_commands) = commands.get_entity(*root_ent) else {
+                let Ok(mut root_ent_commands) = commands.get_entity(*root_ent) else {
                     continue;
                 };
                 root_ent_commands.with_children(|commands| {
@@ -468,7 +468,7 @@ pub fn mesh_builder_to_bundle<Params: PmetraModelling + Component + Clone>(
             // If root is not available, skip...
             continue;
         }
-        let Some(mut ent_commands) = commands.get_entity(entity) else {
+        let Ok(mut ent_commands) = commands.get_entity(entity) else {
             continue;
         };
         let cad_mesh = match mesh_builder.build() {

@@ -1,4 +1,4 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 use truck_modeling::{Edge, Face, Shell, Solid, Vertex, Wire};
 
 /// Holds the [`CadElementTag`] mapped to [`CadElement`]

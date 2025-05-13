@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use bevy::{prelude::*, utils::HashMap};
+use bevy::{platform::collections::HashMap, prelude::*};
 
 use crate::pmetra_core::builders::{CadShellName, PmetraModelling};
 

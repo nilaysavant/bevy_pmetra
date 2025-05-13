@@ -1,4 +1,4 @@
-use bevy::utils::HashMap;
+use bevy::platform::collections::HashMap;
 use truck_meshalgo::{
     prelude::{nonpositive_tolerance, TOLERANCE},
     rexport_polymesh::PolygonMesh,
