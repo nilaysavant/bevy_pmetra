@@ -66,7 +66,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                 ..Default::default()
             },
             BackgroundColor(Color::BLACK.with_alpha(0.8)),
-            PickingBehavior::IGNORE, // Ignore picking events on the UI.
+            Pickable::IGNORE, // Ignore picking events on the UI.
         ))
         .id();
 
@@ -109,7 +109,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                 },
                 BackgroundColor(Color::NONE),
                 shortcut_info,
-                PickingBehavior::IGNORE, // Ignore picking events on the UI.
+                Pickable::IGNORE, // Ignore picking events on the UI.
             ))
             .id();
         commands.entity(root).add_child(shortcut_info);

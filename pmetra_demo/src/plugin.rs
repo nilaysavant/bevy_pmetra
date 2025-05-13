@@ -60,7 +60,9 @@ impl Plugin for PmetraDemoPlugin {
         app // App
             // UI
             // EGUI init...
-            .add_plugins(EguiPlugin)
+            .add_plugins(EguiPlugin {
+                enable_multipass_for_primary_context: false,
+            })
             // window...
             .add_systems(Update, close_on_esc)
             // ENVIRONMENT...
@@ -69,6 +71,7 @@ impl Plugin for PmetraDemoPlugin {
             .insert_resource(AmbientLight {
                 color: Color::WHITE,
                 brightness: 400.,
+                ..Default::default()
             })
             // physics
             .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())

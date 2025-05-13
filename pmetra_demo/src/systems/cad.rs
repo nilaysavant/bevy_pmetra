@@ -23,10 +23,10 @@ pub fn spawn_cad_model(
     }
     // delete all existing models...
     for entity in cad_models.iter() {
-        let Some(ent_commands) = commands.get_entity(entity) else {
+        let Ok(mut ent_commands) = commands.get_entity(entity) else {
             continue;
         };
-        ent_commands.despawn_recursive();
+        ent_commands.despawn();
     }
     // fire event to spawn new model...
     match cad_model_spawner.selected_params {

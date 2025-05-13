@@ -10,11 +10,12 @@ default = []
 dev = ["bevy/dynamic_linking", "bevy/trace", "bevy/file_watcher"]
 
 [dependencies]
-bevy = "0.15"
-bevy_rapier3d = "0.29"
-smooth-bevy-cameras = "0.13"
-bevy_egui = "0.33"
-bevy-inspector-egui = "0.30"
+bevy = "0.16"
+# TODO: Use latest commit of bevy_rapier3d until the crate is released for Bevy 0.16...
+bevy_rapier3d = { git = "https://github.com/dimforge/bevy_rapier", rev = "07e1c5273d4c31cd43db1b0791eb5a7723becd4e" }
+smooth-bevy-cameras = "0.14"
+bevy_egui = "0.34"
+bevy-inspector-egui = "0.31"
 strum = { version = "0.25", features = ["derive"] }
 itertools = "0.12"
 # gltf exporter

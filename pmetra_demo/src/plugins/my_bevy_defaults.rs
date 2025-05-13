@@ -2,12 +2,12 @@ use bevy::{
     app::PluginGroupBuilder,
     asset::AssetMetaCheck,
     log::{Level, LogPlugin},
+    platform::collections::HashMap,
     prelude::*,
     render::{
         settings::{RenderCreation, WgpuFeatures, WgpuSettings},
         RenderPlugin,
     },
-    utils::HashMap,
     window::PresentMode,
 };
 

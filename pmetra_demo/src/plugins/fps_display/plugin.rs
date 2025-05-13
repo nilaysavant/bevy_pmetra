@@ -11,10 +11,12 @@ pub struct FpsDisplayPlugin;
 impl Plugin for FpsDisplayPlugin {
     fn build(&self, app: &mut App) {
         if !app.is_plugin_added::<FrameTimeDiagnosticsPlugin>() {
-            app.add_plugins(FrameTimeDiagnosticsPlugin);
+            app.add_plugins(FrameTimeDiagnosticsPlugin::default());
         }
         if !app.is_plugin_added::<EguiPlugin>() {
-            app.add_plugins(EguiPlugin);
+            app.add_plugins(EguiPlugin {
+                enable_multipass_for_primary_context: false,
+            });
         }
 
         app // app

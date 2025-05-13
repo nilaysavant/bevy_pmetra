@@ -489,8 +489,12 @@ pub fn to_padded_byte_vector<T>(vec: Vec<T>) -> Vec<u8> {
 }
 
 pub fn image_to_uri(image: &Image) -> Result<String> {
-    let rgba = RgbaImage::from_vec(image.width(), image.height(), image.data.clone())
-        .ok_or_else(|| anyhow!("Could not create rgba from bevy Image!"))?;
+    let rgba = RgbaImage::from_vec(
+        image.width(),
+        image.height(),
+        image.data.clone().ok_or(anyhow!("Image data is None!"))?,
+    )
+    .ok_or_else(|| anyhow!("Could not create rgba from bevy Image!"))?;
     let img = image::DynamicImage::ImageRgba8(rgba);
 
     let mut buf = vec![];
