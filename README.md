@@ -19,7 +19,7 @@ Add the dependency in your project's `Cargo.toml`. Make sure you're using the ri
 
 ```toml
 [dependencies]
-bevy_pmetra = { git = "https://github.com/nilaysavant/bevy_pmetra", tag = "v0.3.0" }
+bevy_pmetra = { git = "https://github.com/nilaysavant/bevy_pmetra", tag = "v0.4.0" }
 ```
 
 ## Create Simple Parametric Cube
@@ -278,7 +278,8 @@ Thats it! You can now see the magic:
 
 | bevy | bevy_pmetra        |
 | ---- | ------------------ |
-| 0.15 | `master`, `v0.3.0` |
+| 0.16 | `master`, `v0.4.0` |
+| 0.15 | `v0.3.0`           |
 | 0.14 | `v0.2.x`           |
 | 0.13 | `v0.1.0`           |
 
