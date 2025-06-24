@@ -44,6 +44,14 @@ serve-pmetra-demo-web-release:
 test:
   cargo test
 
+# Build for Vercel deployment.
+vercel-build: build-pmetra-demo-web
+  vercel build
+
+# Build and deploy demo WASM via Vercel.
+vercel-deploy: vercel-build
+  vercel deploy --prebuilt
+
 # List all available recipes.
 list:
   just --list
