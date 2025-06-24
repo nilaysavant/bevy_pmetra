@@ -28,14 +28,6 @@ build-pmetra-demo-web:
   RUSTFLAGS="--cfg=web_sys_unstable_apis" trunk build --release --no-default-features
   echo "trunk build in release mode... done!"
 
-  echo "cd into dist..."
-  cd dist
-
-  echo "fix paths (from absolute to relative) in index.html..."
-  sed -i -e 's/href="/href="./g' index.html
-  sed -i -e "s/'\//'.\//g" index.html
-  echo "fix paths (from absolute to relative) in index.html... done!"
-
 trunk-serve-web:
   #!/bin/bash
 
