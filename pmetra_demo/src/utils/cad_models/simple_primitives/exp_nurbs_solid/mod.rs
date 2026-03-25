@@ -40,9 +40,9 @@ pub struct ExpNurbsSolid {
 impl Default for ExpNurbsSolid {
     fn default() -> Self {
         Self {
-            cylinder_radius: 1.2,
-            cylinder_height: 0.5,
-            cylinder_translation: [0.0, 0.0, 0.0],
+            cylinder_radius: 0.4,
+            cylinder_height: 2.0,
+            cylinder_translation: [0.0, 0.0, 0.5],
             control_point_spacing: 1.0,
             surface_length: 1.0,
             control_points: default_control_points(1.0, 1.0),

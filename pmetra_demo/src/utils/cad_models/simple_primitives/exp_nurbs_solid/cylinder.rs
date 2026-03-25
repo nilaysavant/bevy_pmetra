@@ -8,7 +8,7 @@ use bevy_pmetra::{
     re_exports::{
         anyhow::{anyhow, Context, Result},
         truck_modeling::{
-            builder, control_point::ControlPoint, ParametricSurface3D, Point3, Rad, Shell, Vector3,
+            builder, ParametricSurface3D, Point3, Rad, Shell, Vector3,
             Vertex,
         },
     },
@@ -32,14 +32,25 @@ pub fn build_cylinder_shell(params: &ExpNurbsSolid) -> Result<CadShell> {
     } = params.clone();
 
     let mut tagged_elements = CadTaggedElements::default();
+    let translation = cylinder_translation(params);
+    let sweep_center = Point3::new(
+        translation.x as f64,
+        translation.y as f64,
+        translation.z as f64,
+    );
 
-    let v0 = Vertex::new((DVec3::X * cylinder_radius).to_array().into());
+    let v0 = Vertex::new(
+        (DVec3::X * cylinder_radius
+            + DVec3::new(translation.x as f64, translation.y as f64, translation.z as f64))
+        .to_array()
+        .into(),
+    );
     tagged_elements.insert(
         CadElementTag("VertexV0".into()),
         CadElement::Vertex(v0.clone()),
     );
 
-    let wire = builder::rsweep(&v0, Point3::origin(), Vector3::unit_y(), Rad(TAU + 1.0), 2);
+    let wire = builder::rsweep(&v0, sweep_center, Vector3::unit_y(), Rad(TAU + 1.0), 2);
     let face =
         builder::try_attach_plane(&[wire]).with_context(|| "Could not attach plane to wire")?;
     tagged_elements.insert(
@@ -61,11 +72,11 @@ pub fn cylinder_mesh_builder(
     shell_name: CadShellName,
 ) -> Result<CadMeshBuilder<ExpNurbsSolid>> {
     // spawn entity with generated mesh...
-    let transform = Transform::from_translation(cylinder_translation(params));
+    let transform = Transform::default();
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())? // builder
         .set_transform(transform)?
-        .set_base_material(Color::from(css::RED).into())?;
+        .set_base_material(Color::from(css::RED).with_alpha(0.2).into())?;
 
     Ok(mesh_builder)
 }
@@ -98,11 +109,8 @@ pub fn build_radius_slider(
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
     let left_direction = (face_centroid.as_vec3() - vertex_v0.point().as_bevy_vec3()).normalize();
-    let mesh_transform = Transform::from_translation(cylinder_translation(params));
     let slider_transform = Transform::from_translation(
-        mesh_transform.translation
-            + face_centroid.as_vec3()
-            + left_direction * (*cylinder_radius as f32 + 0.1),
+        face_centroid.as_vec3() + left_direction * (*cylinder_radius as f32 + 0.1),
     )
     .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
@@ -139,9 +147,8 @@ pub fn build_height_slider(
     let face_boundaries = face.boundaries();
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
-    let mesh_transform = Transform::from_translation(cylinder_translation(params));
     let slider_transform = Transform::from_translation(
-        mesh_transform.translation + face_centroid.as_vec3() + Vec3::Y * (*cylinder_height as f32 + 0.1),
+        face_centroid.as_vec3() + Vec3::Y * (*cylinder_height as f32 + 0.1),
     );
 
     Ok(CadSlider {
@@ -177,11 +184,8 @@ pub fn build_move_slider(
     let face_boundaries = face.boundaries();
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
-    let mesh_transform = Transform::from_translation(cylinder_translation(params));
     let slider_transform = Transform::from_translation(
-        mesh_transform.translation
-            + face_centroid.as_vec3()
-            + Vec3::Z * (*cylinder_radius as f32 + 0.1),
+        face_centroid.as_vec3() + Vec3::Z * (*cylinder_radius as f32 + 0.1),
     )
     .with_rotation(get_rotation_from_normals(Vec3::Z, Vec3::Y));
 
