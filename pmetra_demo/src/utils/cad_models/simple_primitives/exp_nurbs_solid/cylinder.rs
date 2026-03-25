@@ -97,12 +97,12 @@ pub fn build_radius_slider(
     let face_boundaries = face.boundaries();
     let face_wire = face_boundaries.last().expect("No wire found!");
     let face_centroid = face_wire.get_centroid();
-    let right_direction = (vertex_v0.point().as_bevy_vec3() - face_centroid.as_vec3()).normalize();
+    let left_direction = (face_centroid.as_vec3() - vertex_v0.point().as_bevy_vec3()).normalize();
     let mesh_transform = Transform::from_translation(cylinder_translation(params));
     let slider_transform = Transform::from_translation(
         mesh_transform.translation
             + face_centroid.as_vec3()
-            + right_direction * (*cylinder_radius as f32 + 0.1),
+            + left_direction * (*cylinder_radius as f32 + 0.1),
     )
     .with_rotation(get_rotation_from_normals(Vec3::Z, face_normal));
 
@@ -110,7 +110,7 @@ pub fn build_radius_slider(
         drag_plane_normal: face_normal,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
-            direction: right_direction,
+            direction: left_direction,
             limit_min: None,
             limit_max: None,
         },
@@ -145,7 +145,7 @@ pub fn build_height_slider(
     );
 
     Ok(CadSlider {
-        drag_plane_normal: Vec3::X,
+        drag_plane_normal: Vec3::Z,
         transform: slider_transform,
         slider_type: CadSliderType::Linear {
             direction: Vec3::Y,

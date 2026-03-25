@@ -162,7 +162,7 @@ impl PmetraInteractions for ExpNurbsSolid {
                 let delta = new_transform.translation - prev_transform.translation;
                 if delta.length() > 0. {
                     let sensitivity = 1.;
-                    let new_value = self.cylinder_radius + delta.x as f64 * sensitivity;
+                    let new_value = self.cylinder_radius - delta.x as f64 * sensitivity;
                     self.cylinder_radius = new_value.clamp(0.01, f64::MAX);
                 }
             }
