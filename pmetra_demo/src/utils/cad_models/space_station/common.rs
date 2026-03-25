@@ -18,7 +18,7 @@ pub fn get_corner_arcs_for_corner_vertices(
     profile_corner_radius: f64,
 ) -> (Edge, Edge, Edge, Edge) {
     // profile arcs...
-    let a0_start = builder::vertex((a0 + DVec3::Y * profile_corner_radius).to_array().into());
+    let a0_start = builder::vertex::<Point3>((a0 + DVec3::Y * profile_corner_radius).to_array().into());
     let a0_center = a0 + DVec3::X * profile_corner_radius + DVec3::Y * profile_corner_radius;
     let a0_end = builder::rotated(
         &a0_start,

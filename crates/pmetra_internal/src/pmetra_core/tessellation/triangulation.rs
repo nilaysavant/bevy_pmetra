@@ -1,4 +1,5 @@
 use rustc_hash::FxHashMap;
+use truck_meshalgo::prelude::triangulation::SP;
 #[cfg(not(target_arch = "wasm32"))]
 use truck_meshalgo::tessellation::triangulation::rayon::iter::{
     IntoParallelIterator, ParallelIterator,
@@ -14,15 +15,14 @@ use crate::pmetra_core::tessellation::{CadMeshedShell, PolylineCurve};
 
 /// Tessellates faces
 #[cfg(not(target_arch = "wasm32"))]
-pub fn shell_tessellation<'a, C, S, F>(
+pub fn shell_tessellation<'a, C, S>(
     shell: &Shell<Point3, C, S>,
     tol: f64,
-    sp: F,
+    sp: impl SP<S>,
 ) -> CadMeshedShell<S>
 where
     C: PolylineableCurve + 'a,
     S: PreMeshableSurface + 'a,
-    F: Fn(&S, Point3, Option<(f64, f64)>) -> Option<(f64, f64)> + Parallelizable,
 {
     use bevy::platform::collections::HashMap;
 
@@ -78,20 +78,18 @@ where
 
 /// Tessellates faces
 #[cfg(any(target_arch = "wasm32", test))]
-pub fn shell_tessellation_single_thread<'a, C, S, F>(
+pub fn shell_tessellation_single_thread<'a, C, S>(
     shell: &'a Shell<Point3, C, S>,
     tol: f64,
-    sp: F,
+    sp: impl SP<S>,
 ) -> CadMeshedShell<S>
 where
     C: PolylineableCurve + 'a,
     S: PreMeshableSurface + 'a,
-    F: Fn(&S, Point3, Option<(f64, f64)>) -> Option<(f64, f64)>,
 {
     use bevy::platform::collections::HashMap;
     use truck_base::entry_map::FxEntryMap as EntryMap;
     use truck_topology::Vertex as TVertex;
-
     let mut vmap = EntryMap::new(
         move |v: &TVertex<Point3>| v.id(),
         move |v| v.mapped(Point3::clone),

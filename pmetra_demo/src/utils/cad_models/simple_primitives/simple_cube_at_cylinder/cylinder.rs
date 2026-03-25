@@ -31,7 +31,7 @@ pub fn build_cylinder_shell(params: &SimpleCubeAtCylinder) -> Result<CadShell> {
         CadElement::Vertex(v0.clone()),
     );
 
-    let wire = builder::rsweep(&v0, Point3::origin(), Vector3::unit_y(), Rad(TAU + 1.0));
+    let wire = builder::rsweep(&v0, Point3::origin(), Vector3::unit_y(), Rad(TAU + 1.0), 2);
     let face =
         builder::try_attach_plane(&[wire]).with_context(|| "Could not attach plane to wire")?;
     tagged_elements.insert(

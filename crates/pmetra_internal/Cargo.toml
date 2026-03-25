@@ -27,11 +27,11 @@ bevy = { version = "0.16", default-features = false, features = [
 anyhow = "1.0"
 strum = { version = "0.25", features = ["derive"] }
 # truck stuff
-truck-modeling = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
-truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
-truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
-truck-topology = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
-truck-base = { git = "https://github.com/nilaysavant/truck.git", tag = "pmetra.v0.1.0" }
+truck-modeling = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
+truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
+truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
+truck-topology = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
+truck-base = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async

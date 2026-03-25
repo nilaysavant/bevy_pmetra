@@ -6,7 +6,7 @@ use bevy_pmetra::{
             filters::OptimizingFilter,
             tessellation::{MeshableShape, MeshedShape},
         },
-        truck_modeling::{builder, cgmath::Vector3},
+        truck_modeling::{Surface, builder, cgmath::Vector3}, truck_topology::Shell,
     },
 };
 use smooth_bevy_cameras::controllers::orbit::{OrbitCameraBundle, OrbitCameraController};
@@ -65,7 +65,7 @@ pub fn test_manual_mesh_gen(
     // connect all arcs with intermediate wires and create a profile...
     let profile = get_profile_from_corner_arcs(&arc0, &arc1, &arc2, &arc3).unwrap();
 
-    let shell = builder::tsweep(&profile, Vector3::unit_z());
+    let shell: Shell<_, _, Surface> = builder::tsweep(&profile, Vector3::unit_z());
 
     let mut polygon_mesh = shell.triangulation(CUSTOM_TRUCK_TOLERANCE_1).to_polygon();
     polygon_mesh.remove_degenerate_faces().remove_unused_attrs();
