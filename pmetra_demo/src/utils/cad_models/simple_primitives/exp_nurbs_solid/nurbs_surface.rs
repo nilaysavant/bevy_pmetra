@@ -89,9 +89,9 @@ pub fn build_control_point_slider(params: &ExpNurbsSolid, index: usize) -> Resul
 }
 
 pub fn build_surface_length_slider(params: &ExpNurbsSolid) -> Result<CadSlider> {
-    let p0 = vec3_from_control_point(params.control_points[0]);
-    let p1 = vec3_from_control_point(params.control_points[4]);
-    let midpoint = (p0 + p1) * 0.5;
+    let p4 = vec3_from_control_point(params.control_points[4]);
+    let p7 = vec3_from_control_point(params.control_points[7]);
+    let midpoint = (p4 + p7) * 0.5;
     let slider_transform = Transform::from_translation(midpoint)
         .with_rotation(get_rotation_from_normals(Vec3::Z, Vec3::Y));
 
