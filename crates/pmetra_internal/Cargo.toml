@@ -33,6 +33,7 @@ truck-shapeops = { git = "https://github.com/nilaysavant/truck.git", rev = "5982
 truck-meshalgo = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
 truck-topology = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
 truck-base = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
+truck-geometry = { git = "https://github.com/nilaysavant/truck.git", rev = "5982eb361999ab8b7f537f39b401fb210a1d537b" }
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async
