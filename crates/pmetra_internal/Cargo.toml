@@ -23,6 +23,7 @@ bevy = { version = "0.16", default-features = false, features = [
     "bevy_mesh_picking_backend",
     # `Window` required for bevy_picking deselect all.
     "bevy_window",
+    "bevy_log",
 ] }
 anyhow = "1.0"
 strum = { version = "0.25", features = ["derive"] }
