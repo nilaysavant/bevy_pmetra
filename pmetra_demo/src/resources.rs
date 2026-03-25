@@ -7,6 +7,7 @@ pub struct CadGeneratedModelSpawner {
 
 #[derive(Debug, Reflect, Default)]
 pub enum CadGeneratedModelParamsId {
+    ExpNurbsSolid,
     SimplCubeAtCylinder,
     TowerExtension,
     RoundCabinSegment,
