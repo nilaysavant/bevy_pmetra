@@ -24,7 +24,7 @@ use crate::{
         window::close_on_esc,
     },
     utils::cad_models::{
-        simple_primitives::exp_nurbs_solid::ExpNurbs,
+        simple_primitives::exp_nurbs::ExpNurbs,
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{
             round_cabin_segment::RoundCabinSegment, tower_extension::TowerExtension,
