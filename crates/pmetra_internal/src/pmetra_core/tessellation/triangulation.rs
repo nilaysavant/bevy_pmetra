@@ -5,7 +5,7 @@ use truck_meshalgo::tessellation::triangulation::rayon::iter::{
     IntoParallelIterator, ParallelIterator,
 };
 use truck_meshalgo::tessellation::{
-    triangulation::shell_create_polygon, Parallelizable, PolylineableCurve, PreMeshableSurface,
+    triangulation::shell_create_polygon, PolylineableCurve, PreMeshableSurface,
 };
 
 use truck_modeling::Point3;
