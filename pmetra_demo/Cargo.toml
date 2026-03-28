@@ -16,7 +16,7 @@ bevy_rapier3d = { git = "https://github.com/dimforge/bevy_rapier", rev = "07e1c5
 smooth-bevy-cameras = "0.14"
 bevy_egui = "0.34"
 bevy-inspector-egui = "0.31"
-strum = { version = "0.25", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
 itertools = "0.12"
 # gltf exporter
 gltf = { version = "1.3", features = [

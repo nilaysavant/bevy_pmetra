@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css, prelude::*};
+use bevy::{color::palettes::css, math::DVec3, prelude::*};
 use bevy_pmetra::{
     math::get_rotation_from_normals,
     pmetra_core::extensions::shell::ShellCadExtension,
@@ -12,26 +12,22 @@ use bevy_pmetra::{
     },
 };
 
-use super::ExpNurbsSolid;
+use super::ExpNurbs;
 
-const CONTROL_POINTS_COUNT: usize = 8;
-const U_COUNT: usize = 4;
-const V_COUNT: usize = 2;
-
-pub fn build_nurbs_surface_shell(params: &ExpNurbsSolid) -> Result<CadShell> {
+pub fn build_nurbs_surface_shell(params: &ExpNurbs) -> Result<CadShell> {
     let tagged_elements = CadTaggedElements::default();
 
     let control_points = params.control_points;
 
     let (p00, p10, p20, p30, p01, p11, p21, p31) = (
-        to_point3(control_points[0]),
-        to_point3(control_points[1]),
-        to_point3(control_points[2]),
-        to_point3(control_points[3]),
-        to_point3(control_points[4]),
-        to_point3(control_points[5]),
-        to_point3(control_points[6]),
-        to_point3(control_points[7]),
+        Point3::from_bevy_dvec3(control_points[0]),
+        Point3::from_bevy_dvec3(control_points[1]),
+        Point3::from_bevy_dvec3(control_points[2]),
+        Point3::from_bevy_dvec3(control_points[3]),
+        Point3::from_bevy_dvec3(control_points[4]),
+        Point3::from_bevy_dvec3(control_points[5]),
+        Point3::from_bevy_dvec3(control_points[6]),
+        Point3::from_bevy_dvec3(control_points[7]),
     );
 
     let v00 = builder::vertex(p00);
@@ -47,8 +43,8 @@ pub fn build_nurbs_surface_shell(params: &ExpNurbsSolid) -> Result<CadShell> {
     let wire = Wire::from(vec![edge_bottom, edge_right, edge_top.inverse(), edge_left]).inverse();
     let bottom_wire = build_bottom_wire_from_control_points(&params.control_points);
 
-    let knot_u = KnotVec::bezier_knot(3);
-    let knot_v = KnotVec::bezier_knot(1);
+    let knot_u = KnotVec::bezier_knot(ExpNurbs::U_COUNT - 1);
+    let knot_v = KnotVec::bezier_knot(ExpNurbs::V_COUNT - 1);
     let control_points = build_surface_control_points(&params.control_points);
     let surface = NurbsSurface::new(BSplineSurface::new((knot_u, knot_v), control_points));
     let top_face = Face::new(vec![wire.clone()], Surface::NurbsSurface(surface));
@@ -68,10 +64,50 @@ pub fn build_nurbs_surface_shell(params: &ExpNurbsSolid) -> Result<CadShell> {
     })
 }
 
+fn build_bottom_wire_from_control_points(points: &[DVec3; ExpNurbs::CONTROL_POINTS_COUNT]) -> Wire {
+    let (mut min_x, mut max_x) = (points[0].x, points[0].x);
+    let (mut min_z, mut max_z) = (points[0].z, points[0].z);
+
+    for point in points.iter().skip(1) {
+        min_x = min_x.min(point.x);
+        max_x = max_x.max(point.x);
+        min_z = min_z.min(point.z);
+        max_z = max_z.max(point.z);
+    }
+
+    let b00 = builder::vertex(Point3::new(min_x, 0.0, min_z));
+    let b30 = builder::vertex(Point3::new(max_x, 0.0, min_z));
+    let b01 = builder::vertex(Point3::new(min_x, 0.0, max_z));
+    let b31 = builder::vertex(Point3::new(max_x, 0.0, max_z));
+
+    let edge_bottom = builder::line::<Curve>(&b00, &b30);
+    let edge_right = builder::line::<Curve>(&b30, &b31);
+    let edge_top = builder::line::<Curve>(&b01, &b31);
+    let edge_left = builder::line::<Curve>(&b01, &b00);
+
+    Wire::from(vec![edge_bottom, edge_right, edge_top.inverse(), edge_left]).inverse()
+}
+
+fn build_surface_control_points(
+    points: &[DVec3; ExpNurbs::CONTROL_POINTS_COUNT],
+) -> Vec<Vec<Vector4>> {
+    let mut control_points =
+        vec![vec![Vector4::new(0.0, 0.0, 0.0, 1.0); ExpNurbs::V_COUNT]; ExpNurbs::U_COUNT];
+
+    for (u, row) in control_points.iter_mut().enumerate() {
+        for (v, cell) in row.iter_mut().enumerate() {
+            let index = (ExpNurbs::V_COUNT - 1 - v) * ExpNurbs::U_COUNT + u;
+            let point = points[index];
+            *cell = Vector4::new(point.x, point.y, point.z, 1.0);
+        }
+    }
+    control_points
+}
+
 pub fn nurbs_surface_mesh_builder(
-    params: &ExpNurbsSolid,
+    params: &ExpNurbs,
     shell_name: CadShellName,
-) -> Result<CadMeshBuilder<ExpNurbsSolid>> {
+) -> Result<CadMeshBuilder<ExpNurbs>> {
     let transform = Transform::default();
 
     let mesh_builder = CadMeshBuilder::new(params.clone(), shell_name.clone())?
@@ -81,14 +117,14 @@ pub fn nurbs_surface_mesh_builder(
     Ok(mesh_builder)
 }
 
-pub fn build_control_point_slider(params: &ExpNurbsSolid, index: usize) -> Result<CadSlider> {
-    if index >= CONTROL_POINTS_COUNT {
+pub fn build_control_point_slider(params: &ExpNurbs, index: usize) -> Result<CadSlider> {
+    if index >= ExpNurbs::CONTROL_POINTS_COUNT {
         return Err(anyhow!("Control point index out of bounds"));
     }
 
-    let mut position = vec3_from_control_point(params.control_points[index]);
+    let mut position = params.control_points[index].as_vec3();
     let z_offset = 0.05;
-    if index < U_COUNT {
+    if index < ExpNurbs::U_COUNT {
         position.z -= z_offset;
     } else {
         position.z += z_offset;
@@ -103,10 +139,10 @@ pub fn build_control_point_slider(params: &ExpNurbsSolid, index: usize) -> Resul
     })
 }
 
-pub fn build_surface_length_slider(params: &ExpNurbsSolid) -> Result<CadSlider> {
-    let p4 = vec3_from_control_point(params.control_points[4]);
-    let p7 = vec3_from_control_point(params.control_points[7]);
-    let mut midpoint = (p4 + p7) * 0.5;
+pub fn build_surface_length_slider(params: &ExpNurbs) -> Result<CadSlider> {
+    let p4 = params.control_points[4];
+    let p7 = params.control_points[7];
+    let mut midpoint = ((p4 + p7) * 0.5).as_vec3();
     midpoint.y = 0.0;
     midpoint += Vec3::Z * 0.15;
     let slider_transform = Transform::from_translation(midpoint)
@@ -122,50 +158,4 @@ pub fn build_surface_length_slider(params: &ExpNurbsSolid) -> Result<CadSlider> 
         },
         ..default()
     })
-}
-
-fn to_point3(point: [f32; 3]) -> Point3 {
-    Point3::new(point[0] as f64, point[1] as f64, point[2] as f64)
-}
-
-fn build_surface_control_points(points: &[[f32; 3]; CONTROL_POINTS_COUNT]) -> Vec<Vec<Vector4>> {
-    let mut control_points = vec![vec![Vector4::new(0.0, 0.0, 0.0, 1.0); V_COUNT]; U_COUNT];
-
-    for (u, row) in control_points.iter_mut().enumerate() {
-        for (v, cell) in row.iter_mut().enumerate() {
-            let index = (V_COUNT - 1 - v) * U_COUNT + u;
-            let point = points[index];
-            *cell = Vector4::new(point[0] as f64, point[1] as f64, point[2] as f64, 1.0);
-        }
-    }
-
-    control_points
-}
-
-fn vec3_from_control_point(point: [f32; 3]) -> Vec3 {
-    Vec3::new(point[0], point[1], point[2])
-}
-
-fn build_bottom_wire_from_control_points(points: &[[f32; 3]; CONTROL_POINTS_COUNT]) -> Wire {
-    let (mut min_x, mut max_x) = (points[0][0], points[0][0]);
-    let (mut min_z, mut max_z) = (points[0][2], points[0][2]);
-
-    for point in points.iter().skip(1) {
-        min_x = min_x.min(point[0]);
-        max_x = max_x.max(point[0]);
-        min_z = min_z.min(point[2]);
-        max_z = max_z.max(point[2]);
-    }
-
-    let b00 = builder::vertex(Point3::new(min_x as f64, 0.0, min_z as f64));
-    let b30 = builder::vertex(Point3::new(max_x as f64, 0.0, min_z as f64));
-    let b01 = builder::vertex(Point3::new(min_x as f64, 0.0, max_z as f64));
-    let b31 = builder::vertex(Point3::new(max_x as f64, 0.0, max_z as f64));
-
-    let edge_bottom = builder::line::<Curve>(&b00, &b30);
-    let edge_right = builder::line::<Curve>(&b30, &b31);
-    let edge_top = builder::line::<Curve>(&b01, &b31);
-    let edge_left = builder::line::<Curve>(&b01, &b00);
-
-    Wire::from(vec![edge_bottom, edge_right, edge_top.inverse(), edge_left]).inverse()
 }

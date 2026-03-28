@@ -5,7 +5,7 @@ use bevy_rapier3d::prelude::*;
 use crate::{
     resources::{CadGeneratedModelParamsId, CadGeneratedModelSpawner},
     utils::cad_models::{
-        simple_primitives::exp_nurbs_solid::ExpNurbsSolid,
+        simple_primitives::exp_nurbs_solid::ExpNurbs,
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{round_cabin_segment::RoundCabinSegment, tower_extension::TowerExtension},
     },
@@ -15,7 +15,7 @@ pub fn spawn_cad_model(
     mut commands: Commands,
     cad_model_spawner: Res<CadGeneratedModelSpawner>,
     cad_models: Query<Entity, With<CadGeneratedRoot>>,
-    mut spawn_exp_nurbs_solid: EventWriter<GenerateCadModel<ExpNurbsSolid>>,
+    mut spawn_exp_nurbs_solid: EventWriter<GenerateCadModel<ExpNurbs>>,
     mut spawn_simple_cube_at_cylinder: EventWriter<GenerateCadModel<SimpleCubeAtCylinder>>,
     mut tower_extension: EventWriter<GenerateCadModel<TowerExtension>>,
     mut round_cabin_segment: EventWriter<GenerateCadModel<RoundCabinSegment>>,

@@ -24,7 +24,7 @@ use crate::{
         window::close_on_esc,
     },
     utils::cad_models::{
-        simple_primitives::exp_nurbs_solid::ExpNurbsSolid,
+        simple_primitives::exp_nurbs_solid::ExpNurbs,
         simple_primitives::simple_cube_at_cylinder::SimpleCubeAtCylinder,
         space_station::{
             round_cabin_segment::RoundCabinSegment, tower_extension::TowerExtension,
@@ -93,9 +93,6 @@ impl Plugin for PmetraDemoPlugin {
                 PmetraBasePlugin {
                     allow_wire_frames: true,
                 },
-                // ExpNurbsSolid
-                PmetraModellingPlugin::<ExpNurbsSolid>::default(),
-                PmetraInteractionsPlugin::<ExpNurbsSolid>::default(),
                 // SimpleCubeAtCylinder
                 PmetraModellingPlugin::<SimpleCubeAtCylinder>::default(),
                 PmetraInteractionsPlugin::<SimpleCubeAtCylinder>::default(),
@@ -105,6 +102,9 @@ impl Plugin for PmetraDemoPlugin {
                 // RoundCabinSegment
                 PmetraModellingPlugin::<RoundCabinSegment>::default(),
                 PmetraInteractionsPlugin::<RoundCabinSegment>::default(),
+                // ExpNurbs
+                PmetraModellingPlugin::<ExpNurbs>::default(),
+                PmetraInteractionsPlugin::<ExpNurbs>::default(),
             ))
             .init_resource::<CadGeneratedModelSpawner>()
             .register_type::<CadGeneratedModelSpawner>()
@@ -118,7 +118,7 @@ impl Plugin for PmetraDemoPlugin {
             // exporter...
             .add_plugins(GltfExporterPlugin)
             // inspectors...
-            .register_type::<ExpNurbsSolid>()
+            .register_type::<ExpNurbs>()
             .register_type::<SimpleCubeAtCylinder>()
             .register_type::<TowerExtension>()
             .register_type::<RoundCabinSegment>()
