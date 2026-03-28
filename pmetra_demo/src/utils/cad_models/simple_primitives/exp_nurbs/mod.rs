@@ -31,8 +31,7 @@ impl ExpNurbs {
     pub const V_COUNT: usize = 2;
 
     pub fn new(control_point_spacing: f64, surface_length: f64, surface_thickness: f64) -> Self {
-        let control_points =
-            Self::default_control_points(control_point_spacing, surface_length, surface_thickness);
+        let control_points = Self::default_control_points(control_point_spacing, surface_length);
         Self {
             control_point_spacing,
             surface_length,
@@ -44,7 +43,6 @@ impl ExpNurbs {
     pub fn default_control_points(
         control_point_spacing: f64,
         surface_length: f64,
-        surface_thickness: f64,
     ) -> [DVec3; Self::CONTROL_POINTS_COUNT] {
         let x0 = 0.0;
         let x1 = control_point_spacing;
@@ -52,7 +50,7 @@ impl ExpNurbs {
         let x3 = control_point_spacing * 3.0;
         let z0 = 0.0;
         let z1 = surface_length;
-        let y = surface_thickness;
+        let y = 1.0;
 
         let control_points = [
             DVec3::new(x0, y, z0),
