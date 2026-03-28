@@ -67,7 +67,7 @@ impl Plugin for PmetraDemoPlugin {
             // ENVIRONMENT...
             .insert_resource(ClearColor(Color::BLACK))
             .insert_resource(DirectionalLightShadowMap { size: 4096 })
-            .insert_resource(AmbientLight {
+            .insert_resource(GlobalAmbientLight {
                 color: Color::WHITE,
                 brightness: 400.,
                 ..Default::default()

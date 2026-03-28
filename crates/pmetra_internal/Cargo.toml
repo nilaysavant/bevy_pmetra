@@ -7,7 +7,7 @@ description = "Internal crate for bevy_pmetra."
 
 
 [dependencies]
-bevy = { version = "0.17", default-features = false, features = [
+bevy = { version = "0.18", default-features = false, features = [
     "std",
     "async_executor",
     "bevy_pbr",
@@ -21,7 +21,7 @@ bevy = { version = "0.17", default-features = false, features = [
     "default_font",
     # Picking features...
     "bevy_picking",
-    "bevy_mesh_picking_backend",
+    "mesh_picking",
     # `Window` required for bevy_picking deselect all.
     "bevy_window",
     "bevy_log",
@@ -38,4 +38,4 @@ truck-geometry = { git = "https://github.com/nilaysavant/truck.git", tag = "pmet
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async
-bevy_async_task = "0.11"
+bevy_async_task = "0.12"

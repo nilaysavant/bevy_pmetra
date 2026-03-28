@@ -35,11 +35,11 @@ members = ["crates/*", "pmetra_demo"]
 pmetra_internal = { path = "crates/pmetra_internal" }
 
 [dev-dependencies]
-bevy = "0.17"
+bevy = "0.18"
 # TODO: Update to once published to crates.io
-smooth-bevy-cameras = { git = "https://github.com/bonsairobo/smooth-bevy-cameras", rev = "1d0da095c73d9706bb86b79ea2ff20b2011b019b" }
-bevy_egui = "0.38"
-bevy-inspector-egui = "0.35"
+smooth-bevy-cameras = { git = "https://github.com/nilaysavant/smooth-bevy-cameras", rev = "8998a69f2509b3b55d00e039043a58c5aba0e8c7" }
+bevy_egui = "0.39"
+bevy-inspector-egui = "0.36"
 
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
