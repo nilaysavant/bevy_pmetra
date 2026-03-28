@@ -50,16 +50,18 @@ impl ExpNurbs {
         let x3 = control_point_spacing * 3.0;
         let z0 = 0.0;
         let z1 = surface_length;
-        let y = 1.0;
+        let y = 0.0;
+        let y_max = 1.0;
+        let y_min = -1.0;
 
         let control_points = [
             DVec3::new(x0, y, z0),
-            DVec3::new(x1, y, z0),
-            DVec3::new(x2, y, z0),
+            DVec3::new(x1, y_min, z0),
+            DVec3::new(x2, y_max, z0),
             DVec3::new(x3, y, z0),
             DVec3::new(x0, y, z1),
-            DVec3::new(x1, y, z1),
-            DVec3::new(x2, y, z1),
+            DVec3::new(x1, y_max, z1),
+            DVec3::new(x2, y_min, z1),
             DVec3::new(x3, y, z1),
         ];
 
@@ -84,8 +86,8 @@ impl ExpNurbs {
 impl Default for ExpNurbs {
     fn default() -> Self {
         let control_point_spacing = 1.0;
-        let surface_length = 1.0;
-        let surface_thickness = 1.0;
+        let surface_length = 2.0;
+        let surface_thickness = 0.15;
 
         Self::new(control_point_spacing, surface_length, surface_thickness)
     }
