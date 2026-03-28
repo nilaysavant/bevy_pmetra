@@ -278,7 +278,7 @@ Thats it! You can now see the magic:
 
 | bevy | bevy_pmetra        |
 | ---- | ------------------ |
-| 0.17 | `master`, `0.6.0`  |
+| 0.17 | `master`, `v0.6.0`  |
 | 0.16 | `v0.4.0`, `v0.5.0` |
 | 0.15 | `v0.3.0`           |
 | 0.14 | `v0.2.x`           |
