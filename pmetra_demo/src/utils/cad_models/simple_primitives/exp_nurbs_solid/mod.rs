@@ -17,12 +17,6 @@ pub mod nurbs_surface;
 #[reflect(InspectorOptions)]
 pub struct ExpNurbsSolid {
     #[inspector(min = 0.1)]
-    pub cylinder_radius: f64,
-    #[inspector(min = 0.1)]
-    pub cylinder_height: f64,
-    #[inspector(min = -10., max = 10.)]
-    pub cylinder_translation: [f32; 3],
-    #[inspector(min = 0.1)]
     pub control_point_spacing: f32,
     #[inspector(min = 0.1)]
     pub surface_length: f32,
@@ -33,9 +27,6 @@ pub struct ExpNurbsSolid {
 impl Default for ExpNurbsSolid {
     fn default() -> Self {
         Self {
-            cylinder_radius: 0.4,
-            cylinder_height: 2.0,
-            cylinder_translation: [0.0, 0.0, 0.5],
             control_point_spacing: 1.0,
             surface_length: 1.0,
             control_points: default_control_points(1.0, 1.0),
@@ -45,13 +36,11 @@ impl Default for ExpNurbsSolid {
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CadShellIds {
-    Cylinder,
     NurbsSurface,
 }
 
 #[derive(Debug, PartialEq, Display, EnumString)]
 pub enum CadMeshIds {
-    Cylinder,
     NurbsSurface,
 }
 
