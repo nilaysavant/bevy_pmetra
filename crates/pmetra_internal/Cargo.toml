@@ -7,13 +7,14 @@ description = "Internal crate for bevy_pmetra."
 
 
 [dependencies]
-bevy = { version = "0.16", default-features = false, features = [
+bevy = { version = "0.17", default-features = false, features = [
     "std",
     "async_executor",
     "bevy_pbr",
     "bevy_render",
     "bevy_text",
     "bevy_ui",
+    "bevy_ui_render",
     "multi_threaded",
     "bevy_gizmos",
     "bevy_color",
@@ -37,4 +38,4 @@ truck-geometry = { git = "https://github.com/nilaysavant/truck.git", tag = "pmet
 # truck deps for custom adaptation...
 rustc-hash = "1.1.0"
 # async
-bevy_async_task = "0.8"
+bevy_async_task = "0.11"

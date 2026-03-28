@@ -1,7 +1,12 @@
 use std::task::Poll;
 
 use anyhow::{anyhow, Result};
-use bevy::{color::palettes::css, pbr::NotShadowCaster, prelude::*, render::primitives::Aabb};
+use bevy::{
+    camera::primitives::Aabb,
+    color::palettes::css,
+    light::NotShadowCaster,
+    prelude::*,
+};
 use bevy_async_task::TaskPool;
 
 use crate::{
@@ -37,7 +42,7 @@ use super::{
 
 pub fn spawn_shells_by_name_on_generate<Params: PmetraModelling + Component + Clone>(
     mut commands: Commands,
-    mut events: EventReader<GenerateCadModel<Params>>,
+    mut events: MessageReader<GenerateCadModel<Params>>,
     cad_generated: Query<Entity, (With<Params>, With<CadGeneratedRoot>, Without<Cleanup>)>,
 ) {
     for GenerateCadModel {

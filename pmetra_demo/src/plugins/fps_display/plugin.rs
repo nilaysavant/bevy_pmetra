@@ -14,9 +14,7 @@ impl Plugin for FpsDisplayPlugin {
             app.add_plugins(FrameTimeDiagnosticsPlugin::default());
         }
         if !app.is_plugin_added::<EguiPlugin>() {
-            app.add_plugins(EguiPlugin {
-                enable_multipass_for_primary_context: false,
-            });
+            app.add_plugins(EguiPlugin::default());
         }
 
         app // app

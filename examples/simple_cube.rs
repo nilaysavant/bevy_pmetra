@@ -36,7 +36,7 @@ fn main() {
 
 fn scene_setup(
     mut commands: Commands,
-    mut spawn_simple_cube: EventWriter<GenerateCadModel<SimpleCube>>,
+    mut spawn_simple_cube: MessageWriter<GenerateCadModel<SimpleCube>>,
 ) {
     commands
         .spawn((

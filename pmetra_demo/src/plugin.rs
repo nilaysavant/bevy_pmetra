@@ -1,4 +1,4 @@
-use bevy::{pbr::DirectionalLightShadowMap, prelude::*};
+use bevy::{light::DirectionalLightShadowMap, prelude::*};
 use bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, ResourceInspectorPlugin};
 use bevy_rapier3d::prelude::*;
@@ -61,9 +61,7 @@ impl Plugin for PmetraDemoPlugin {
         app // App
             // UI
             // EGUI init...
-            .add_plugins(EguiPlugin {
-                enable_multipass_for_primary_context: false,
-            })
+            .add_plugins(EguiPlugin::default())
             // window...
             .add_systems(Update, close_on_esc)
             // ENVIRONMENT...

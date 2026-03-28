@@ -1,7 +1,7 @@
 use bevy::{
     color::palettes::css,
     ecs::component::Mutable,
-    pbr::{NotShadowCaster, NotShadowReceiver},
+    light::{NotShadowCaster, NotShadowReceiver},
     prelude::*,
 };
 
@@ -47,7 +47,7 @@ pub fn update_slider_visibility_based_on_root_selection(
 }
 
 pub fn slider_drag_start<Params: PmetraInteractions + Component>(
-    drag_event: Trigger<Pointer<DragStart>>,
+    drag_event: On<Pointer<DragStart>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -63,7 +63,7 @@ pub fn slider_drag_start<Params: PmetraInteractions + Component>(
     >,
     global_settings: Res<PmetraGlobalSettings>,
 ) {
-    let slider = drag_event.target;
+    let slider = drag_event.entity;
     let Ok((
         CadGeneratedSliderConfig {
             drag_plane_normal, ..
@@ -129,7 +129,7 @@ pub fn slider_drag_start<Params: PmetraInteractions + Component>(
 }
 
 pub fn slider_drag_end(
-    drag_event: Trigger<Pointer<DragEnd>>,
+    drag_event: On<Pointer<DragEnd>>,
     mut commands: Commands,
     cad_slider_drag_planes: Query<
         (Entity, &BelongsToCadGeneratedSlider),
@@ -148,7 +148,7 @@ pub fn slider_drag_end(
     >,
     mut ui_nodes: Query<&mut Visibility, With<ParamDisplayUi>>,
 ) {
-    let slider = drag_event.target;
+    let slider = drag_event.entity;
     // Remove drag planes...
     for (entity, BelongsToCadGeneratedSlider(cur_slider_entity)) in cad_slider_drag_planes.iter() {
         if *cur_slider_entity != slider {
@@ -189,7 +189,7 @@ pub fn slider_drag_end(
 }
 
 pub fn transform_slider_on_pointer_move(
-    trigger: Trigger<Pointer<Move>>,
+    trigger: On<Pointer<Move>>,
     cad_generated: Query<(Entity, &Transform), (With<CadGeneratedRoot>, Without<Cleanup>)>,
     slider_drag_planes: Query<
         (&BelongsToCadGeneratedRoot, &BelongsToCadGeneratedSlider),
@@ -200,7 +200,7 @@ pub fn transform_slider_on_pointer_move(
         (With<CadGeneratedSlider>, Without<CadGeneratedRoot>),
     >,
 ) {
-    let target = trigger.target;
+    let target = trigger.entity;
     let hit = trigger.hit.clone();
     let drag_plane = target;
     let Some(hit_point) = hit.position else {

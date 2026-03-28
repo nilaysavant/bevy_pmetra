@@ -4,14 +4,14 @@ use bevy::{
 };
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::{
-    controllers::orbit::{ControlEvent, OrbitCameraController},
+    controllers::orbit::{ControlMessage, OrbitCameraController},
     LookTransform,
 };
 
 pub fn orbit_cam_custom_input_map_controller(
-    mut events: EventWriter<ControlEvent>,
-    mut mouse_wheel_reader: EventReader<MouseWheel>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut events: MessageWriter<ControlMessage>,
+    mut mouse_wheel_reader: MessageReader<MouseWheel>,
+    mut mouse_motion_events: MessageReader<MouseMotion>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     controllers: Query<&OrbitCameraController>,
@@ -37,11 +37,13 @@ pub fn orbit_cam_custom_input_map_controller(
 
     if mouse_buttons.pressed(MouseButton::Right) {
         if keyboard.pressed(KeyCode::ShiftLeft) {
-            events.write(ControlEvent::TranslateTarget(
+            events.write(ControlMessage::TranslateTarget(
                 mouse_translate_sensitivity * cursor_delta,
             ));
         } else {
-            events.write(ControlEvent::Orbit(mouse_rotate_sensitivity * cursor_delta));
+            events.write(ControlMessage::Orbit(
+                mouse_rotate_sensitivity * cursor_delta,
+            ));
         }
     }
 
@@ -54,7 +56,7 @@ pub fn orbit_cam_custom_input_map_controller(
         };
         scalar *= 1.0 - scroll_amount * mouse_wheel_zoom_sensitivity;
     }
-    events.write(ControlEvent::Zoom(scalar));
+    events.write(ControlMessage::Zoom(scalar));
 }
 
 const IMPULSE_MAG: f32 = 0.0007;

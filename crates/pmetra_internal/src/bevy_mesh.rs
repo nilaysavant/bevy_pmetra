@@ -1,6 +1,5 @@
 use bevy::{
-    prelude::*,
-    render::{mesh::Indices, render_asset::RenderAssetUsages, render_resource::PrimitiveTopology},
+    asset::RenderAssetUsages, mesh::Indices, prelude::*, render::render_resource::PrimitiveTopology,
 };
 use truck_meshalgo::rexport_polymesh::PolygonMesh;
 

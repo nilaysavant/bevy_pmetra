@@ -13,13 +13,13 @@ pub fn fps_text_update_system(
     diagnostics: Res<DiagnosticsStore>,
     mut egui_contexts: EguiContexts,
     settings: Res<FpsDisplayPluginSettings>,
-) {
+) -> Result {
     if !settings.show_fps {
-        return;
+        return Ok(());
     }
     if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         let Some(avg_fps) = fps.average() else {
-            return;
+            return Ok(());
         };
         // println!("fps: {}", avg_fps);
         let frame = get_default_egui_frame();
@@ -30,12 +30,13 @@ pub fn fps_text_update_system(
             .resizable(false)
             .frame(frame)
             .anchor(egui::Align2::LEFT_BOTTOM, egui::vec2(0.0, 0.0))
-            .show(egui_contexts.ctx_mut(), |ui| {
+            .show(egui_contexts.ctx_mut()?, |ui| {
                 ui.vertical(|ui| {
                     ui.label(RichText::new(format!("FPS: {:.0}", avg_fps)));
                 });
             });
     }
+    Ok(())
 }
 
 pub fn get_default_egui_frame() -> egui::Frame {

@@ -15,10 +15,10 @@ pub fn spawn_cad_model(
     mut commands: Commands,
     cad_model_spawner: Res<CadGeneratedModelSpawner>,
     cad_models: Query<Entity, With<CadGeneratedRoot>>,
-    mut spawn_exp_nurbs_solid: EventWriter<GenerateCadModel<ExpNurbs>>,
-    mut spawn_simple_cube_at_cylinder: EventWriter<GenerateCadModel<SimpleCubeAtCylinder>>,
-    mut tower_extension: EventWriter<GenerateCadModel<TowerExtension>>,
-    mut round_cabin_segment: EventWriter<GenerateCadModel<RoundCabinSegment>>,
+    mut spawn_exp_nurbs_solid: MessageWriter<GenerateCadModel<ExpNurbs>>,
+    mut spawn_simple_cube_at_cylinder: MessageWriter<GenerateCadModel<SimpleCubeAtCylinder>>,
+    mut tower_extension: MessageWriter<GenerateCadModel<TowerExtension>>,
+    mut round_cabin_segment: MessageWriter<GenerateCadModel<RoundCabinSegment>>,
 ) {
     if !cad_model_spawner.is_changed() {
         return;

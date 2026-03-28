@@ -97,7 +97,7 @@ pub fn setup_info_ui(mut commands: Commands, cameras: Query<Entity, Added<CadCam
                 },
                 Text::new(format!("[{}: {}]", description, shortcut_label)),
                 TextLayout {
-                    justify: JustifyText::Center,
+                    justify: Justify::Center,
                     linebreak: LineBreak::NoWrap,
                 },
                 Node {
@@ -120,7 +120,7 @@ pub fn update_info_ui(
     mut shortcuts_info: Query<(Entity, &ShortcutInfo, &mut TextColor)>,
     key_input: Res<ButtonInput<KeyCode>>,
     mouse_input: Res<ButtonInput<MouseButton>>,
-    mouse_wheel: EventReader<MouseWheel>,
+    mouse_wheel: MessageReader<MouseWheel>,
 ) {
     let mut shortcuts_pressed_info = shortcuts_info
         .iter()

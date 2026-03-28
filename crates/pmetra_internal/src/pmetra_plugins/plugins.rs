@@ -149,8 +149,8 @@ impl<Params: PmetraModelling + Component + Clone> Plugin for PmetraModellingPlug
     fn build(&self, app: &mut App) {
         // now add param specific stuff...
         app // App
-            .add_event::<GenerateCadModel<Params>>()
-            .add_event::<SpawnMeshesBuilder<Params>>()
+            .add_message::<GenerateCadModel<Params>>()
+            .add_message::<SpawnMeshesBuilder<Params>>()
             .init_resource::<MeshesBuilderQueue<Params>>()
             .init_resource::<MeshesBuilderQueueInspector>()
             .init_resource::<MeshesBuilderFinishedResultsMap<Params>>()

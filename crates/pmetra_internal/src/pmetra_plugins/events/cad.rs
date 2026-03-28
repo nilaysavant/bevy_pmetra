@@ -9,7 +9,7 @@ use crate::{
 ///
 /// Prerequisites:
 /// - Add plugin: [`PmetraModelling<Params>`].
-#[derive(Debug, Event, Reflect)]
+#[derive(Debug, Message, Reflect)]
 pub struct GenerateCadModel<Params: PmetraModelling + Component> {
     /// Params used to generate cad model.
     pub params: Params,
@@ -30,7 +30,7 @@ impl<Params: PmetraModelling + Component + Default> Default for GenerateCadModel
 }
 
 /// Event used to spawn individual mesh builders for parallel meshing.
-#[derive(Debug, Event, Reflect, Clone)]
+#[derive(Debug, Message, Reflect, Clone)]
 pub struct SpawnMeshesBuilder<Params: PmetraModelling + Component> {
     pub belongs_to_root: BelongsToCadGeneratedRoot,
     pub shell_name: CadShellName,

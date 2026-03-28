@@ -2,7 +2,7 @@ use bevy_pmetra::re_exports::anyhow::{anyhow, Result};
 use std::io::Cursor;
 
 use base64::{engine::general_purpose::STANDARD, Engine};
-use bevy::{prelude::*, render::mesh::VertexAttributeValues};
+use bevy::{mesh::VertexAttributeValues, prelude::*};
 use gltf::json;
 use image::RgbaImage;
 use itertools::Itertools;
